@@ -1,0 +1,48 @@
+{
+	"schemaVersion": 1,
+	"id": "vivatech",
+	"version": "${version}",
+	"name": "Vivatech",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"falseresync"
+	],
+	"contact": {
+		"homepage": "https://github.com/falseresync/vivatech",
+		"sources": "https://github.com/falseresync/vivatech",
+		"issues": "https://github.com/falseresync/vivatech/issues"
+	},
+	"license": "Apache-2.0",
+	"icon": "assets/vivatech/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.falseresync.vivatech.common.Vivatech"
+		],
+		"client": [
+			"dev.falseresync.vivatech.client.VivatechClient"
+		],
+		"fabric-datagen": [
+			"dev.falseresync.vivatech.datagen.VivatechDataGenerator"
+		],
+		"cardinal-components": [
+			"dev.falseresync.vivatech.common.VivatechComponents"
+		]
+	},
+	"mixins": [
+		"vivatech.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.6",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*",
+		"libgui": "*",
+		"yet_another_config_lib_v3": "*"
+	},
+	"custom": {
+		"cardinal-components": [
+			"vivatech:power_grid"
+		]
+	}
+}
