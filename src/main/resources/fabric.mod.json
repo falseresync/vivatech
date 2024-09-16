@@ -19,6 +19,9 @@
 		],
 		"fabric-datagen": [
 			"falseresync.vivatech.VivatechDataGenerator"
+		],
+		"cardinal-components": [
+			"falseresync.vivatech.component.entity.VtEntityComponents"
 		]
 	},
 	"mixins": [
@@ -30,7 +33,9 @@
 		"java": ">=21",
 		"fabric-api": "*"
 	},
-	"suggests": {
-		"another-mod": "*"
+	"custom": {
+		"cardinal-components": [
+			"vivatech:collected_blood"
+		]
 	}
 }

@@ -1,24 +1,27 @@
 package falseresync.vivatech;
 
+import falseresync.vivatech.component.item.VtItemComponents;
+import falseresync.vivatech.item.VtItemGroups;
+import falseresync.vivatech.item.VtItems;
 import net.fabricmc.api.ModInitializer;
 
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Vivatech implements ModInitializer {
 	public static final String MOD_ID = "vivatech";
 
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+		VtItems.init();
+		VtItemGroups.init();
+		VtItemComponents.init();
+	}
 
-		LOGGER.info("Hello Fabric world!");
+	public static Identifier vtId(String path) {
+		return Identifier.of(MOD_ID, path);
 	}
 }
