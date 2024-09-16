@@ -1,5 +1,6 @@
 package falseresync.vivatech;
 
+import falseresync.vivatech.block.VtBlocks;
 import falseresync.vivatech.component.item.VtItemComponents;
 import falseresync.vivatech.item.VtItemGroups;
 import falseresync.vivatech.item.VtItems;
@@ -16,6 +17,7 @@ public class Vivatech implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		VtBlocks.init();
 		VtItems.init();
 		VtItemGroups.init();
 		VtItemComponents.init();
