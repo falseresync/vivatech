@@ -35,7 +35,7 @@
 	},
 	"custom": {
 		"cardinal-components": [
-			"vivatech:collected_blood"
+			"vivatech:accumulated_life"
 		]
 	}
 }

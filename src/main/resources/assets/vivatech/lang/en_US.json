@@ -1,4 +1,8 @@
 {
   "itemGroup.vivatech.general": "Vivatech",
-  "item.vivatech.sacrificial_dagger": "Sacrificial Dagger"
+  "item.vivatech.raw_zinc": "Raw Zinc",
+  "item.vivatech.zinc_ingot": "Zinc Ingot",
+  "item.vivatech.zinc_nugget": "Zinc Nugget",
+  "item.vivatech.sacrificial_dagger": "Sacrificial Dagger",
+  "item.vivatech.life_accumulator": "Life Accumulator"
 }

@@ -19,7 +19,12 @@ public class SacrificialDaggerItem extends SwordItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient) {
-            user.sendMessage(Text.literal("Collected blood " + VtEntityComponents.COLLECTED_BLOOD.get(user).getAmount()));
+            if (user.isSneaking()) {
+                user.attack(user);
+                VtEntityComponents.ACCUMULATED_LIFE.get(user).increment(10);
+            }
+
+            user.sendMessage(Text.literal("Collected blood " + VtEntityComponents.ACCUMULATED_LIFE.get(user).getAmount()));
         }
         return super.use(world, user, hand);
     }
@@ -28,7 +33,7 @@ public class SacrificialDaggerItem extends SwordItem {
     public void postDamageEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         super.postDamageEntity(stack, target, attacker);
         if (attacker instanceof PlayerEntity player) {
-            VtEntityComponents.COLLECTED_BLOOD.get(player).add(10);
+            VtEntityComponents.ACCUMULATED_LIFE.get(player).increment(10);
         }
     }
 }
