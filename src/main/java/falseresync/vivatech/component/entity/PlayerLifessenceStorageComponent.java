@@ -73,7 +73,7 @@ public class PlayerLifessenceStorageComponent extends SimpleLifessenceStorage im
     }
 
     private boolean shouldOffload() {
-        return player.getRandom().nextFloat() < (200F / (60 /*s*/ * 20 /*tps*/));
+        return player.getRandom().nextFloat() < (20F / (60 /*s*/ * 20 /*tps*/));
     }
 
     private long calculateOffloadTotal() {

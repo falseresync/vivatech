@@ -12,7 +12,9 @@ public interface LifessenceStoringItem {
     LifessenceStorage getLifessenceStorage(ContainerItemContext context);
 
     default void appendLifessenceTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var storage = getLifessenceStorage(ContainerItemContext.withConstant(stack));
-        tooltip.add(Text.translatable("tooltip.vivatech.lifessence.amount", storage.getAmount(), storage.getCapacity()));
+        if (type.isAdvanced()) {
+            var storage = getLifessenceStorage(ContainerItemContext.withConstant(stack));
+            tooltip.add(Text.translatable("tooltip.vivatech.lifessence.stored_amount", storage.getAmount(), storage.getCapacity()));
+        }
     }
 }

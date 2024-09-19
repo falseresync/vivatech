@@ -1,0 +1,9 @@
+{
+  "itemGroup.vivatech.general": "Vivatech",
+  "item.vivatech.raw_zinc": "Rohzink",
+  "item.vivatech.zinc_ingot": "Zinkbarren",
+  "item.vivatech.zinc_nugget": "Zinkklumpen",
+  "item.vivatech.sacrificial_dagger": "Opfernder Dolch",
+  "item.vivatech.lifessence_accumulator": "Lebessenzsammler",
+  "tooltip.vivatech.lifessence.stored_amount": "Lebessenz gespeichert: %1$s / §6%2$s"
+}

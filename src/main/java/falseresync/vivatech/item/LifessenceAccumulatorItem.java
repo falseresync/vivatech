@@ -57,7 +57,7 @@ public class LifessenceAccumulatorItem extends Item implements LifessenceStoring
                     }
                     var newVariant = ItemVariant.of(stack);
                     try (var tx = transaction.openNested()) {
-                        if (context.exchange(newVariant, 1, transaction) == 1) {
+                        if (context.exchange(newVariant, 1, tx) == 1) {
                             tx.commit();
                             return amountChange;
                         }

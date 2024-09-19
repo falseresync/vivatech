@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "b": {
+      "item": "minecraft:string"
+    },
+    "f": {
+      "item": "minecraft:flint"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "z": {
+      "item": "vivatech:zinc_ingot"
+    }
+  },
+  "pattern": [
+    " zf",
+    "sb "
+  ],
+  "result": {
+    "count": 1,
+    "id": "vivatech:sacrificial_dagger"
+  }
+}

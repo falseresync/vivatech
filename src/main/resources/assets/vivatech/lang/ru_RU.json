@@ -1,0 +1,9 @@
+{
+  "itemGroup.vivatech.general": "Vivatech",
+  "item.vivatech.raw_zinc": "Необработанный цинк",
+  "item.vivatech.zinc_ingot": "Цинковый слиток",
+  "item.vivatech.zinc_nugget": "Кусочек цинка",
+  "item.vivatech.sacrificial_dagger": "Жертвенный кинжал",
+  "item.vivatech.lifessence_accumulator": "Накопитель жизнессенции",
+  "tooltip.vivatech.lifessence.stored_amount": "Хранится жизнессенции: %1$s / §6%2$s"
+}

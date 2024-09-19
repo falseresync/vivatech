@@ -18,7 +18,7 @@
 			"falseresync.vivatech.Vivatech"
 		],
 		"fabric-datagen": [
-			"falseresync.vivatech.VivatechDataGenerator"
+			"falseresync.vivatech.datagen.VivatechDatagen"
 		],
 		"cardinal-components": [
 			"falseresync.vivatech.component.entity.VtEntityComponents"

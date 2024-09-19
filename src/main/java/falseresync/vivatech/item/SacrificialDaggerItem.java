@@ -25,7 +25,7 @@ public class SacrificialDaggerItem extends SwordItem {
                 user.attack(user);
             }
 
-            user.sendMessage(Text.literal("Collected blood " + VtEntityComponents.PLAYER_LIFESSENCE_STORAGE.get(user).getAmount()));
+//            user.sendMessage(Text.literal("Collected blood " + VtEntityComponents.PLAYER_LIFESSENCE_STORAGE.get(user).getAmount()));
         }
         return super.use(world, user, hand);
     }
