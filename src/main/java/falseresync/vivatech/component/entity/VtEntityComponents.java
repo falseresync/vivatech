@@ -9,11 +9,11 @@ import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import static falseresync.vivatech.Vivatech.vtId;
 
 public class VtEntityComponents implements EntityComponentInitializer {
-    public static final ComponentKey<AccumulatedLifeComponent> ACCUMULATED_LIFE =
-            ComponentRegistry.getOrCreate(vtId("accumulated_life"), AccumulatedLifeComponent.class);
+    public static final ComponentKey<PlayerLifessenceStorageComponent> PLAYER_LIFESSENCE_STORAGE =
+            ComponentRegistry.getOrCreate(vtId("accumulated_life"), PlayerLifessenceStorageComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerForPlayers(ACCUMULATED_LIFE, AccumulatedLifeComponent::new, RespawnCopyStrategy.INVENTORY);
+        registry.registerForPlayers(PLAYER_LIFESSENCE_STORAGE, PlayerLifessenceStorageComponent::new, RespawnCopyStrategy.INVENTORY);
     }
 }

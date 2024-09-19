@@ -13,8 +13,8 @@ import java.lang.reflect.Modifier;
  * <p>In your ModInitializer:
  * <pre>{@code
  * new AutoRegistry("mod_id", LOGGER)
- *      .run(Registries.BLOCK, MyBlocks.class)
- *      .run(Registries.ITEM, MyItems.class);
+ *      .link(Registries.BLOCK, MyBlocks.class)
+ *      .link(Registries.ITEM, MyItems.class);
  * }</pre>
  *
  * <p>In your MyBlocks/Items/etc classes:
@@ -43,29 +43,29 @@ public class AutoRegistry {
      * @param <T> type parameter must match the type of the fields
      * @implNote help
      */
-    public <T> AutoRegistry run(Registry<T> registry, Class<?> holderClass) {
-        for (var field : holderClass.getDeclaredFields()) {
-            var modifiers = field.getModifiers();
-            var annotations = field.getAnnotationsByType(RegistryObject.class);
-            if (!Modifier.isStatic(modifiers)
-                    || !Modifier.isPublic(modifiers)
-                    || annotations.length == 0) {
-                continue;
-            }
-
-            try {
-                var registryObject = field.get(holderClass);
-                if (registryObject == null) {
-                    logger.warn("Found a null @RegistryObject field, discarding: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+    public <T> AutoRegistry link(Registry<T> registry, Class<?>... holderClasses) {
+        for (var holderClass : holderClasses) {
+            for (var field : holderClass.getDeclaredFields()) {
+                var modifiers = field.getModifiers();
+                var annotations = field.getAnnotationsByType(RegistryObject.class);
+                if (!Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers) || annotations.length == 0) {
                     continue;
                 }
 
-                //noinspection unchecked
-                Registry.register(registry, Identifier.of(modId, field.getName().toLowerCase()), (T) registryObject);
-            } catch (IllegalAccessException e) {
-                throw new InaccessibleObjectException("Couldn't read a @RegistryObject field: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
-            } catch (ClassCastException e) {
-                throw new IllegalArgumentException("A @RegistryObject field's type doesn't match the provided registry: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                try {
+                    var registryObject = field.get(holderClass);
+                    if (registryObject == null) {
+                        logger.warn("Found a null @RegistryObject field, discarding: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                        continue;
+                    }
+
+                    //noinspection unchecked
+                    Registry.register(registry, Identifier.of(modId, field.getName().toLowerCase()), (T) registryObject);
+                } catch (IllegalAccessException e) {
+                    throw new InaccessibleObjectException("Couldn't read a @RegistryObject field: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                } catch (ClassCastException e) {
+                    throw new IllegalArgumentException("A @RegistryObject field's type doesn't match the provided registry: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                }
             }
         }
         return this;

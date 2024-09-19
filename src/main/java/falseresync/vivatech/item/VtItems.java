@@ -14,6 +14,6 @@ public final class VtItems {
                     new Item.Settings().maxCount(1).maxDamage(256).rarity(Rarity.UNCOMMON)
                             .attributeModifiers(SacrificialDaggerItem.createAttributeModifiers(
                                     VtToolMaterials.ZINC, 2, -2.0f)));
-    public static final @RegistryObject LifeAccumulatorItem LIFE_ACCUMULATOR =
-            new LifeAccumulatorItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE));
+    public static final @RegistryObject LifessenceAccumulatorItem LIFESSENCE_ACCUMULATOR =
+            new LifessenceAccumulatorItem(100L, new Item.Settings().maxCount(1).rarity(Rarity.RARE));
 }

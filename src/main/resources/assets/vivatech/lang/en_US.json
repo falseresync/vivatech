@@ -4,5 +4,6 @@
   "item.vivatech.zinc_ingot": "Zinc Ingot",
   "item.vivatech.zinc_nugget": "Zinc Nugget",
   "item.vivatech.sacrificial_dagger": "Sacrificial Dagger",
-  "item.vivatech.life_accumulator": "Life Accumulator"
+  "item.vivatech.lifessence_accumulator": "Life Accumulator",
+  "tooltip.vivatech.lifessence.amount": "Lifessence stored: %1$s / §6%2$s"
 }

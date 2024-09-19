@@ -23,6 +23,6 @@ public final class VtModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(VtItems.ZINC_INGOT, Models.GENERATED);
         itemModelGenerator.register(VtItems.ZINC_NUGGET, Models.GENERATED);
         itemModelGenerator.register(VtItems.SACRIFICIAL_DAGGER, Models.GENERATED);
-        itemModelGenerator.register(VtItems.LIFE_ACCUMULATOR, Models.GENERATED);
+        itemModelGenerator.register(VtItems.LIFESSENCE_ACCUMULATOR, Models.GENERATED);
     }
 }

@@ -14,7 +14,7 @@ public final class VtItemGroups {
                 entries.add(VtItems.ZINC_INGOT);
                 entries.add(VtItems.ZINC_NUGGET);
                 entries.add(VtItems.SACRIFICIAL_DAGGER);
-                entries.add(VtItems.LIFE_ACCUMULATOR);
+                entries.add(VtItems.LIFESSENCE_ACCUMULATOR);
             })
             .build();
 }
