@@ -1,11 +1,11 @@
-package falseresync.vivatech;
+package falseresync.vivatech.common;
 
 import falseresync.vivatech.api.registry.AutoRegistry;
-import falseresync.vivatech.block.VtBlocks;
-import falseresync.vivatech.component.item.VtItemComponents;
-import falseresync.vivatech.item.VtItemGroups;
-import falseresync.vivatech.item.VtItems;
-import falseresync.vivatech.lifessence.Lifessence;
+import falseresync.vivatech.common.block.VivatechBlocks;
+import falseresync.vivatech.common.component.item.VivatechItemComponents;
+import falseresync.vivatech.common.item.VivatechItemGroups;
+import falseresync.vivatech.common.item.VivatechItems;
+import falseresync.vivatech.api.lifessence.Lifessence;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.registry.Registries;
@@ -21,10 +21,10 @@ public class Vivatech implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		new AutoRegistry(MOD_ID, LOGGER)
-				.link(Registries.BLOCK, VtBlocks.class)
-				.link(Registries.DATA_COMPONENT_TYPE, VtItemComponents.class)
-				.link(Registries.ITEM, VtItems.class)
-				.link(Registries.ITEM_GROUP, VtItemGroups.class);
+				.link(Registries.BLOCK, VivatechBlocks.class)
+				.link(Registries.DATA_COMPONENT_TYPE, VivatechItemComponents.class)
+				.link(Registries.ITEM, VivatechItems.class)
+				.link(Registries.ITEM_GROUP, VivatechItemGroups.class);
 		Lifessence.init();
 	}
 

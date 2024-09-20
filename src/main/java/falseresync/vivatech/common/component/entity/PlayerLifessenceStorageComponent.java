@@ -1,8 +1,8 @@
-package falseresync.vivatech.component.entity;
+package falseresync.vivatech.common.component.entity;
 
-import falseresync.vivatech.lifessence.Lifessence;
-import falseresync.vivatech.lifessence.LifessenceStorage;
-import falseresync.vivatech.lifessence.base.SimpleLifessenceStorage;
+import falseresync.vivatech.api.lifessence.Lifessence;
+import falseresync.vivatech.api.lifessence.LifessenceStorage;
+import falseresync.vivatech.api.lifessence.base.SimpleLifessenceStorage;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
-import org.apache.commons.lang3.stream.Streams;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 

@@ -1,4 +1,4 @@
-package falseresync.vivatech.item;
+package falseresync.vivatech.common.item;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.block.Block;
@@ -9,8 +9,8 @@ import net.minecraft.registry.tag.TagKey;
 
 import java.util.function.Supplier;
 
-public enum VtToolMaterials implements ToolMaterial {
-    ZINC(BlockTags.INCORRECT_FOR_IRON_TOOL, 131, 10.0F, 1.0F, 22, () -> Ingredient.ofItems(VtItems.ZINC_INGOT)),;
+public enum VivatechToolMaterials implements ToolMaterial {
+    ZINC(BlockTags.INCORRECT_FOR_IRON_TOOL, 131, 10.0F, 1.0F, 22, () -> Ingredient.ofItems(VivatechItems.ZINC_INGOT)),;
 
     private final TagKey<Block> inverseTag;
     private final int itemDurability;
@@ -19,7 +19,7 @@ public enum VtToolMaterials implements ToolMaterial {
     private final int enchantability;
     private final Supplier<Ingredient> repairIngredient;
 
-    VtToolMaterials(
+    VivatechToolMaterials(
             final TagKey<Block> inverseTag,
             final int itemDurability,
             final float miningSpeed,

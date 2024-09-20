@@ -1,10 +1,10 @@
-package falseresync.vivatech.item;
+package falseresync.vivatech.common.item;
 
 import com.google.common.base.Preconditions;
-import falseresync.vivatech.component.item.VtItemComponents;
-import falseresync.vivatech.lifessence.LifessenceStorage;
-import falseresync.vivatech.lifessence.LifessenceStoringItem;
-import falseresync.vivatech.lifessence.base.SimpleLifessenceStorage;
+import falseresync.vivatech.common.component.item.VivatechItemComponents;
+import falseresync.vivatech.api.lifessence.LifessenceStorage;
+import falseresync.vivatech.api.lifessence.LifessenceStoringItem;
+import falseresync.vivatech.api.lifessence.base.SimpleLifessenceStorage;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
@@ -27,7 +27,7 @@ public class LifessenceAccumulatorItem extends Item implements LifessenceStoring
     public LifessenceStorage getLifessenceStorage(ContainerItemContext context) {
         Preconditions.checkArgument(!context.getItemVariant().isBlank() && context.getAmount() > 0, "Cannot retrieve Lifessence storage from an empty stack");
         var stack = context.getItemVariant().toStack();
-        return new SimpleLifessenceStorage(capacity, stack.getOrDefault(VtItemComponents.LIFESSENCE, 0L)) {
+        return new SimpleLifessenceStorage(capacity, stack.getOrDefault(VivatechItemComponents.LIFESSENCE, 0L)) {
             @Override
             public boolean supportsInsertion() {
                 return true;
@@ -51,9 +51,9 @@ public class LifessenceAccumulatorItem extends Item implements LifessenceStoring
             private long saveToStack(long amountChange, TransactionContext transaction) {
                 if (amountChange > 0) {
                     if (getAmount() > 0) {
-                        stack.set(VtItemComponents.LIFESSENCE, getAmount());
+                        stack.set(VivatechItemComponents.LIFESSENCE, getAmount());
                     } else {
-                        stack.remove(VtItemComponents.LIFESSENCE);
+                        stack.remove(VivatechItemComponents.LIFESSENCE);
                     }
                     var newVariant = ItemVariant.of(stack);
                     try (var tx = transaction.openNested()) {
@@ -76,7 +76,7 @@ public class LifessenceAccumulatorItem extends Item implements LifessenceStoring
 
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
-        return stack.contains(VtItemComponents.LIFESSENCE);
+        return stack.contains(VivatechItemComponents.LIFESSENCE);
     }
 
     @Override
@@ -86,6 +86,6 @@ public class LifessenceAccumulatorItem extends Item implements LifessenceStoring
 
     @Override
     public int getItemBarStep(ItemStack stack) {
-        return Math.clamp(Math.round(stack.getOrDefault(VtItemComponents.LIFESSENCE, 0L) * 13F / capacity), 0, 13);
+        return Math.clamp(Math.round(stack.getOrDefault(VivatechItemComponents.LIFESSENCE, 0L) * 13F / capacity), 0, 13);
     }
 }

@@ -1,12 +1,12 @@
-package falseresync.vivatech.lifessence;
+package falseresync.vivatech.api.lifessence;
 
-import falseresync.vivatech.component.entity.VtEntityComponents;
+import falseresync.vivatech.common.component.entity.VivatechEntityComponents;
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.entity.EntityType;
 
-import static falseresync.vivatech.Vivatech.vtId;
+import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class Lifessence {
     public static final ItemApiLookup<LifessenceStorage, ContainerItemContext> ITEM =
@@ -32,6 +32,6 @@ public class Lifessence {
             }
             return null;
         });
-        ENTITY.registerForType((entity, unused) -> VtEntityComponents.PLAYER_LIFESSENCE_STORAGE.get(entity), EntityType.PLAYER);
+        ENTITY.registerForType((entity, unused) -> VivatechEntityComponents.PLAYER_LIFESSENCE_STORAGE.get(entity), EntityType.PLAYER);
     }
 }

@@ -15,13 +15,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"falseresync.vivatech.Vivatech"
+			"falseresync.vivatech.common.Vivatech"
 		],
 		"fabric-datagen": [
 			"falseresync.vivatech.datagen.VivatechDatagen"
 		],
 		"cardinal-components": [
-			"falseresync.vivatech.component.entity.VtEntityComponents"
+          "falseresync.vivatech.component.entity.VivatechEntityComponents"
 		]
 	},
 	"mixins": [

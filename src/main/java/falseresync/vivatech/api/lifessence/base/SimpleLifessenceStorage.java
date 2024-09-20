@@ -1,6 +1,6 @@
-package falseresync.vivatech.lifessence.base;
+package falseresync.vivatech.api.lifessence.base;
 
-import falseresync.vivatech.lifessence.LifessenceStorage;
+import falseresync.vivatech.api.lifessence.LifessenceStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;

@@ -1,4 +1,4 @@
-package falseresync.vivatech.lifessence;
+package falseresync.vivatech.api.lifessence;
 
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.item.Item;
