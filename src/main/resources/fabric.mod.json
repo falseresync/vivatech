@@ -21,7 +21,7 @@
 			"falseresync.vivatech.datagen.VivatechDatagen"
 		],
 		"cardinal-components": [
-          "falseresync.vivatech.component.entity.VivatechEntityComponents"
+          "falseresync.vivatech.common.component.entity.VivatechEntityComponents"
 		]
 	},
 	"mixins": [

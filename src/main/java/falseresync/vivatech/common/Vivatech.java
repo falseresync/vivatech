@@ -3,6 +3,7 @@ package falseresync.vivatech.common;
 import falseresync.vivatech.api.registry.AutoRegistry;
 import falseresync.vivatech.common.block.VivatechBlocks;
 import falseresync.vivatech.common.component.item.VivatechItemComponents;
+import falseresync.vivatech.common.entity.VivatechEntities;
 import falseresync.vivatech.common.item.VivatechItemGroups;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.api.lifessence.Lifessence;
@@ -24,11 +25,16 @@ public class Vivatech implements ModInitializer {
 				.link(Registries.BLOCK, VivatechBlocks.class)
 				.link(Registries.DATA_COMPONENT_TYPE, VivatechItemComponents.class)
 				.link(Registries.ITEM, VivatechItems.class)
-				.link(Registries.ITEM_GROUP, VivatechItemGroups.class);
+				.link(Registries.ITEM_GROUP, VivatechItemGroups.class)
+				.link(Registries.ENTITY_TYPE, VivatechEntities.class);
 		Lifessence.init();
 	}
 
 	public static Identifier vtId(String path) {
 		return Identifier.of(MOD_ID, path);
+	}
+
+	public static Identifier vtTexId(String path) {
+		return vtId("textures/" + path + ".png");
 	}
 }
