@@ -6,7 +6,7 @@ import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
-import static falseresync.vivatech.common.Vivatech.vtId;
+import static falseresync.vivatech.common.VivatechCommon.vtId;
 
 public class VivatechEntityComponents implements EntityComponentInitializer {
     public static final ComponentKey<PlayerLifessenceStorageComponent> PLAYER_LIFESSENCE_STORAGE =

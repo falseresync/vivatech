@@ -6,7 +6,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.util.Identifier;
 
-import static falseresync.vivatech.common.Vivatech.vtTexId;
+import static falseresync.vivatech.common.VivatechCommon.vtTexId;
 
 public class AutomatonEntityRenderer extends MobEntityRenderer<AutomatonEntity, AutomatonEntityModel> {
     public static final Identifier TEXTURE = vtTexId("entity/automaton");

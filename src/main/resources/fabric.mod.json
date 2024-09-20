@@ -15,7 +15,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"falseresync.vivatech.common.Vivatech"
+			"falseresync.vivatech.common.VivatechCommon"
+		],
+		"client": [
+			"falseresync.vivatech.client.VivatechClient"
 		],
 		"fabric-datagen": [
 			"falseresync.vivatech.datagen.VivatechDatagen"

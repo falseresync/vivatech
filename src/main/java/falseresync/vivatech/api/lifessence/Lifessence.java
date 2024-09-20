@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.entity.EntityType;
 
-import static falseresync.vivatech.common.Vivatech.vtId;
+import static falseresync.vivatech.common.VivatechCommon.vtId;
 
 public class Lifessence {
     public static final ItemApiLookup<LifessenceStorage, ContainerItemContext> ITEM =
