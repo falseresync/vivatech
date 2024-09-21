@@ -8,7 +8,7 @@ import net.minecraft.entity.SpawnGroup;
 public class VivatechEntities {
     public static final @RegistryObject EntityType<AutomatonEntity> AUTOMATON = FabricEntityType.Builder
             .createMob(AutomatonEntity::new, SpawnGroup.MISC, automaton -> automaton
-                    .defaultAttributes(AutomatonEntity::createMobAttributes))
+                    .defaultAttributes(AutomatonEntity::createAutomatonAttributes))
             .dimensions(16 / 16f, 16 / 16f)
             .eyeHeight(14 / 16f)
             .build("automaton");
