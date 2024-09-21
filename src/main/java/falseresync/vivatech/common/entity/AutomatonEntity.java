@@ -1,8 +1,13 @@
 package falseresync.vivatech.common.entity;
 
 import com.mojang.serialization.Dynamic;
+import falseresync.vivatech.api.inventory.ImplementedSidedInventory;
+import falseresync.vivatech.api.inventory.SidedInventoryBuilder;
+import falseresync.vivatech.api.inventory.SimpleInventoryBuilder;
+import falseresync.vivatech.api.inventory.SlotDescription;
 import falseresync.vivatech.client.screen.AutomatonScreen;
 import falseresync.vivatech.common.entity.brain.AutomatonBrain;
+import falseresync.vivatech.common.item.VivatechItems;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -27,10 +32,20 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class AutomatonEntity extends PathAwareEntity implements InventoryOwner {
-    private final SimpleInventory inventory = new SimpleInventory(8);
+    public static final SlotDescription SLOT_ENGINE = SlotDescription
+            .of(0, input -> input.isOf(VivatechItems.LIFESSENCE_ACCUMULATOR), null);
+    public static final SlotDescription SLOT_CORE = SlotDescription.of(1);
+    public static final SlotDescription SLOT_TOOL = SlotDescription.of(2);
+    public static final SlotDescription SLOT_INVENTORY_1 = SlotDescription.of(3);
+    public static final SlotDescription SLOT_INVENTORY_2 = SlotDescription.of(4);
+    public static final SlotDescription SLOT_INVENTORY_3 = SlotDescription.of(5);
+    private final SimpleInventory inventory = new SimpleInventoryBuilder()
+            .addSlots(SLOT_ENGINE, SLOT_CORE, SLOT_TOOL, SLOT_INVENTORY_1, SLOT_INVENTORY_2, SLOT_INVENTORY_3)
+            .build();
 
     protected AutomatonEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
+        setCanPickUpLoot(true);
     }
 
     /**
@@ -95,6 +110,7 @@ public class AutomatonEntity extends PathAwareEntity implements InventoryOwner {
     @Override
     protected void loot(ItemEntity item) {
         InventoryOwner.pickUpItem(this, this, item);
+//        System.out.println(inventory);
     }
 
     @Override
