@@ -1,10 +1,8 @@
 package falseresync.vivatech.common.entity;
 
 import com.mojang.serialization.Dynamic;
-import falseresync.vivatech.api.inventory.ImplementedSidedInventory;
-import falseresync.vivatech.api.inventory.SidedInventoryBuilder;
-import falseresync.vivatech.api.inventory.SimpleInventoryBuilder;
-import falseresync.vivatech.api.inventory.SlotDescription;
+import falseresync.vivatech.api.inventory.BetterInventory;
+import falseresync.vivatech.api.inventory.InventoryBuilder;
 import falseresync.vivatech.client.screen.AutomatonScreen;
 import falseresync.vivatech.common.entity.brain.AutomatonBrain;
 import falseresync.vivatech.common.item.VivatechItems;
@@ -12,16 +10,16 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.InventoryOwner;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -31,16 +29,14 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class AutomatonEntity extends PathAwareEntity implements InventoryOwner {
-    public static final SlotDescription SLOT_ENGINE = SlotDescription
-            .of(0, input -> input.isOf(VivatechItems.LIFESSENCE_ACCUMULATOR), null);
-    public static final SlotDescription SLOT_CORE = SlotDescription.of(1);
-    public static final SlotDescription SLOT_TOOL = SlotDescription.of(2);
-    public static final SlotDescription SLOT_INVENTORY_1 = SlotDescription.of(3);
-    public static final SlotDescription SLOT_INVENTORY_2 = SlotDescription.of(4);
-    public static final SlotDescription SLOT_INVENTORY_3 = SlotDescription.of(5);
-    private final SimpleInventory inventory = new SimpleInventoryBuilder()
-            .addSlots(SLOT_ENGINE, SLOT_CORE, SLOT_TOOL, SLOT_INVENTORY_1, SLOT_INVENTORY_2, SLOT_INVENTORY_3)
+public class AutomatonEntity extends PathAwareEntity {
+    private final BetterInventory inventory = new InventoryBuilder()
+            .addSlot(stack -> stack.isOf(VivatechItems.LIFESSENCE_ACCUMULATOR)) // Engine
+            .addSlot(stack -> false) // Core
+            .addSlot(stack -> stack.isIn(ItemTags.PICKAXES)) // Tool
+            .addSlot(null) // Inventory 1
+            .addSlot(null) // Inventory 2
+            .addSlot(null) // Inventory 3
             .build();
 
     protected AutomatonEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
@@ -109,7 +105,20 @@ public class AutomatonEntity extends PathAwareEntity implements InventoryOwner {
 
     @Override
     protected void loot(ItemEntity item) {
-        InventoryOwner.pickUpItem(this, this, item);
+        var stack = item.getStack();
+        if (canGather(stack)) {
+            if (!inventory.canInsert(stack)) return;
+
+            triggerItemPickedUpByEntityCriteria(item);
+            int initialCount = stack.getCount();
+            var remainingStack = inventory.addStack(stack);
+            sendPickup(item, initialCount - remainingStack.getCount());
+            if (remainingStack.isEmpty()) {
+                item.discard();
+            } else {
+                stack.setCount(remainingStack.getCount());
+            }
+        }
 //        System.out.println(inventory);
     }
 
@@ -118,22 +127,18 @@ public class AutomatonEntity extends PathAwareEntity implements InventoryOwner {
         return super.canPickupItem(stack);
     }
 
-    @Override
-    public SimpleInventory getInventory() {
-        return inventory;
-    }
 
     // DATA
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        readInventory(nbt, getRegistryManager());
+        Inventories.readNbt(nbt, inventory.getStacks(), getRegistryManager());
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        writeInventory(nbt, getRegistryManager());
+        Inventories.writeNbt(nbt, inventory.getStacks(), getRegistryManager());
     }
 }
