@@ -4,6 +4,8 @@ import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
 import com.google.common.graph.Traverser;
+import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -41,15 +43,15 @@ public class Grid {
     }
 
     public boolean add(GridEdge edge) {
-        var nodeU = PowerSystem.APPLIANCE.find(world, edge.u(), null);
-        var nodeV = PowerSystem.APPLIANCE.find(world, edge.v(), null);
+        var applianceU = PowerSystem.APPLIANCE.find(world, edge.u(), null);
+        var applianceV = PowerSystem.APPLIANCE.find(world, edge.v(), null);
 
-        if (nodeU != null && nodeV != null) {
-            var wasModified = graph.addEdge(nodeU.asNode(), nodeV.asNode(), edge);
+        if (applianceU != null && applianceV != null) {
+            var wasModified = graph.addEdge(applianceU.asNode(), applianceV.asNode(), edge);
             if (wasModified) {
                 gridsManager.onWireAdded(edge.toServerWire());
-                initOrMerge(nodeU);
-                initOrMerge(nodeV);
+                initOrMerge(applianceU);
+                initOrMerge(applianceV);
             }
             return wasModified;
         }
@@ -104,7 +106,6 @@ public class Grid {
 
         // Couldn't find a bypass - must create a new Power systems
         // Here we don't really care if it's breadth or depth
-        // TODO: still doesn't work properly :p
         partition(nodes.nodeU());
         partition(nodes.nodeV());
 
@@ -113,17 +114,24 @@ public class Grid {
 
     private void partition(GridNode startingNode) {
         var visitedEdges = new ObjectOpenHashSet<GridEdge>();
+        var partitioned = new ObjectArrayList<Pair<EndpointPair<GridNode>, GridEdge>>();
         for (var node : Traverser.forGraph(graph).breadthFirst(startingNode)) {
             for (var edge : graph.incidentEdges(node)) {
                 if (!visitedEdges.contains(edge)) {
+                    partitioned.add(Pair.of(graph.incidentNodes(edge), edge));
                     visitedEdges.add(edge);
                 }
             }
         }
 
-        if (!visitedEdges.isEmpty()) {
+        if (!partitioned.isEmpty()) {
             var other = gridsManager.create();
-            visitedEdges.forEach(other::add);
+            partitioned.forEach(pair -> {
+                other.graph.addEdge(pair.left(), pair.right());
+                pair.left().forEach(node -> {
+                    gridsManager.getGridLookup().put(node.appliance().getGridUuid(), this);
+                });
+            });
         }
     }
 
