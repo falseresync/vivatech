@@ -1,6 +1,5 @@
 package falseresync.vivatech.client.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import falseresync.lib.math.VectorMath;
 import falseresync.vivatech.client.VivatechClient;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -12,6 +11,8 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import java.util.Map;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
@@ -46,13 +47,19 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
             var sprite = WIRE_TEX.getSprite();
             var buffer = sprite.getTextureSpecificVertexConsumer(context.consumers().getBuffer(RenderLayer.getCutout()));
 
-            matrices.multiply(VectorMath.swingTwistDecomposition(context.camera().getRotation(), wireEnd.normalize(new Vector3f())).getRight());
+//            matrices.multiply(VectorMath.swingTwistDecomposition(context.camera().getRotation(), wireEnd.normalize(new Vector3f())).getRight());
 
-            var length = wireEnd.length();
+            var length = wireEnd.length() * 8;
+            var lengthSquared = Math.pow(length, 2);
+            var lengthHalvedSquared = Math.pow(length / 2f, 2);
             var segmentStart = new Vector3f(wireStart);
-            var segmentEnd = wireEnd.mul(1f / length);
-            var segmentStep = wireEnd.normalize(new Vector3f());
+            var segmentStep = wireEnd.normalize(new Vector3f()).mul(1 / 8f);
+            var segmentEnd = new Vector3f(segmentStep);
+            double previousSagging = 0;
             for (int i = 0; i < length; i++) {
+                var sagging = (Math.pow((i - length / 2f), 2) - lengthHalvedSquared) / lengthSquared;
+                matrices.translate(0, sagging - previousSagging, 0);
+                previousSagging = sagging;
                 drawSegment(buffer, positionMatrix, segmentStart, segmentEnd, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV(), tint, light, overlay, normal);
                 segmentStart.add(segmentStep);
                 segmentEnd.add(segmentStep);
@@ -65,12 +72,11 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
     private static void drawSegment(VertexConsumer buffer, Matrix4f positionMatrix, Vector3f vUpLeft, Vector3f vDownRight, float u1, float u2, float v1, float v2, int tint, int light, int overlay, Vector3f normal) {
         var vDownLeft = new Vector3f(vUpLeft.x, vDownRight.y, vUpLeft.z);
         var vUpRight = new Vector3f(vDownRight.x, vUpLeft.y, vDownRight.z);
-
-        quad(buffer, positionMatrix, vUpLeft, vDownLeft, vDownRight, vUpRight, u1, u2, v1, v2, tint, light, overlay, normal);
-        quad(buffer, positionMatrix, vUpRight, vDownRight, vDownLeft, vUpLeft, u1, u2, v1, v2, tint, light, overlay, normal.negate());
+        drawQuad(buffer, positionMatrix, vUpLeft, vDownLeft, vDownRight, vUpRight, u1, u2, v1, v2, tint, light, overlay, normal);
+        drawQuad(buffer, positionMatrix, vUpRight, vDownRight, vDownLeft, vUpLeft, u1, u2, v1, v2, tint, light, overlay, normal.negate());
     }
 
-    private static void quad(VertexConsumer buffer, Matrix4f positionMatrix, Vector3f vUpLeft, Vector3f vDownLeft, Vector3f vDownRight, Vector3f vUpRight, float u1, float u2, float v1, float v2, int tint, int light, int overlay, Vector3f normal) {
+    private static void drawQuad(VertexConsumer buffer, Matrix4f positionMatrix, Vector3f vUpLeft, Vector3f vDownLeft, Vector3f vDownRight, Vector3f vUpRight, float u1, float u2, float v1, float v2, int tint, int light, int overlay, Vector3f normal) {
         setupVertex(vUpLeft, buffer, positionMatrix, u1, v1, tint, light, overlay, normal);
         setupVertex(vDownLeft, buffer, positionMatrix, u2, v1, tint, light, overlay, normal);
         setupVertex(vDownRight, buffer, positionMatrix, u2, v2, tint, light, overlay, normal);
