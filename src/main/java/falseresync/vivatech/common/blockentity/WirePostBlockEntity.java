@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.blockentity;
 
-import falseresync.vivatech.common.power.PowerNode;
-import falseresync.vivatech.common.power.PowerSystem;
+import falseresync.vivatech.common.power.Appliance;
+import falseresync.vivatech.common.power.Grid;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -14,9 +14,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class WirePostBlockEntity extends BlockEntity implements Ticking, PowerNode {
+public class WirePostBlockEntity extends BlockEntity implements Ticking, Appliance {
     private final UUID powerNodeUuid = UUID.randomUUID();
-    private @Nullable PowerSystem powerSystem;
+    private @Nullable Grid grid;
     public WirePostBlockEntity(BlockPos pos, BlockState state) {
         super(VtBlockEntities.WIRE_POST, pos, state);
     }
@@ -48,17 +48,7 @@ public class WirePostBlockEntity extends BlockEntity implements Ticking, PowerNo
     }
 
     @Override
-    public @Nullable PowerSystem getPowerSystem() {
-        return powerSystem;
-    }
-
-    @Override
-    public void setPowerSystem(@Nullable PowerSystem powerSystem) {
-        this.powerSystem = powerSystem;
-    }
-
-    @Override
-    public UUID getPowerNodeUuid() {
+    public UUID getGridUuid() {
         return powerNodeUuid;
     }
 }

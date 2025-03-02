@@ -6,26 +6,24 @@ import falseresync.vivatech.common.data.VtComponents;
 import falseresync.vivatech.common.item.VtItemGroups;
 import falseresync.vivatech.common.item.VtItems;
 import falseresync.lib.registry.AutoRegistry;
+import falseresync.vivatech.common.power.Grid;
 import falseresync.vivatech.common.power.PowerSystem;
-import falseresync.vivatech.common.power.PowerSystemsManager;
+import falseresync.vivatech.common.power.ServerGridsLoader;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VtServerReceivers;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Vivatech implements ModInitializer {
 	public static final String MOD_ID = "vivatech";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	private static PowerSystemsManager powerSystemsManager;
+	private static ServerGridsLoader serverGridsLoader;
 
 	@Override
 	public void onInitialize() {
@@ -35,28 +33,27 @@ public class Vivatech implements ModInitializer {
 				.link(Registries.BLOCK_ENTITY_TYPE, VtBlockEntities.class)
 				.link(Registries.ITEM_GROUP, VtItemGroups.class)
 				.link(Registries.DATA_COMPONENT_TYPE, VtComponents.class);
-		PowerSystemsManager.registerAll();
+		PowerSystem.registerAll();
 
 		VivatechNetworking.registerAll();
 		VtServerReceivers.registerAll();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			powerSystemsManager = new PowerSystemsManager(server);
+			serverGridsLoader = new ServerGridsLoader(server);
 		});
 
 		ServerLifecycleEvents.AFTER_SAVE.register((server, flush, force) -> {
-			powerSystemsManager.save();
+			serverGridsLoader.save();
 		});
 
 		ServerTickEvents.END_WORLD_TICK.register(world -> {
-			powerSystemsManager.getAll(world).forEach(PowerSystem::tick);
-			powerSystemsManager.sendUnsyncedWires();
-			powerSystemsManager.sendRequestedWires();
+			serverGridsLoader.getGridsManager(world).getGrids().forEach(Grid::tick);
+			serverGridsLoader.sendWires();
 		});
 	}
 
-	public static PowerSystemsManager getPowerSystemsManager() {
-		return powerSystemsManager;
+	public static ServerGridsLoader getServerGridsLoader() {
+		return serverGridsLoader;
 	}
 
 	public static Identifier vtId(String path) {

@@ -13,28 +13,28 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class VivatechClient implements ClientModInitializer {
-    private static PowerSystemsRenderManager powerSystemsRenderManager;
+    private static ClientWireManager clientWireManager;
 
     @Override
     public void onInitializeClient() {
         VtClientReceivers.registerAll();
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            powerSystemsRenderManager = new PowerSystemsRenderManager(client);
+            clientWireManager = new ClientWireManager(client);
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            powerSystemsRenderManager.tick();
+            clientWireManager.tick();
         });
 
         ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            if (powerSystemsRenderManager != null) {
-                powerSystemsRenderManager.queueUnsyncedChunk(chunk.getPos());
+            if (clientWireManager != null) {
+                clientWireManager.queueUnsyncedChunk(chunk.getPos());
             }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            var wires = powerSystemsRenderManager.getWires();
+            var wires = clientWireManager.getWires();
             if (wires.isEmpty()) {
                 return;
             }
@@ -43,7 +43,7 @@ public class VivatechClient implements ClientModInitializer {
                 matrices.push();
 
                 // Adjust location
-                var translation = context.camera().getPos().relativize(wire.from().toCenterPos());
+                var translation = context.camera().getPos().relativize(wire.u().toCenterPos());
                 matrices.translate(translation.x, translation.y, translation.z);
 
 //                var light = WorldRenderer.getLightmapCoordinates(context.world(), conn.from());
@@ -56,7 +56,7 @@ public class VivatechClient implements ClientModInitializer {
                 var x1 = 0;
                 var y1 = 0;
                 var z1 = 0;
-                var vertex2 = wire.from().toCenterPos().relativize(wire.to().toCenterPos()).toVector3f();
+                var vertex2 = wire.u().toCenterPos().relativize(wire.v().toCenterPos()).toVector3f();
                 var normal = context.camera().getPos().subtract(wire.middle()).normalize().toVector3f();
                 var normalNeg = normal.negate();
 
@@ -90,7 +90,7 @@ public class VivatechClient implements ClientModInitializer {
         });
     }
 
-    public static PowerSystemsRenderManager getPowerSystemsRenderManager() {
-        return powerSystemsRenderManager;
+    public static ClientWireManager getClientWireManager() {
+        return clientWireManager;
     }
 }

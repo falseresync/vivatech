@@ -11,15 +11,30 @@ import java.util.Set;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public record WiresPayload(Set<Wire> wires) implements CustomPayload {
-    public static final CustomPayload.Id<WiresPayload> ID = new Id<>(vtId("wires"));
-    public static final PacketCodec<RegistryByteBuf, WiresPayload> PACKET_CODEC = PacketCodec.tuple(
-            PacketCodecs.collection(ObjectOpenHashSet::new, Wire.PACKET_CODEC), WiresPayload::wires,
-            WiresPayload::new
-    );
+public class WiresPayload {
+    public record Added(Set<Wire> wires) implements CustomPayload {
+        public static final CustomPayload.Id<WiresPayload.Added> ID = new Id<>(vtId("wires_added"));
+        public static final PacketCodec<RegistryByteBuf, WiresPayload.Added> PACKET_CODEC = PacketCodec.tuple(
+                PacketCodecs.collection(ObjectOpenHashSet::new, Wire.PACKET_CODEC), WiresPayload.Added::wires,
+                WiresPayload.Added::new
+        );
 
-    @Override
-    public Id<WiresPayload> getId() {
-        return ID;
+        @Override
+        public Id<WiresPayload.Added> getId() {
+            return ID;
+        }
+    }
+
+    public record Removed(Set<Wire> wires) implements CustomPayload {
+        public static final CustomPayload.Id<WiresPayload.Removed> ID = new Id<>(vtId("wires_removed"));
+        public static final PacketCodec<RegistryByteBuf, WiresPayload.Removed> PACKET_CODEC = PacketCodec.tuple(
+                PacketCodecs.collection(ObjectOpenHashSet::new, Wire.PACKET_CODEC), WiresPayload.Removed::wires,
+                WiresPayload.Removed::new
+        );
+
+        @Override
+        public Id<WiresPayload.Removed> getId() {
+            return ID;
+        }
     }
 }

@@ -11,24 +11,21 @@ import net.minecraft.util.math.ChunkPos;
 import java.util.List;
 import java.util.Set;
 
-public class PowerSystemsRenderManager {
+public class ClientWireManager {
     private final MinecraftClient client;
     private final Set<Wire> wires = new ObjectOpenHashSet<>();
     private final List<ChunkPos> unsyncedChunks = new ObjectArrayList<>();
 
-    public PowerSystemsRenderManager(MinecraftClient client) {
+    public ClientWireManager(MinecraftClient client) {
         this.client = client;
     }
 
-    public void onWires(Set<Wire> wires) {
+    public void onWiresAdded(Set<Wire> wires) {
         this.wires.addAll(wires);
-        wires.forEach(wire -> {
-            if (wire.removed()) {
-                this.wires.remove(wire);
-            } else {
-                this.wires.add(wire);
-            }
-        });
+    }
+
+    public void onWiresRemoved(Set<Wire> wires) {
+        this.wires.removeAll(wires);
     }
 
     public Set<Wire> getWires() {

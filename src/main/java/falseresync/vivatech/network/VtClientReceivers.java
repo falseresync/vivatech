@@ -6,10 +6,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class VtClientReceivers {
     public static void registerAll() {
-        ClientPlayNetworking.registerGlobalReceiver(WiresPayload.ID, VtClientReceivers::onWires);
+        ClientPlayNetworking.registerGlobalReceiver(WiresPayload.Added.ID, VtClientReceivers::onWiresAdded);
+        ClientPlayNetworking.registerGlobalReceiver(WiresPayload.Removed.ID, VtClientReceivers::onWiresRemoved);
     }
 
-    private static void onWires(WiresPayload payload, ClientPlayNetworking.Context context) {
-        VivatechClient.getPowerSystemsRenderManager().onWires(payload.wires());
+    private static void onWiresAdded(WiresPayload.Added payload, ClientPlayNetworking.Context context) {
+        VivatechClient.getClientWireManager().onWiresAdded(payload.wires());
+    }
+
+    private static void onWiresRemoved(WiresPayload.Removed payload, ClientPlayNetworking.Context context) {
+        VivatechClient.getClientWireManager().onWiresRemoved(payload.wires());
     }
 }

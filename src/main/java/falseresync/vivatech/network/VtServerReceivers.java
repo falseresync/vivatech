@@ -10,6 +10,6 @@ public class VtServerReceivers {
     }
 
     private static void onRequestWires(RequestWiresPayload payload, ServerPlayNetworking.Context context) {
-        Vivatech.getPowerSystemsManager().queueWiresRequest(context.player().getServerWorld(), payload.chunks());
+        Vivatech.getServerGridsLoader().onWiresRequested(context.player().getServerWorld(), payload.chunks());
     }
 }

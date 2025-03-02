@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.power.PowerNode;
+import falseresync.vivatech.common.power.Appliance;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
@@ -13,21 +13,11 @@ public class ConnectorItem extends WireManagementItem {
     }
 
     @Override
-    protected ActionResult manageWire(World world, PowerNode previousNode, PowerNode currentNode, GlobalPos previous, BlockPos currentPos) {
+    protected ActionResult manageWire(World world, Appliance applianceU, Appliance applianceV, GlobalPos anchor, BlockPos currentPos) {
         if (!world.isClient) {
-            var previousSystem = previousNode.getPowerSystem();
-            if (previousSystem != null) {
-                previousSystem.add(previous.pos(), currentPos);
-            } else {
-                var currentSystem = currentNode.getPowerSystem();
-                if (currentSystem != null) {
-                    currentSystem.add(currentPos, previous.pos());
-                } else {
-                    var newSystem = Vivatech.getPowerSystemsManager().create(world);
-                    newSystem.add(previous.pos(), currentPos);
-                }
-            }
-
+            var gridsManager = Vivatech.getServerGridsLoader().getGridsManager(world);
+            var grid = gridsManager.findOrCreate(applianceU.getGridUuid(), applianceV.getGridUuid());
+            grid.add(anchor.pos(), currentPos);
             return ActionResult.CONSUME;
         }
 

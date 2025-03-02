@@ -1,45 +1,33 @@
 package falseresync.vivatech.common.power;
 
-import com.mojang.serialization.Codec;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-public record Wire(Set<BlockPos> positions, BlockPos from, BlockPos to, Vec3d middle, ChunkPos chunkPos, double squaredLength, double length, boolean removed) {
-    public static final Codec<Wire> CODEC =
-            Codec.list(BlockPos.CODEC, 2, 2).xmap(it -> new Wire(it.getFirst(), it.getLast()), it -> List.of(it.from, it.to));
+public record Wire(ImmutableSet<BlockPos> positions, BlockPos u, BlockPos v, Vec3d middle, ChunkPos chunkPos) {
     public static final PacketCodec<RegistryByteBuf, Wire> PACKET_CODEC = PacketCodec.tuple(
-            BlockPos.PACKET_CODEC, Wire::from,
-            BlockPos.PACKET_CODEC, Wire::to,
-            PacketCodecs.BOOL, Wire::removed,
-            Wire::new
+            BlockPos.PACKET_CODEC, Wire::u,
+            BlockPos.PACKET_CODEC, Wire::v,
+            Wire::createClientWire
     );
 
-    private Wire(BlockPos from, BlockPos to, Vec3d middle, double squaredLength, boolean removed) {
-        this(
-                Set.of(from, to), from, to, middle,
-                new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z)),
-                squaredLength, Math.sqrt(squaredLength), removed);
+    @SuppressWarnings("JavaExistingMethodCanBeUsed")
+    public static Wire createServerWire(BlockPos u, BlockPos v) {
+        var middle = u.add(v).toCenterPos().multiply(0.5f);
+        var chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z));
+        return new Wire(ImmutableSet.of(u, v), u, v, middle, chunkPos);
     }
 
-    private Wire(BlockPos from, BlockPos to, boolean removed) {
-        this(from, to, from.add(to).toCenterPos().multiply(0.5f), to.getSquaredDistance(from), removed);
-    }
-
-    public Wire(BlockPos from, BlockPos to) {
-        this(from, to, false);
-    }
-
-    public Wire withRemoved(boolean removed) {
-        return new Wire(positions, from, to, middle, chunkPos, squaredLength, length, removed);
+    public static Wire createClientWire(BlockPos u, BlockPos v) {
+        var middle = u.add(v).toCenterPos().multiply(0.5f);
+        var chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z));
+        return new Wire(ImmutableSet.of(u, v), u, v, middle, chunkPos);
     }
 
     @Override

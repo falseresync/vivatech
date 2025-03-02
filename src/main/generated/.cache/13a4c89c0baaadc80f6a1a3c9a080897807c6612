@@ -1,6 +1,7 @@
-// 1.21.1	2025-03-01T18:10:07.648749	Vivatech/Model Definitions
+// 1.21.1	2025-03-02T23:18:20.8744545	Vivatech/Model Definitions
 2baf75a83ea79727bbe8a59a6fafdf9f11dca1b5 assets\vivatech\blockstates\wire_post.json
 2a665948a615ce18f71573112e04126fc1edf12c assets\vivatech\models\block\consumer.json
+6f287b1f4f25d88f49885ec2ccd9d06b534bd9e5 assets\vivatech\models\item\pliers.json
 690403059f38bb11d2c56e5f39db1942cd9def80 assets\vivatech\blockstates\consumer.json
 f5379fd4723751073945c2ce0bbd00cd439bc005 assets\vivatech\models\item\wire_post.json
 0ab642ddd6b4973d3d880590db5169600251f95d assets\vivatech\models\block\generator.json
