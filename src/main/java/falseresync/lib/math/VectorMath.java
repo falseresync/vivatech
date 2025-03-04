@@ -1,6 +1,7 @@
 package falseresync.lib.math;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -23,10 +24,32 @@ public class VectorMath {
     }
 
     /**
+     * Orthogonal component method rotation
+     * @return Vector a rotated about the vector b by the given angle
+     * @implNote <a href="https://math.stackexchange.com/questions/511370/how-to-rotate-one-vector-about-another">Orthogonal component method</a>
+     */
+    public static Vector3f rotateAbout(Vector3f a, Vector3f b, float angle) {
+        var aRejection = vectorRejection(a, b);
+        var aRejectionLength = aRejection.length();
+        var w = b.cross(aRejection, new Vector3f());
+        return aRejection
+                .mul(Math.cos(angle) / aRejectionLength, new Vector3f())
+                .add(w.mul(Math.sin(angle) / w.length(), new Vector3f()))
+                .mul(aRejectionLength).add(vectorProjection(a, b));
+    }
+
+    /**
+     * @implNote <a href="https://en.wikipedia.org/wiki/Vector_projection">Vectors projection</a>
+     */
+    public static Vector3f vectorRejection(Vector3f a, Vector3f b) {
+        return a.sub(vectorProjection(a, b), new Vector3f());
+    }
+
+    /**
      * @implNote <a href="https://en.wikipedia.org/wiki/Vector_projection">Vectors projection</a>
      */
     public static Vector3f vectorProjection(Vector3f a, Vector3f b) {
-        return b.mul(scalarProjection(a, b));
+        return b.mul(scalarProjection(a, b), new Vector3f());
     }
 
     /**
