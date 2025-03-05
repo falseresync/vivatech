@@ -47,7 +47,7 @@ public class Grid {
         var applianceV = PowerSystem.APPLIANCE.find(world, edge.v(), null);
 
         if (applianceU != null && applianceV != null) {
-            var wasModified = graph.addEdge(applianceU.asNode(), applianceV.asNode(), edge);
+            var wasModified = graph.addEdge(applianceU.asGridNode(), applianceV.asGridNode(), edge);
             if (wasModified) {
                 gridsManager.onWireAdded(edge.toServerWire());
                 initOrMerge(applianceU);
@@ -66,14 +66,15 @@ public class Grid {
                 merge(other);
             }
         } else {
-            gridsManager.getGridLookup().put(appliance.getGridUuid(), this);
+            appliance.onGridConnected();
+            updateGridLookup(appliance, this);
         }
     }
 
     private void merge(Grid other) {
         other.graph.nodes().forEach(node -> {
             graph.addNode(node);
-            gridsManager.getGridLookup().put(node.appliance().getGridUuid(), this);
+            updateGridLookup(node.appliance(), this);
         });
         other.graph.edges().forEach(edge -> {
             var nodes = other.graph.incidentNodes(edge);
@@ -128,11 +129,25 @@ public class Grid {
             var other = gridsManager.create();
             partitioned.forEach(pair -> {
                 other.graph.addEdge(pair.left(), pair.right());
-                pair.left().forEach(node -> {
-                    gridsManager.getGridLookup().put(node.appliance().getGridUuid(), this);
-                });
+                pair.left().forEach(node -> updateGridLookup(node.appliance(), other));
             });
+        } else {
+            startingNode.appliance().onGridDisconnected();
+            gridsManager.getGridLookup().remove(startingNode.uuid());
+            findProxied(startingNode.appliance()).ifPresent(proxied -> gridsManager.getGridLookup().remove(proxied.getGridUuid()));
         }
+    }
+
+    private void updateGridLookup(Appliance appliance, Grid grid) {
+        gridsManager.getGridLookup().put(appliance.getGridUuid(), grid);
+        findProxied(appliance).ifPresent(proxied -> gridsManager.getGridLookup().put(proxied.getGridUuid(), grid));
+    }
+
+    private Optional<Appliance> findProxied(Appliance appliance) {
+        if (appliance instanceof ApplianceProxy proxy) {
+            return Optional.ofNullable(proxy.getProxiedAppliance());
+        }
+        return Optional.empty();
     }
 
     @Nullable
@@ -149,6 +164,9 @@ public class Grid {
     }
 
     public void tick() {
+        for (var node : graph.nodes()) {
+            node.appliance().gridTick(0);
+        }
     }
 
     @Override

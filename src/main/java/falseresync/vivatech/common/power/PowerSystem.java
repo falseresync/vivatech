@@ -23,7 +23,11 @@ public class PowerSystem {
     }
 
     public static void registerAll() {
-        APPLIANCE.registerSelf(VtBlockEntities.WIRE_POST);
+        APPLIANCE.registerSelf(
+                VtBlockEntities.WIRE_POST,
+                VtBlockEntities.GENERATOR,
+                VtBlockEntities.CONSUMER
+        );
     }
 
     public static String createFileName(World world) {

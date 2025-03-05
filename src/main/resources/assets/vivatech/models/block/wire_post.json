@@ -1,0 +1,20 @@
+{
+  "textures": {
+    "tex": "vivatech:block/wire_post",
+    "particle": "#tex"
+  },
+  "elements": [
+    {   
+      "from": [ 4, 4, 0 ],
+      "to": [ 12, 12, 10 ],
+      "faces": {
+        "down":  { "texture": "#tex" },
+        "up":    { "texture": "#tex" },
+        "north": { "texture": "#tex", "cullface": "north" },
+        "south": { "texture": "#tex" },
+        "west":  { "texture": "#tex" },
+        "east":  { "texture": "#tex" }
+      }
+    }
+  ]
+}

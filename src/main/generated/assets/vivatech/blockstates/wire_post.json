@@ -1,7 +1,27 @@
 {
   "variants": {
-    "": {
+    "facing=down": {
+      "model": "vivatech:block/wire_post",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "vivatech:block/wire_post",
+      "y": 90
+    },
+    "facing=north": {
       "model": "vivatech:block/wire_post"
+    },
+    "facing=south": {
+      "model": "vivatech:block/wire_post",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "vivatech:block/wire_post",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "vivatech:block/wire_post",
+      "y": 270
     }
   }
 }

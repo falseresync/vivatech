@@ -16,7 +16,7 @@ public class VivatechClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), VtBlocks.WIRE_POST);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), VtBlocks.WIRE_POST);
 
         VtClientReceivers.registerAll();
 
