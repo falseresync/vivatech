@@ -6,6 +6,7 @@ import com.google.common.graph.NetworkBuilder;
 import com.google.common.graph.Traverser;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class Grid {
-    private final UUID uuid = UUID.randomUUID();
     private final MutableNetwork<GridNode, GridEdge> graph;
     private final Map<BlockPos, BlockApiCache<GridNode, Void>> nodeLookupsCache;
     private final Map<BlockPos, Appliance> appliances;
@@ -34,7 +34,7 @@ public class Grid {
                 .allowsSelfLoops(false)
                 .build();
         this.nodeLookupsCache = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
-        this.appliances = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
+        this.appliances = new Object2ReferenceRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
     }
 
     public Grid(GridsManager gridsManager, ServerWorld world, Set<GridEdge> edges) {
@@ -67,11 +67,11 @@ public class Grid {
         return false;
     }
 
-
+    // TODO: Works half of the time. Could be spawning ghost grids
     private void initOrMerge(GridNode node) {
         var other = gridsManager.getGridLookup().get(node.pos());
         if (other != null) {
-            if (!other.equals(this)) {
+            if (other != this) {
                 merge(other);
             }
         } else {
@@ -99,6 +99,7 @@ public class Grid {
         return cut(new GridEdge(from, to));
     }
 
+    // TODO: sometimes it randomly doesn't work
     public boolean cut(GridEdge edge) {
         var nodes = incidentNodesIgnoreDirection(edge);
         if (nodes == null) {
@@ -156,13 +157,17 @@ public class Grid {
         }
     }
 
+    // TODO: Doesn't work after the first node :p
+    // This might be spawning a shitton of grids
     public void remove(BlockPos pos, @Nullable BlockState state) {
         var node = nodeLookupsCache.get(pos).find(state, null);
         if (node != null) {
-            var removableEdges = graph.incidentEdges(node).toArray(new GridEdge[] {});
-            for (var edge : removableEdges) {
-                cut(edge);
-            }
+            var removableEdges = new GridEdge[] {};
+            do {
+                removableEdges = graph.incidentEdges(node).toArray(new GridEdge[] {});
+                cut(removableEdges[0]);
+            } while (removableEdges.length > 1);
+
 
             graph.removeNode(node);
             onNodeRemoved(node);
@@ -175,7 +180,9 @@ public class Grid {
         gridsManager.getGridLookup().put(node.pos(), this);
         nodeLookupsCache.put(node.pos(), BlockApiCache.create(PowerSystem.GRID_NODE, world, node.pos()));
         if (node.appliance() != null) {
-            appliances.put(node.pos(), node.appliance());
+            if (!appliances.containsValue(node.appliance())) {
+                appliances.put(node.pos(), node.appliance());
+            }
         }
     }
 
@@ -220,17 +227,5 @@ public class Grid {
         for (var appliance : appliances.values()) {
             appliance.gridTick(voltage);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Grid that)) return false;
-        return uuid.equals(that.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
     }
 }
