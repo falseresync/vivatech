@@ -7,6 +7,6 @@ import net.minecraft.block.entity.BlockEntityType;
 public class VtBlockEntities {
     public static final @RegistryObject BlockEntityType<GeneratorBlockEntity> GENERATOR =
             BlockEntityType.Builder.create(GeneratorBlockEntity::new, VtBlocks.GENERATOR).build();
-    public static final @RegistryObject BlockEntityType<ConsumerBlockEntity> CONSUMER =
-            BlockEntityType.Builder.create(ConsumerBlockEntity::new, VtBlocks.CONSUMER).build();
+    public static final @RegistryObject BlockEntityType<HeaterBlockEntity> HEATER =
+            BlockEntityType.Builder.create(HeaterBlockEntity::new, VtBlocks.HEATER).build();
 }

@@ -27,7 +27,7 @@ public class PowerSystem {
     public static void registerAll() {
         APPLIANCE.registerSelf(
                 VtBlockEntities.GENERATOR,
-                VtBlockEntities.CONSUMER
+                VtBlockEntities.HEATER
         );
 
         GRID_NODE.registerForBlocks((world, pos, state, blockEntity, context) -> {

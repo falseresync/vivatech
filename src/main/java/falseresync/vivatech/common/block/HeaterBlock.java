@@ -1,12 +1,14 @@
 package falseresync.vivatech.common.block;
 
 import com.mojang.serialization.MapCodec;
-import falseresync.vivatech.common.blockentity.ConsumerBlockEntity;
+import falseresync.vivatech.common.blockentity.HeaterBlockEntity;
 import falseresync.vivatech.common.blockentity.Ticking;
 import falseresync.vivatech.common.blockentity.VtBlockEntities;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -14,27 +16,37 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class ConsumerBlock extends BlockWithEntity {
-    public static final MapCodec<ConsumerBlock> CODEC = createCodec(ConsumerBlock::new);
+public class HeaterBlock extends BlockWithEntity {
+    public static final MapCodec<HeaterBlock> CODEC = createCodec(HeaterBlock::new);
 
-    protected ConsumerBlock(Settings settings) {
+    protected HeaterBlock(Settings settings) {
         super(settings);
     }
 
     @Override
-    protected MapCodec<ConsumerBlock> getCodec() {
+    protected MapCodec<HeaterBlock> getCodec() {
         return CODEC;
     }
 
     @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        if (!world.isClient) {
+            if (world.getBlockEntity(pos) instanceof HeaterBlockEntity heater) {
+                heater.scan(sourcePos);
+            }
+        }
+    }
+
+    @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new ConsumerBlockEntity(pos, state);
+        return new HeaterBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VtBlockEntities.CONSUMER, Ticking.getDefaultTicker());
+        return validateTicker(type, VtBlockEntities.HEATER, Ticking.getDefaultTicker());
     }
 
     @Override

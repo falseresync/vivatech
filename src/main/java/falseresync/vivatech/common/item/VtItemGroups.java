@@ -13,7 +13,7 @@ public class VtItemGroups {
                     .displayName(Text.translatable("itemGroup.vivatech.general"))
                     .entries((displayContext, entries) -> {
                         entries.add(VtItems.GENERATOR);
-                        entries.add(VtItems.CONSUMER);
+                        entries.add(VtItems.HEATER);
                         entries.add(VtItems.WIRE_POST);
 
                         entries.add(VtItems.CONNECTOR);

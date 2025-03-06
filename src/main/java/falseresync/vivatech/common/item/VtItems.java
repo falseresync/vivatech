@@ -13,7 +13,7 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class VtItems {
     public static final BlockItem GENERATOR = rBlockItem("generator", VtBlocks.GENERATOR, new Item.Settings());
-    public static final BlockItem CONSUMER = rBlockItem("consumer", VtBlocks.CONSUMER, new Item.Settings());
+    public static final BlockItem HEATER = rBlockItem("heater", VtBlocks.HEATER, new Item.Settings());
     public static final BlockItem WIRE_POST = rBlockItem("wire_post", VtBlocks.WIRE_POST, new Item.Settings());
 
     public static final ConnectorItem CONNECTOR = r("connector", ConnectorItem::new, new Item.Settings().maxCount(1));

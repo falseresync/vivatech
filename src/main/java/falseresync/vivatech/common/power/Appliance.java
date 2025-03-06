@@ -29,6 +29,9 @@ public interface Appliance {
         return 0;
     }
 
+    /**
+     * It is advisable to minimize the cost of this method. Do expensive calculations in the regular tick methods
+     */
     default void gridTick(float voltage) {
     }
 }

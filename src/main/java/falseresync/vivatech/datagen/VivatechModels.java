@@ -19,7 +19,14 @@ public class VivatechModels extends FabricModelProvider {
 
         blockStateModelGenerator.registerSimpleCubeAll(VtBlocks.GENERATOR);
 
-        blockStateModelGenerator.registerSimpleCubeAll(VtBlocks.CONSUMER);
+        blockStateModelGenerator.blockStateCollector.accept(
+                VariantsBlockStateSupplier
+                        .create(
+                                VtBlocks.HEATER,
+                                BlockStateVariant.create().put(
+                                        VariantSettings.MODEL,
+                                        Models.CUBE_COLUMN.upload(VtBlocks.HEATER, TextureMap.sideEnd(VtBlocks.HEATER), blockStateModelGenerator.modelCollector)))
+        );
 
         blockStateModelGenerator.blockStateCollector.accept(
                 VariantsBlockStateSupplier
