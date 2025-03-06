@@ -1,13 +1,14 @@
 package falseresync.vivatech.common.block;
 
 import com.mojang.serialization.MapCodec;
-import falseresync.vivatech.common.blockentity.Ticking;
-import falseresync.vivatech.common.blockentity.VtBlockEntities;
-import falseresync.vivatech.common.blockentity.WirePostBlockEntity;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
+import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.power.GridNode;
+import falseresync.vivatech.common.power.GridNodeProvider;
+import falseresync.vivatech.common.power.PowerSystem;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -21,11 +22,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import org.jetbrains.annotations.Nullable;
 
-public class WirePostBlock extends BlockWithEntity {
-    public static final MapCodec<WirePostBlock> CODEC = createCodec(WirePostBlock::new);
+public class WirePostBlock extends Block implements GridNodeProvider {
     public static final DirectionProperty FACING = Properties.FACING;
+    public static final MapCodec<WirePostBlock> CODEC = createCodec(WirePostBlock::new);
 
     public static final VoxelShape SHAPE_SOUTH = createCuboidShape(4, 4, 6, 12, 12, 16);
     public static final VoxelShape SHAPE_NORTH = createCuboidShape(4, 4, 0, 12, 12, 10);
@@ -51,7 +51,7 @@ public class WirePostBlock extends BlockWithEntity {
         return switch (state.get(FACING)) {
             case SOUTH -> SHAPE_SOUTH;
             case NORTH -> SHAPE_NORTH;
-            case EAST ->  SHAPE_EAST;
+            case EAST -> SHAPE_EAST;
             case WEST -> SHAPE_WEST;
             case DOWN -> SHAPE_DOWN;
             case UP -> SHAPE_UP;
@@ -91,18 +91,18 @@ public class WirePostBlock extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new WirePostBlockEntity(pos, state);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VtBlockEntities.WIRE_POST, Ticking.getDefaultTicker());
+    public GridNode getGridNode(World world, BlockPos pos, BlockState state) {
+        return new GridNode(pos, PowerSystem.APPLIANCE.find(world, pos.offset(state.get(FACING)), null));
     }
 
     @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onStateReplaced(state, world, pos, newState, moved);
+        if (!world.isClient) {
+            var grid = Vivatech.getServerGridsLoader().getGridsManager(world).getGridLookup().get(pos);
+            if (grid != null) {
+                grid.remove(pos, state);
+            }
+        }
     }
 }

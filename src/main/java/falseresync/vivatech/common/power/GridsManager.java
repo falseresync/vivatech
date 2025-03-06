@@ -12,13 +12,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -26,7 +26,7 @@ public class GridsManager {
     public static final Codec<List<GridSnapshot>> CODEC = GridSnapshot.CODEC.listOf();
     private final ServerWorld world;
     private final Set<Grid> grids = new ObjectOpenHashSet<>();
-    private final Map<UUID, Grid> gridLookup = new Object2ObjectRBTreeMap<>();
+    private final Map<BlockPos, Grid> gridLookup = new Object2ObjectRBTreeMap<>();
     private final Map<ChunkPos, Set<Wire>> wires = PowerSystem.createWireMap();
     private final Map<ChunkPos, Set<Wire>> addedWires = PowerSystem.createWireMap();
     private final Map<ChunkPos, Set<Wire>> removedWires = PowerSystem.createWireMap();
@@ -132,7 +132,7 @@ public class GridsManager {
         return !playersForNetworkIds.isEmpty();
     }
 
-    public Map<UUID, Grid> getGridLookup() {
+    public Map<BlockPos, Grid> getGridLookup() {
         return gridLookup;
     }
 
@@ -140,8 +140,7 @@ public class GridsManager {
         return grids;
     }
 
-
-    public Grid findOrCreate(UUID u, UUID v) {
+    public Grid findOrCreate(BlockPos u, BlockPos v) {
         var found = find(u, v);
         if (found != null) {
             return found;
@@ -150,7 +149,7 @@ public class GridsManager {
     }
 
     @Nullable
-    public Grid find(UUID u, UUID v) {
+    public Grid find(BlockPos u, BlockPos v) {
         var gridU = gridLookup.get(u);
         if (gridU != null) {
             return gridU;

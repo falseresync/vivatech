@@ -1,18 +1,18 @@
 package falseresync.vivatech.common.power;
 
-import java.util.Objects;
-import java.util.UUID;
+import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 
-public record GridNode(UUID uuid, Appliance appliance) {
+public record GridNode(BlockPos pos, @Nullable Appliance appliance) {
     @Override
     public int hashCode() {
-        return Objects.hashCode(uuid);
+        return pos.hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GridNode that)) return false;
-        return Objects.equals(uuid, that.uuid);
+        return pos.equals(that.pos);
     }
 }

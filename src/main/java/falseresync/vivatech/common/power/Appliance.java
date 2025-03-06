@@ -1,24 +1,34 @@
 package falseresync.vivatech.common.power;
 
-import java.util.UUID;
+import net.minecraft.util.math.BlockPos;
 
 public interface Appliance {
-    UUID getGridUuid();
+    /**
+     * Must not change
+     */
+    BlockPos getPos();
 
+    /**
+     * Only called when first connected. <br/>
+     * Does not get called when a grid changes through mergers and partitions.
+     */
     default void onGridConnected() {
     }
 
+    /**
+     * Only called when completely disconnected. <br/>
+     * Does not get called when a grid changes through mergers and partitions.
+     */
     default void onGridDisconnected() {
     }
 
-    default float getGridCurrent() {
+    /**
+     * Positive current corresponds to power generation, negative current - to consumption
+     */
+    default float getElectricalCurrent() {
         return 0;
     }
 
     default void gridTick(float voltage) {
-    }
-
-    default GridNode asGridNode() {
-        return new GridNode(getGridUuid(), this);
     }
 }

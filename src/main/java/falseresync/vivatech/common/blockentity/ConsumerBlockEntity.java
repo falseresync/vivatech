@@ -1,9 +1,11 @@
 package falseresync.vivatech.common.blockentity;
 
+import falseresync.vivatech.common.power.Appliance;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 
-public class ConsumerBlockEntity extends BaseAppliance implements Ticking {
+public class ConsumerBlockEntity extends BlockEntity implements Ticking, Appliance {
     public ConsumerBlockEntity(BlockPos pos, BlockState state) {
         super(VtBlockEntities.CONSUMER, pos, state);
     }
@@ -14,12 +16,12 @@ public class ConsumerBlockEntity extends BaseAppliance implements Ticking {
     }
 
     @Override
-    public void gridTick(float voltage) {
-        super.gridTick(voltage);
+    public float getElectricalCurrent() {
+        return -1;
     }
 
     @Override
-    public float getGridCurrent() {
-        return super.getGridCurrent();
+    public void gridTick(float voltage) {
+        Appliance.super.gridTick(voltage);
     }
 }

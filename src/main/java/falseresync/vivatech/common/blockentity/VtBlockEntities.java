@@ -9,6 +9,4 @@ public class VtBlockEntities {
             BlockEntityType.Builder.create(GeneratorBlockEntity::new, VtBlocks.GENERATOR).build();
     public static final @RegistryObject BlockEntityType<ConsumerBlockEntity> CONSUMER =
             BlockEntityType.Builder.create(ConsumerBlockEntity::new, VtBlocks.CONSUMER).build();
-    public static final @RegistryObject BlockEntityType<WirePostBlockEntity> WIRE_POST =
-            BlockEntityType.Builder.create(WirePostBlockEntity::new, VtBlocks.WIRE_POST).build();
 }

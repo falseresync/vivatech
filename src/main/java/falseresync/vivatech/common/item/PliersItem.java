@@ -1,10 +1,8 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.power.Appliance;
+import falseresync.vivatech.common.power.GridNode;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 
 public class PliersItem extends WireManagementItem {
@@ -13,16 +11,14 @@ public class PliersItem extends WireManagementItem {
     }
 
     @Override
-    protected ActionResult manageWire(World world, Appliance applianceU, Appliance applianceV, GlobalPos anchor, BlockPos currentPos) {
+    protected ActionResult manageWire(World world, GridNode nodeU, GridNode nodeV) {
         if (!world.isClient) {
             var gridsManager = Vivatech.getServerGridsLoader().getGridsManager(world);
-            var grid = gridsManager.find(applianceU.getGridUuid(), applianceV.getGridUuid());
+            var grid = gridsManager.find(nodeU.pos(), nodeV.pos());
             if (grid == null) {
                 return ActionResult.FAIL;
             }
-
-            grid.cut(anchor.pos(), currentPos);
-            return ActionResult.CONSUME;
+            return grid.cut(nodeU.pos(), nodeV.pos()) ? ActionResult.CONSUME : ActionResult.FAIL;
         }
 
         return ActionResult.SUCCESS;

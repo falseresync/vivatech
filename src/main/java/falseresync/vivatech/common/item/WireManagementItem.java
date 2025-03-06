@@ -1,12 +1,11 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.data.VtComponents;
-import falseresync.vivatech.common.power.Appliance;
+import falseresync.vivatech.common.power.GridNode;
 import falseresync.vivatech.common.power.PowerSystem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 
@@ -20,7 +19,7 @@ public abstract class WireManagementItem extends Item {
         var world = context.getWorld();
 
         var currentPos = context.getBlockPos();
-        var currentNode = PowerSystem.APPLIANCE.find(world, currentPos, null);
+        var currentNode = PowerSystem.GRID_NODE.find(world, currentPos, null);
         if (currentNode == null) {
             return ActionResult.FAIL;
         }
@@ -36,14 +35,14 @@ public abstract class WireManagementItem extends Item {
             return ActionResult.FAIL;
         }
 
-        var previousNode = PowerSystem.APPLIANCE.find(world, previous.pos(), null);
+        var previousNode = PowerSystem.GRID_NODE.find(world, previous.pos(), null);
         if (previousNode != null) {
             stack.remove(VtComponents.CONNECTION);
-            return manageWire(world, previousNode, currentNode, previous, currentPos);
+            return manageWire(world, previousNode, currentNode);
         }
 
         return ActionResult.success(context.getWorld().isClient);
     }
 
-    protected abstract ActionResult manageWire(World world, Appliance applianceU, Appliance applianceV, GlobalPos anchor, BlockPos currentPos);
+    protected abstract ActionResult manageWire(World world, GridNode nodeU, GridNode nodeV);
 }
