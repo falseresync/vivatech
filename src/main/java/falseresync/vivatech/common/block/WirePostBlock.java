@@ -2,8 +2,8 @@ package falseresync.vivatech.common.block;
 
 import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.power.GridNode;
-import falseresync.vivatech.common.power.GridNodeProvider;
+import falseresync.vivatech.common.power.GridVertex;
+import falseresync.vivatech.common.power.GridVertexProvider;
 import falseresync.vivatech.common.power.PowerSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
-public class WirePostBlock extends Block implements GridNodeProvider {
+public class WirePostBlock extends Block implements GridVertexProvider {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final MapCodec<WirePostBlock> CODEC = createCodec(WirePostBlock::new);
 
@@ -91,18 +91,18 @@ public class WirePostBlock extends Block implements GridNodeProvider {
     }
 
     @Override
-    public GridNode getGridNode(World world, BlockPos pos, BlockState state) {
-        return new GridNode(pos, PowerSystem.APPLIANCE.find(world, pos.offset(state.get(FACING)), null));
+    public GridVertex getGridVertex(World world, BlockPos pos, BlockState state) {
+        return new GridVertex(pos, PowerSystem.APPLIANCE.find(world, pos.offset(state.get(FACING)), null));
     }
 
     @Override
     protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
         if (!world.isClient) {
             var grid = Vivatech.getServerGridsLoader().getGridsManager(world).getGridLookup().get(pos);
             if (grid != null) {
                 grid.remove(pos, state);
             }
         }
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 }

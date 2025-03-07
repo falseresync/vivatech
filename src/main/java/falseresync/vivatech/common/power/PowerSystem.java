@@ -16,7 +16,7 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class PowerSystem {
     public static final BlockApiLookup<Appliance, Void> APPLIANCE = BlockApiLookup.get(vtId("appliance"), Appliance.class, Void.class);
-    public static final BlockApiLookup<GridNode, Void> GRID_NODE = BlockApiLookup.get(vtId("grid_node"), GridNode.class, Void.class);
+    public static final BlockApiLookup<GridVertex, Void> GRID_VERTEX = BlockApiLookup.get(vtId("grid_vertex"), GridVertex.class, Void.class);
     public static final WorldSavePath SAVE_PATH = new WorldSavePath("power_systems");
     public static final int DATA_VERSION = 100;
 
@@ -30,9 +30,9 @@ public class PowerSystem {
                 VtBlockEntities.HEATER
         );
 
-        GRID_NODE.registerForBlocks((world, pos, state, blockEntity, context) -> {
-            if (state.getBlock() instanceof GridNodeProvider provider) {
-                return provider.getGridNode(world, pos, state);
+        GRID_VERTEX.registerForBlocks((world, pos, state, blockEntity, context) -> {
+            if (state.getBlock() instanceof GridVertexProvider provider) {
+                return provider.getGridVertex(world, pos, state);
             }
             return null;
         }, VtBlocks.WIRE_POST);

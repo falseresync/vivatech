@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.power.GridNode;
+import falseresync.vivatech.common.power.GridVertex;
 import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
 
@@ -11,11 +11,11 @@ public class ConnectorItem extends WireManagementItem {
     }
 
     @Override
-    protected ActionResult manageWire(World world, GridNode nodeU, GridNode nodeV) {
+    protected ActionResult manageWire(World world, GridVertex vertexU, GridVertex vertexV) {
         if (!world.isClient) {
             var gridsManager = Vivatech.getServerGridsLoader().getGridsManager(world);
-            var grid = gridsManager.findOrCreate(nodeU.pos(), nodeV.pos());
-            return grid.connect(nodeU, nodeV) ? ActionResult.CONSUME : ActionResult.FAIL;
+            var grid = gridsManager.findOrCreate(vertexU.pos(), vertexV.pos());
+            return grid.connect(vertexU, vertexV) ? ActionResult.CONSUME : ActionResult.FAIL;
         }
 
         return ActionResult.SUCCESS;

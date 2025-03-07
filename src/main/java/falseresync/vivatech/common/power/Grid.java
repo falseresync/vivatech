@@ -1,39 +1,31 @@
 package falseresync.vivatech.common.power;
 
-import com.google.common.graph.EndpointPair;
-import com.google.common.graph.MutableNetwork;
-import com.google.common.graph.NetworkBuilder;
-import com.google.common.graph.Traverser;
-import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.BiconnectivityInspector;
+import org.jgrapht.graph.SimpleGraph;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class Grid {
-    private final MutableNetwork<GridNode, GridEdge> graph;
-    private final Map<BlockPos, BlockApiCache<GridNode, Void>> nodeLookupsCache;
+    private final SimpleGraph<GridVertex, GridEdge> graph;
+    private final Map<BlockPos, BlockApiCache<GridVertex, Void>> vertexCaches;
     private final Map<BlockPos, Appliance> appliances;
     private final GridsManager gridsManager;
     private final ServerWorld world;
-    private float voltage = 0;
 
     public Grid(GridsManager gridsManager, ServerWorld world) {
         this.gridsManager = gridsManager;
         this.world = world;
-        this.graph = NetworkBuilder
-                .undirected()
-                .allowsParallelEdges(false)
-                .allowsSelfLoops(false)
-                .build();
-        this.nodeLookupsCache = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
+        this.graph = new SimpleGraph<>(GridEdge.class);
+        this.vertexCaches = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
         this.appliances = new Object2ReferenceRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
     }
 
@@ -43,167 +35,122 @@ public class Grid {
     }
 
     public GridSnapshot createSnapshot() {
-        return new GridSnapshot(graph.edges());
+        return new GridSnapshot(graph.edgeSet());
     }
 
     public boolean connect(GridEdge edge) {
-        var nodeU = PowerSystem.GRID_NODE.find(world, edge.u(), null);
-        var nodeV = PowerSystem.GRID_NODE.find(world, edge.v(), null);
-        return connect(nodeU, nodeV);
+        var vertexU = PowerSystem.GRID_VERTEX.find(world, edge.u(), null);
+        var vertexV = PowerSystem.GRID_VERTEX.find(world, edge.v(), null);
+        return connect(vertexU, vertexV, () -> edge);
     }
 
-    public boolean connect(GridNode nodeU, GridNode nodeV) {
-        if (nodeU != null && nodeV != null) {
-            var edge = new GridEdge(nodeU.pos(), nodeV.pos());
-            var wasModified = graph.addEdge(nodeU, nodeV, edge);
+    public boolean connect(GridVertex vertexU, GridVertex vertexV) {
+        return connect(vertexU, vertexV, () -> new GridEdge(vertexU.pos(), vertexV.pos()));
+    }
+
+    public boolean connect(GridVertex vertexU, GridVertex vertexV, Supplier<GridEdge> edgeSupplier) {
+        if (vertexU != null && vertexV != null) {
+            initOrMerge(vertexU);
+            initOrMerge(vertexV);
+            var edge = edgeSupplier.get();
+            var wasModified = graph.addEdge(vertexU, vertexV, edge);
             if (wasModified) {
                 gridsManager.onWireAdded(edge.toServerWire());
-                initOrMerge(nodeU);
-                initOrMerge(nodeV);
             }
             return wasModified;
         }
-
         return false;
     }
 
-    // TODO: Works half of the time. Could be spawning ghost grids
-    private void initOrMerge(GridNode node) {
-        var other = gridsManager.getGridLookup().get(node.pos());
-        if (other != null) {
-            if (other != this) {
-                merge(other);
-            }
-        } else {
-            if (node.appliance() != null) {
-                node.appliance().onGridConnected();
-            }
-            onNodeAdded(node);
+    private void initOrMerge(GridVertex vertex) {
+        var otherGrid = gridsManager.getGridLookup().get(vertex.pos());
+        if (otherGrid == null) {
+            graph.addVertex(vertex);
+            onVertexAdded(vertex, false);
+        } else if (otherGrid != this) {
+            merge(otherGrid.graph);
+            gridsManager.getGrids().remove(otherGrid);
         }
     }
 
-    private void merge(Grid other) {
-        other.graph.nodes().forEach(node -> {
-            graph.addNode(node);
-            onNodeAdded(node);
-            other.onNodeRemoved(node);
-        });
-        other.graph.edges().forEach(edge -> {
-            var nodes = other.graph.incidentNodes(edge);
-            graph.addEdge(nodes.nodeU(), nodes.nodeV(), edge);
-        });
-        gridsManager.getGrids().remove(other);
+    private void merge(Graph<GridVertex, GridEdge> otherGraph) {
+        Graphs.addGraph(this.graph, otherGraph);
+        for (var vertex : otherGraph.vertexSet()) {
+            onVertexAdded(vertex, true);
+        }
     }
 
-    public boolean cut(BlockPos from, BlockPos to) {
-        return cut(new GridEdge(from, to));
-    }
-
-    // TODO: sometimes it randomly doesn't work
-    public boolean cut(GridEdge edge) {
-        var nodes = incidentNodesIgnoreDirection(edge);
-        if (nodes == null) {
+    public boolean remove(BlockPos pos, BlockState state) {
+        var cache = vertexCaches.get(pos);
+        if (cache == null) {
+            vertexCaches.remove(pos);
             return false;
         }
-        if (!graph.removeEdge(edge)) {
+
+        var vertex = cache.find(state, null);
+        if (vertex == null) {
+            vertexCaches.remove(pos);
+            gridsManager.getGridLookup().remove(pos);
             return false;
         }
-        gridsManager.onWireRemoved(edge.toServerWire());
-        // I assume that between two disconnected nodes in an electrical grid a bypass path will be nearby
-        // hence breadFirst search. But this is merely an assumption
-        for (var reference : Traverser.forGraph(graph).breadthFirst(nodes.nodeU())) {
-            if (reference.equals(nodes.nodeV())) {
-                // There's a bypass route, don't do anything
-                return true;
-            }
+
+        for (var edge : graph.edgesOf(vertex)) {
+            gridsManager.onWireRemoved(edge.toServerWire());
+        }
+        if (!graph.removeVertex(vertex)) {
+            return false;
         }
 
-        // Couldn't find a bypass - must create a new Power systems
-        // Here we don't really care if it's breadth or depth
-        partition(nodes.nodeU());
-        partition(nodes.nodeV());
-
-        gridsManager.getGrids().remove(this);
-
+        partition();
         return true;
     }
 
-    private void partition(GridNode startingNode) {
-        var visitedEdges = new ObjectOpenHashSet<GridEdge>();
-        var partitioned = new ObjectArrayList<Pair<EndpointPair<GridNode>, GridEdge>>();
-        for (var node : Traverser.forGraph(graph).breadthFirst(startingNode)) {
-            for (var edge : graph.incidentEdges(node)) {
-                if (!visitedEdges.contains(edge)) {
-                    partitioned.add(Pair.of(graph.incidentNodes(edge), edge));
-                    visitedEdges.add(edge);
+    public boolean disconnect(GridVertex vertexU, GridVertex vertexV) {
+        var edge = new GridEdge(vertexU.pos(), vertexV.pos());
+        if (!graph.removeEdge(edge)) {
+            return false;
+        }
+
+        gridsManager.onWireRemoved(edge.toServerWire());
+        partition();
+        return true;
+    }
+
+    private void partition() {
+        var inspector = new BiconnectivityInspector<>(graph);
+        if (inspector.isConnected()) {
+            return;
+        }
+
+        for (var isolatedGraph : inspector.getConnectedComponents()) {
+            if (isolatedGraph.vertexSet().size() == 1) {
+                isolatedGraph.vertexSet().forEach(this::onVertexRemoved);
+            } else {
+                var other = gridsManager.create();
+                other.merge(isolatedGraph);
+            }
+        }
+
+        gridsManager.getGrids().remove(this);
+    }
+
+    private void onVertexAdded(GridVertex vertex, boolean isTransferred) {
+        gridsManager.getGridLookup().put(vertex.pos(), this);
+        vertexCaches.put(vertex.pos(), BlockApiCache.create(PowerSystem.GRID_VERTEX, world, vertex.pos()));
+        if (vertex.appliance() != null) {
+            if (!appliances.containsValue(vertex.appliance())) {
+                appliances.put(vertex.pos(), vertex.appliance());
+                if (!isTransferred) {
+                    vertex.appliance().onGridConnected();
                 }
             }
         }
-
-        if (!partitioned.isEmpty()) {
-            var other = gridsManager.create();
-            partitioned.forEach(pair -> {
-                other.graph.addEdge(pair.left(), pair.right());
-                pair.left().forEach(node -> {
-                    other.onNodeAdded(node);
-                    onNodeRemoved(node);
-                });
-            });
-        } else {
-            if (startingNode.appliance() != null) {
-                startingNode.appliance().onGridDisconnected();
-            }
-            onNodeRemoved(startingNode);
-        }
     }
 
-    // TODO: Doesn't work after the first node :p
-    // This might be spawning a shitton of grids
-    public void remove(BlockPos pos, @Nullable BlockState state) {
-        var node = nodeLookupsCache.get(pos).find(state, null);
-        if (node != null) {
-            var removableEdges = new GridEdge[] {};
-            do {
-                removableEdges = graph.incidentEdges(node).toArray(new GridEdge[] {});
-                cut(removableEdges[0]);
-            } while (removableEdges.length > 1);
-
-
-            graph.removeNode(node);
-            onNodeRemoved(node);
-        } else {
-            nodeLookupsCache.remove(pos);
-        }
-    }
-
-    private void onNodeAdded(GridNode node) {
-        gridsManager.getGridLookup().put(node.pos(), this);
-        nodeLookupsCache.put(node.pos(), BlockApiCache.create(PowerSystem.GRID_NODE, world, node.pos()));
-        if (node.appliance() != null) {
-            if (!appliances.containsValue(node.appliance())) {
-                appliances.put(node.pos(), node.appliance());
-            }
-        }
-    }
-
-    private void onNodeRemoved(GridNode node) {
-        gridsManager.getGridLookup().remove(node.pos());
-        nodeLookupsCache.remove(node.pos());
-        if (node.appliance() != null) {
-            appliances.remove(node.pos());
-        }
-    }
-
-    @Nullable
-    private EndpointPair<GridNode> incidentNodesIgnoreDirection(GridEdge edge) {
-        try {
-            return graph.incidentNodes(edge);
-        } catch (IllegalArgumentException e) {
-           try {
-               return graph.incidentNodes(new GridEdge(edge.u(), edge.v()));
-           } catch (IllegalArgumentException _ignored) {
-               return null;
-           }
+    private void onVertexRemoved(GridVertex vertex) {
+        gridsManager.getGridLookup().remove(vertex.pos());
+        if (vertex.appliance() != null) {
+            vertex.appliance().onGridDisconnected();
         }
     }
 

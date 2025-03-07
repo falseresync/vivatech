@@ -63,6 +63,7 @@ public class HeaterBlockEntity extends BlockEntity implements Ticking, Appliance
         } else {
             cachedFurnaces.remove(posToScan);
         }
+        markDirty();
     }
 
     @Override

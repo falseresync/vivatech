@@ -1,18 +1,18 @@
 package falseresync.vivatech.common.power;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 import java.util.Objects;
 
-public record GridEdge(ImmutableSet<BlockPos> positions, BlockPos u, BlockPos v) {
+public record GridEdge(ImmutableSortedSet<BlockPos> positions, BlockPos u, BlockPos v) {
     public static final Codec<GridEdge> CODEC =
             Codec.list(BlockPos.CODEC, 2, 2).xmap(it -> new GridEdge(it.getFirst(), it.getLast()), it -> List.of(it.u, it.v));
 
     public GridEdge(BlockPos u, BlockPos v) {
-        this(ImmutableSet.of(u, v), u, v);
+        this(ImmutableSortedSet.of(u, v), u, v);
     }
 
     public Wire toServerWire() {
@@ -28,6 +28,6 @@ public record GridEdge(ImmutableSet<BlockPos> positions, BlockPos u, BlockPos v)
 
     @Override
     public int hashCode() {
-        return Objects.hash(positions);
+        return positions.hashCode();
     }
 }
