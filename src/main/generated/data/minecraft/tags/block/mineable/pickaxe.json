@@ -1,0 +1,11 @@
+{
+  "values": [
+    "vivatech:generator",
+    "vivatech:gearbox",
+    "vivatech:windmill",
+    "vivatech:heater",
+    "vivatech:static_compensator",
+    "vivatech:charger",
+    "vivatech:wire_post"
+  ]
+}

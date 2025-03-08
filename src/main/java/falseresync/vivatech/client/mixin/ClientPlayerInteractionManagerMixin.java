@@ -20,7 +20,7 @@ public class ClientPlayerInteractionManagerMixin {
     private int lastSelectedSlot;
 
     @Inject(method = "syncSelectedSlot", at = @At("HEAD"))
-    private void wizcraft$syncSelectedSlot(CallbackInfo ci) {
+    private void vivatech$syncSelectedSlot(CallbackInfo ci) {
         if (client.player == null) {
             return;
         }

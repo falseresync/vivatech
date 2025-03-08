@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "vivatech:block/static_compensator_bottom",
+    "side": "vivatech:block/static_compensator_side",
+    "top": "vivatech:block/static_compensator_top"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "tag": "c:ingots/gold"
+  },
+  "base": {
+    "item": "vivatech:comet_warp_focus"
+  },
+  "result": {
+    "components": {
+      "vivatech:focus_plating": 1
+    },
+    "count": 1,
+    "id": "vivatech:comet_warp_focus"
+  },
+  "template": []
+}

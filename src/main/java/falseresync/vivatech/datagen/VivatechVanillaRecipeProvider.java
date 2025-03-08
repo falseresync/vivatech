@@ -103,6 +103,7 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
         for (var item : VivatechItemTagProvider.FOCUSES) {
             var stack = new ItemStack(item);
             stack.applyChanges(platingComponents);
+            stack.remove(VivatechComponents.UUID);
             new CustomSmithingTransformRecipeJsonBuilder(Ingredient.EMPTY, Ingredient.ofItems(item), ingredient, stack)
                     .offerTo(exporter, plating);
         }

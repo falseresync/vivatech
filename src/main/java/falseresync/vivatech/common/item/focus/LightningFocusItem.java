@@ -36,7 +36,7 @@ public class LightningFocusItem extends FocusItem {
                 //noinspection DataFlowIssue
                 lightning.refreshPositionAfterTeleport(pos);
                 lightning.setChanneler(player);
-                ((VivatechLightning) lightning).wizcraft$setThunderless();
+                ((VivatechLightning) lightning).vivatech$setThunderless();
                 world.spawnEntity(lightning);
                 focusStack.damage(1, user, EquipmentSlot.MAINHAND);
                 return TypedActionResult.success(wandStack);
@@ -57,6 +57,6 @@ public class LightningFocusItem extends FocusItem {
     }
 
     public interface VivatechLightning {
-        void wizcraft$setThunderless();
+        void vivatech$setThunderless();
     }
 }

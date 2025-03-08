@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "vivatech:block/charger_bottom",
+    "side": "vivatech:block/charger_side",
+    "top": "vivatech:block/charger_top"
+  }
+}

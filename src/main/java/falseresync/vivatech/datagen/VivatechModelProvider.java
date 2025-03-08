@@ -31,7 +31,7 @@ public class VivatechModelProvider extends FabricModelProvider {
         registerWindmill();
         blockStateModelGenerator.registerSingleton(VivatechBlocks.HEATER, TexturedModel.CUBE_BOTTOM_TOP);
         blockStateModelGenerator.registerSingleton(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_BOTTOM_TOP);
-        blockStateModelGenerator.registerSingleton(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_BOTTOM_TOP);
+        blockStateModelGenerator.registerSingleton(VivatechBlocks.CHARGER, TexturedModel.CUBE_BOTTOM_TOP);
         registerWirePost();
     }
 

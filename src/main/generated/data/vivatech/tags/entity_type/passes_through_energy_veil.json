@@ -1,0 +1,16 @@
+{
+  "values": [
+    "minecraft:item",
+    "minecraft:area_effect_cloud",
+    "minecraft:lightning_bolt",
+    "minecraft:marker",
+    "minecraft:end_crystal",
+    "minecraft:ominous_item_spawner",
+    "minecraft:eye_of_ender",
+    "minecraft:ender_pearl",
+    "minecraft:experience_orb",
+    "minecraft:experience_bottle",
+    "#c:boats",
+    "#c:minecarts"
+  ]
+}

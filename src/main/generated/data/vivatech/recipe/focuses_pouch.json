@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "l": {
+      "tag": "c:leathers"
+    },
+    "t": {
+      "item": "minecraft:turtle_helmet"
+    }
+  },
+  "pattern": [
+    "ltl",
+    "l l",
+    "lll"
+  ],
+  "result": {
+    "count": 1,
+    "id": "vivatech:focuses_pouch"
+  }
+}

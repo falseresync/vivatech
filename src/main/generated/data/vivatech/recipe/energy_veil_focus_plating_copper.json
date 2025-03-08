@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "tag": "c:ingots/copper"
+  },
+  "base": {
+    "item": "vivatech:energy_veil_focus"
+  },
+  "result": {
+    "components": {
+      "vivatech:focus_plating": 2
+    },
+    "count": 1,
+    "id": "vivatech:energy_veil_focus"
+  },
+  "template": []
+}

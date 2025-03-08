@@ -17,11 +17,13 @@ import falseresync.vivatech.common.item.VivatechItems;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.EmptyEntityRenderer;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
@@ -32,6 +34,12 @@ public class VivatechRendering {
 
         EntityRendererRegistry.register(VivatechEntities.STAR_PROJECTILE, StarProjectileRenderer::new);
         EntityRendererRegistry.register(VivatechEntities.ENERGY_VEIL, EmptyEntityRenderer::new);
+
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
+            if (entityRenderer instanceof PlayerEntityRenderer) {
+                registrationHelper.register(new EnergyVeilFeatureRenderer<>((PlayerEntityRenderer) entityRenderer, context.getModelLoader()));
+            }
+        });
 
         BlockEntityRendererFactories.register(VivatechBlockEntities.WINDMILL, WindmillBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(VivatechBlockEntities.CHARGER, ChargerBlockEntityRenderer::new);

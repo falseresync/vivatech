@@ -1,0 +1,26 @@
+{
+  "parent": "minecraft:item/generated",
+  "overrides": [
+    {
+      "model": "vivatech:item/lightning_focus_plating_iron",
+      "predicate": {
+        "vivatech:focus_plating": 0
+      }
+    },
+    {
+      "model": "vivatech:item/lightning_focus_plating_gold",
+      "predicate": {
+        "vivatech:focus_plating": 1
+      }
+    },
+    {
+      "model": "vivatech:item/lightning_focus_plating_copper",
+      "predicate": {
+        "vivatech:focus_plating": 2
+      }
+    }
+  ],
+  "textures": {
+    "layer0": "vivatech:item/lightning_focus"
+  }
+}
