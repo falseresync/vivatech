@@ -3,7 +3,7 @@ package falseresync.vivatech.common.block;
 import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.blockentity.GeneratorBlockEntity;
 import falseresync.vivatech.common.blockentity.Ticking;
-import falseresync.vivatech.common.blockentity.VtBlockEntities;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -64,7 +64,7 @@ public class GeneratorBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VtBlockEntities.GENERATOR, Ticking.getDefaultTicker());
+        return validateTicker(type, VivatechBlockEntities.GENERATOR, Ticking.getDefaultTicker());
     }
 
     @Override

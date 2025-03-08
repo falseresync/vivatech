@@ -1,7 +1,7 @@
 package falseresync.vivatech.client;
 
 import falseresync.vivatech.common.power.Wire;
-import falseresync.vivatech.network.c2s.RequestWiresPayload;
+import falseresync.vivatech.network.c2s.RequestWiresC2SPayload;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -43,7 +43,7 @@ public class ClientWireManager {
         }
 
         if (!unsyncedChunks.isEmpty()) {
-            ClientPlayNetworking.send(new RequestWiresPayload(List.copyOf(unsyncedChunks)));
+            ClientPlayNetworking.send(new RequestWiresC2SPayload(List.copyOf(unsyncedChunks)));
             unsyncedChunks.clear();
         }
 

@@ -2,7 +2,7 @@ package falseresync.vivatech.common.power;
 
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
-import falseresync.vivatech.network.s2c.WiresPayload;
+import falseresync.vivatech.network.s2c.WiresS2CPayload;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -82,7 +82,7 @@ public class GridsManager {
             return;
         }
 
-        if (sendWires(wires, requestedChunks::contains, WiresPayload.Added::new)) {
+        if (sendWires(wires, requestedChunks::contains, WiresS2CPayload.Added::new)) {
             requestedChunks.clear();
         }
     }
@@ -92,7 +92,7 @@ public class GridsManager {
             return;
         }
 
-        if (sendWires(addedWires, Predicates.alwaysTrue(), WiresPayload.Added::new)) {
+        if (sendWires(addedWires, Predicates.alwaysTrue(), WiresS2CPayload.Added::new)) {
             addedWires.clear();
         }
     }
@@ -102,7 +102,7 @@ public class GridsManager {
             return;
         }
 
-        if (sendWires(removedWires, Predicates.alwaysTrue(), WiresPayload.Removed::new)) {
+        if (sendWires(removedWires, Predicates.alwaysTrue(), WiresS2CPayload.Removed::new)) {
             removedWires.clear();
         }
     }

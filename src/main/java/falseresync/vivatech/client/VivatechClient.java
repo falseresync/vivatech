@@ -1,38 +1,40 @@
 package falseresync.vivatech.client;
 
-import falseresync.vivatech.client.render.WireRenderer;
-import falseresync.vivatech.client.render.block.WindmillBlockEntityRenderer;
-import falseresync.vivatech.common.block.VtBlocks;
-import falseresync.vivatech.common.blockentity.VtBlockEntities;
-import falseresync.vivatech.network.VtClientReceivers;
+import falseresync.vivatech.client.gui.VivatechGui;
+import falseresync.vivatech.client.hud.VivatechHud;
+import falseresync.vivatech.client.rendering.VivatechRendering;
+import falseresync.vivatech.common.config.TranslatableEnum;
+import falseresync.vivatech.common.config.TranslatableEnumGuiProvider;
+import falseresync.vivatech.common.config.VivatechConfig;
+import falseresync.vivatech.network.VivatechClientReceivers;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 
 public class VivatechClient implements ClientModInitializer {
     private static ClientWireManager clientWireManager;
+    private static VivatechHud hud;
+    private static ToolManager toolManager;
 
     @Override
     public void onInitializeClient() {
-        EntityModelLayerRegistry.registerModelLayer(WindmillBlockEntityRenderer.LAYER, WindmillBlockEntityRenderer::getTexturedModelData);
-
-        BlockEntityRendererFactories.register(VtBlockEntities.WINDMILL, WindmillBlockEntityRenderer::new);
-
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(),
-                VtBlocks.WIRE_POST,
-                VtBlocks.WINDMILL
+        AutoConfig.getGuiRegistry(VivatechConfig.class).registerPredicateProvider(
+                new TranslatableEnumGuiProvider<>(),
+                field -> field.getType().isEnum() && field.isAnnotationPresent(TranslatableEnum.class)
         );
-
-        VtClientReceivers.registerAll();
+        
+        VivatechRendering.init();
+        VivatechGui.init();
+        VivatechKeybindings.init();
+        VivatechClientReceivers.registerAll();
+        ClientPlayerInventoryEvents.init();
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             clientWireManager = new ClientWireManager(client);
+            hud = new VivatechHud(client);
+            toolManager = new ToolManager();
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -44,11 +46,17 @@ public class VivatechClient implements ClientModInitializer {
                 clientWireManager.queueUnsyncedChunk(chunk.getPos());
             }
         });
-
-        WorldRenderEvents.AFTER_ENTITIES.register(new WireRenderer());
     }
 
     public static ClientWireManager getClientWireManager() {
         return clientWireManager;
+    }
+    
+    public static VivatechHud getHud() {
+        return hud;
+    }
+
+    public static ToolManager getToolManager() {
+        return toolManager;
     }
 }

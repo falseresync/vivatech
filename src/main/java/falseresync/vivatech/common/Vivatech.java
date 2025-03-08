@@ -1,17 +1,22 @@
 package falseresync.vivatech.common;
 
-import falseresync.vivatech.common.block.VtBlocks;
-import falseresync.vivatech.common.blockentity.VtBlockEntities;
-import falseresync.vivatech.common.data.VtComponents;
-import falseresync.vivatech.common.item.VtItemGroups;
-import falseresync.vivatech.common.item.VtItems;
+import falseresync.vivatech.common.block.VivatechBlocks;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
+import falseresync.vivatech.common.config.VivatechConfig;
+import falseresync.vivatech.common.data.VivatechAttachments;
+import falseresync.vivatech.common.data.VivatechComponents;
+import falseresync.vivatech.common.entity.VivatechEntities;
+import falseresync.vivatech.common.item.VivatechItemGroups;
+import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.lib.registry.AutoRegistry;
 import falseresync.vivatech.common.power.Grid;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.ServerGridsLoader;
 import falseresync.vivatech.common.power.WireType;
 import falseresync.vivatech.network.VivatechNetworking;
-import falseresync.vivatech.network.VtServerReceivers;
+import falseresync.vivatech.network.VivatechServerReceivers;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -24,21 +29,28 @@ import org.slf4j.LoggerFactory;
 public class Vivatech implements ModInitializer {
 	public static final String MOD_ID = "vivatech";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	private static ChargeManager chargeManager;
+	private static VivatechConfig config;
 	private static ServerGridsLoader serverGridsLoader;
 
 	@Override
 	public void onInitialize() {
-		VtBlocks.registerAll();
-		VtItems.registerAll();
-		new AutoRegistry(MOD_ID, LOGGER)
-				.link(Registries.BLOCK_ENTITY_TYPE, VtBlockEntities.class)
-				.link(Registries.ITEM_GROUP, VtItemGroups.class)
-				.link(Registries.DATA_COMPONENT_TYPE, VtComponents.class)
-				.link(WireType.REGISTRY, WireType.class);
-		PowerSystem.registerAll();
+		config = AutoConfig.register(VivatechConfig.class, JanksonConfigSerializer::new).getConfig();
 
+		VivatechBlocks.registerAll();
+		VivatechItems.registerAll();
+		new AutoRegistry(MOD_ID, LOGGER)
+				.link(Registries.BLOCK_ENTITY_TYPE, VivatechBlockEntities.class)
+				.link(Registries.ITEM_GROUP, VivatechItemGroups.class)
+				.link(Registries.DATA_COMPONENT_TYPE, VivatechComponents.class)
+				.link(Registries.ENTITY_TYPE, VivatechEntities.class)
+				.link(WireType.REGISTRY, WireType.class);
+		VivatechAttachments.init();
+		PowerSystem.registerAll();
 		VivatechNetworking.registerAll();
-		VtServerReceivers.registerAll();
+		VivatechServerReceivers.registerAll();
+
+		chargeManager = new ChargeManager();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			serverGridsLoader = new ServerGridsLoader(server);
@@ -56,6 +68,14 @@ public class Vivatech implements ModInitializer {
 
 	public static ServerGridsLoader getServerGridsLoader() {
 		return serverGridsLoader;
+	}
+
+	public static ChargeManager getChargeManager() {
+		return chargeManager;
+	}
+
+	public static VivatechConfig getConfig() {
+		return config;
 	}
 
 	public static Identifier vtId(String path) {

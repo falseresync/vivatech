@@ -1,4 +1,91 @@
 {
-  "block.vivatech.sterling_generator": "Sterling Generator",
-  "itemGroup.vivatech.general": "Vivatech"
+  "block.vivatech.generator": "Generator",
+  "block.vivatech.gearbox": "Gearbox",
+  "block.vivatech.windmill": "Windmill",
+
+  "block.vivatech.heater": "Heater",
+  "block.vivatech.static_compensator": "Static compensator",
+  "block.vivatech.charger": "Charger",
+
+  "block.vivatech.wire_post": "Wire post",
+
+  "itemGroup.vivatech.general": "Vivatech",
+  
+  "item.vivatech.connector": "Connector",
+  "item.vivatech.pliers": "Pliers",
+  "item.vivatech.mortar_and_pestle": "Mortar and pestle",
+  "item.vivatech.metallized_stick": "Metallized stick",
+  "item.vivatech.wand_core": "Wand core",
+  "item.vivatech.wand": "Wand",
+  "item.vivatech.charging_focus": "Charging focus",
+  "item.vivatech.starshooter_focus": "Starshooter focus",
+  "item.vivatech.lightning_focus": "Lightning focus",
+  "item.vivatech.comet_warp_focus": "Comet warp focus",
+  "item.vivatech.energy_veil_focus": "Energy veil focus",
+  "item.vivatech.trueseer_goggles": "Trueseer goggles",
+  "item.vivatech.focuses_belt": "Focuses belt",
+  "item.vivatech.charge_shell": "Charge shell",
+
+  "tag.item.vivatech.focuses": "Focuses",
+  "tag.item.vivatech.wands": "Wands",
+  "tag.block.vivatech.crucible_heat_sources": "Crucible heat sources",
+  "tag.entity.vivatech.passes_through_energy_veil": "Passes through Energy veil",
+
+  "entity.vivatech.star_projectile": "Star projectile",
+  "entity.vivatech.energy_veil": "Energy veil",
+
+  "tooltip.vivatech.wand.active_focus": "Active focus: %s",
+  "tooltip.vivatech.wand.change_focus": "Press [%s] to change focus",
+  "tooltip.vivatech.wand.setup_anchor": "Use while sneaking to setup an anchor",
+  "tooltip.vivatech.wand.has_anchor": "Anchored in %s at %s",
+
+  "hud.vivatech.wand.cannot_charge": "Can only charge from clear skies",
+  "hud.vivatech.wand.already_charged": "Already fully charged",
+  "hud.vivatech.wand.successfully_charged": "Charged!",
+  "hud.vivatech.wand.no_focuses": "No other focus to pick",
+  "hud.vivatech.wand.insufficient_charge": "Not enough charge",
+  "hud.vivatech.wand.no_anchor": "Setup an anchor first",
+  "hud.vivatech.wand.full_inventory": "Cannot pick a focus with a full inventory",
+  "hud.vivatech.worktable.incomplete_worktable": "Place all required blocks to complete the worktable",
+
+  "sound.vivatech.block.worktable.success": "Worktable successfully crafts an item",
+  "sound.vivatech.entity.star_projectile.explode": "Star projectile explodes",
+  "sound.vivatech.focus.charging.successfully_charged": "Successfully charged a wand",
+  "sound.vivatech.focus.comet_warp.anchor_placed": "Placed a Comet warp anchor",
+
+  "keyCategory.vivatech": "Vivatech",
+  "key.vivatech.tool_control": "Tool control",
+
+  "text.autoconfig.vivatech.title": "Vivatech Config",
+  "text.autoconfig.vivatech.category.general": "Cheats",
+  "text.autoconfig.vivatech.category.performance": "Performance",
+  "text.autoconfig.vivatech.category.accessibility": "Accessibility",
+
+  "text.autoconfig.vivatech.option.infiniteCharge": "Tools have infinite charge",
+  "text.autoconfig.vivatech.option.infiniteCharge.NEVER": "Never",
+  "text.autoconfig.vivatech.option.infiniteCharge.CREATIVE_ONLY": "Creative only",
+  "text.autoconfig.vivatech.option.infiniteCharge.ALWAYS": "Always",
+  "text.autoconfig.vivatech.option.passiveCharge": "Tools charge passively",
+  "text.autoconfig.vivatech.option.passiveCharge.DISABLED": "Disabled",
+  "text.autoconfig.vivatech.option.passiveCharge.DEFAULT": "Enabled",
+  "text.autoconfig.vivatech.option.passiveCharge.FASTER": "Enabled (faster)",
+  "text.autoconfig.vivatech.option.transmutation": "Transmutation",
+  "text.autoconfig.vivatech.option.transmutation.@Tooltip[0]": "Configure the weight (i.e. relative chance) of each possible outcome of a transmutation.",
+  "text.autoconfig.vivatech.option.transmutation.@Tooltip[1]": "IMPORTANT: To configure which entities a transmutation affects and which it produces,",
+  "text.autoconfig.vivatech.option.transmutation.@Tooltip[2]": "you need to edit the corresponding tags.",
+  "text.autoconfig.vivatech.option.transmutation.agingWeight": "Aging weight",
+  "text.autoconfig.vivatech.option.transmutation.transformationWeight": "Transformation weight",
+  "text.autoconfig.vivatech.option.transmutation.doNothingWeight": "Do nothing weight",
+
+  "text.autoconfig.vivatech.option.trueseerGogglesDisplayRange": "Trueseer goggles display range",
+  "text.autoconfig.vivatech.option.animationParticlesAmount": "Animation particles amount",
+  "text.autoconfig.vivatech.option.animationParticlesAmount.DEFAULT": "Normal",
+  "text.autoconfig.vivatech.option.animationParticlesAmount.REDUCED": "Reduced",
+  "text.autoconfig.vivatech.option.animationQuality": "Animations quality",
+  "text.autoconfig.vivatech.option.animationQuality.DEFAULT": "Normal",
+  "text.autoconfig.vivatech.option.animationQuality.FAST": "Fast",
+
+  "text.autoconfig.vivatech.option.fullscreenEffectsTransparency": "Fullscreen effects transparency",
+  "text.autoconfig.vivatech.option.fullscreenEffectsTransparency.DEFAULT": "Normal",
+  "text.autoconfig.vivatech.option.fullscreenEffectsTransparency.INCREASED": "Increased"
 }

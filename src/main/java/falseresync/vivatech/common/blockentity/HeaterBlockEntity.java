@@ -21,7 +21,7 @@ public class HeaterBlockEntity extends BlockEntity implements Ticking, Appliance
     private int heatInertiaTicks = 0;
 
     public HeaterBlockEntity(BlockPos pos, BlockState state) {
-        super(VtBlockEntities.HEATER, pos, state);
+        super(VivatechBlockEntities.HEATER, pos, state);
     }
 
     @Override

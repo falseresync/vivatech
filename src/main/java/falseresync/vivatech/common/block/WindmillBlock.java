@@ -3,7 +3,7 @@ package falseresync.vivatech.common.block;
 import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.blockentity.WindmillBlockEntity;
 import falseresync.vivatech.common.blockentity.Ticking;
-import falseresync.vivatech.common.blockentity.VtBlockEntities;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -67,7 +67,7 @@ public class WindmillBlock extends BlockWithEntity {
     protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         var facing = state.get(FACING);
         var otherState = world.getBlockState(pos.offset(facing));
-        return otherState.isOf(VtBlocks.GEARBOX) && otherState.get(GearboxBlock.FACING) == facing;
+        return otherState.isOf(VivatechBlocks.GEARBOX) && otherState.get(GearboxBlock.FACING) == facing;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class WindmillBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VtBlockEntities.WINDMILL, Ticking.getDefaultTicker());
+        return validateTicker(type, VivatechBlockEntities.WINDMILL, Ticking.getDefaultTicker());
     }
 
     @Override

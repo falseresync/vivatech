@@ -3,3 +3,7 @@ accessWidener v2 named
 accessible method net/minecraft/util/WorldSavePath <init> (Ljava/lang/String;)V
 accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity fuelTime I
 accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity burnTime I
+accessible field net/minecraft/server/world/ServerChunkLoadingManager watchDistance I
+accessible method net/minecraft/data/client/Models block (Ljava/lang/String;[Lnet/minecraft/data/client/TextureKey;)Lnet/minecraft/data/client/Model;
+accessible method net/minecraft/client/render/entity/LivingEntityRenderer getAnimationProgress (Lnet/minecraft/entity/LivingEntity;F)F
+accessible field net/minecraft/client/item/ModelPredicateProviderRegistry GLOBAL Ljava/util/Map;

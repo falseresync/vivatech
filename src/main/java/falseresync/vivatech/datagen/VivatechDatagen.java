@@ -7,6 +7,11 @@ public class VivatechDatagen implements DataGeneratorEntrypoint {
 	@Override
 	public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
 		var pack = fabricDataGenerator.createPack();
-		pack.addProvider(VivatechModels::new);
+		pack.addProvider(VivatechBlockLootTableProvider::new);
+		pack.addProvider(VivatechBlockTagProvider::new);
+		pack.addProvider(VivatechItemTagProvider::new);
+		pack.addProvider(VivatechEntityTagProvider::new);
+		pack.addProvider(VivatechVanillaRecipeProvider::new);
+		pack.addProvider(VivatechModelProvider::new);
 	}
 }

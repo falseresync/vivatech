@@ -1,6 +1,6 @@
 package falseresync.vivatech.common.item;
 
-import falseresync.vivatech.common.data.VtComponents;
+import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.power.GridVertex;
 import falseresync.vivatech.common.power.PowerSystem;
 import net.minecraft.item.Item;
@@ -25,9 +25,9 @@ public abstract class WireManagementItem extends Item {
         }
 
         var stack = context.getStack();
-        var connection = stack.get(VtComponents.CONNECTION);
+        var connection = stack.get(VivatechComponents.CONNECTION);
         if (connection == null) {
-            stack.set(VtComponents.CONNECTION, new GlobalPos(world.getRegistryKey(), currentPos));
+            stack.set(VivatechComponents.CONNECTION, new GlobalPos(world.getRegistryKey(), currentPos));
             return ActionResult.success(context.getWorld().isClient);
         }
 
@@ -37,7 +37,7 @@ public abstract class WireManagementItem extends Item {
 
         var previousVertex = PowerSystem.GRID_VERTEX.find(world, connection.pos(), null);
         if (previousVertex != null) {
-            stack.remove(VtComponents.CONNECTION);
+            stack.remove(VivatechComponents.CONNECTION);
             return manageWire(world, previousVertex, currentVertex);
         }
 

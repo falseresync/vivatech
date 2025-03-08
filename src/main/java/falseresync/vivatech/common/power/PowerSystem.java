@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.power;
 
-import falseresync.vivatech.common.block.VtBlocks;
-import falseresync.vivatech.common.blockentity.VtBlockEntities;
+import falseresync.vivatech.common.block.VivatechBlocks;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.util.WorldSavePath;
@@ -26,8 +26,8 @@ public class PowerSystem {
 
     public static void registerAll() {
         APPLIANCE.registerSelf(
-                VtBlockEntities.GENERATOR,
-                VtBlockEntities.HEATER
+                VivatechBlockEntities.GENERATOR,
+                VivatechBlockEntities.HEATER
         );
 
         GRID_VERTEX.registerForBlocks((world, pos, state, blockEntity, context) -> {
@@ -35,7 +35,7 @@ public class PowerSystem {
                 return provider.getGridVertex(world, pos, state);
             }
             return null;
-        }, VtBlocks.WIRE_POST);
+        }, VivatechBlocks.WIRE_POST);
     }
 
     public static String createFileName(World world) {

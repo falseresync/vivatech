@@ -11,7 +11,7 @@ public class WindmillBlockEntity extends BlockEntity implements Ticking {
     private float rotationProgress;
 
     public WindmillBlockEntity(BlockPos pos, BlockState state) {
-        super(VtBlockEntities.WINDMILL, pos, state);
+        super(VivatechBlockEntities.WINDMILL, pos, state);
     }
 
     @Override
