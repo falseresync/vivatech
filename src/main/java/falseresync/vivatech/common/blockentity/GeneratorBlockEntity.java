@@ -1,22 +1,47 @@
 package falseresync.vivatech.common.blockentity;
 
+import falseresync.vivatech.common.block.GearboxBlock;
+import falseresync.vivatech.common.block.VtBlocks;
 import falseresync.vivatech.common.power.Appliance;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class GeneratorBlockEntity extends BlockEntity implements Ticking, Appliance {
+    private boolean generating = true;
+    private boolean connected = false;
+
     public GeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(VtBlockEntities.GENERATOR, pos, state);
     }
 
     @Override
     public void tick() {
+        if (!world.isClient) {
+            return;
+        }
 
+        if (connected) {
+            var facing = getCachedState().get(GearboxBlock.FACING);
+            var gearboxState = world.getBlockState(pos.offset(facing));
+            var windmillState = world.getBlockState(pos.offset(facing, 2));
+            generating = gearboxState.isOf(VtBlocks.GEARBOX) && windmillState.isOf(VtBlocks.WINDMILL);
+        }
     }
 
     @Override
     public float getElectricalCurrent() {
-        return 1;
+        return generating ? 2 : 0;
+    }
+
+    @Override
+    public void onGridConnected() {
+        connected = true;
+    }
+
+    @Override
+    public void onGridDisconnected() {
+        connected = false;
+        generating = false;
     }
 }

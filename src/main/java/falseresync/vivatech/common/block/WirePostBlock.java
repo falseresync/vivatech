@@ -1,6 +1,5 @@
 package falseresync.vivatech.common.block;
 
-import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.power.GridVertex;
 import falseresync.vivatech.common.power.GridVertexProvider;
@@ -25,7 +24,6 @@ import net.minecraft.world.WorldView;
 
 public class WirePostBlock extends Block implements GridVertexProvider {
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final MapCodec<WirePostBlock> CODEC = createCodec(WirePostBlock::new);
 
     public static final VoxelShape SHAPE_SOUTH = createCuboidShape(4, 4, 6, 12, 12, 16);
     public static final VoxelShape SHAPE_NORTH = createCuboidShape(4, 4, 0, 12, 12, 10);
@@ -39,11 +37,6 @@ public class WirePostBlock extends Block implements GridVertexProvider {
     public WirePostBlock(Settings settings) {
         super(settings);
         setDefaultState(stateManager.getDefaultState().with(FACING, Direction.NORTH));
-    }
-
-    @Override
-    protected MapCodec<WirePostBlock> getCodec() {
-        return CODEC;
     }
 
     @Override

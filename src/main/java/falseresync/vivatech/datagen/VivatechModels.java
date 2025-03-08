@@ -17,18 +17,20 @@ public class VivatechModels extends FabricModelProvider {
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         this.blockStateModelGenerator = blockStateModelGenerator;
 
-        blockStateModelGenerator.registerSimpleCubeAll(VtBlocks.GENERATOR);
-        blockStateModelGenerator.registerSingleton(VtBlocks.WINDMILL, TexturedModel.PARTICLE);
-        blockStateModelGenerator.excludeFromSimpleItemModelGeneration(VtBlocks.WINDMILL);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VtBlocks.GENERATOR, TexturedModel.CUBE_COLUMN_HORIZONTAL);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VtBlocks.GEARBOX, TexturedModel.CUBE_COLUMN_HORIZONTAL);
 
+        var windmillModelId = TexturedModel.PARTICLE.upload(VtBlocks.WINDMILL, blockStateModelGenerator.modelCollector);
         blockStateModelGenerator.blockStateCollector.accept(
                 VariantsBlockStateSupplier
                         .create(
-                                VtBlocks.HEATER,
-                                BlockStateVariant.create().put(
-                                        VariantSettings.MODEL,
-                                        Models.CUBE_COLUMN.upload(VtBlocks.HEATER, TextureMap.sideEnd(VtBlocks.HEATER), blockStateModelGenerator.modelCollector)))
+                                VtBlocks.WINDMILL,
+                                BlockStateVariant.create().put(VariantSettings.MODEL, windmillModelId)
+                        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
         );
+        blockStateModelGenerator.excludeFromSimpleItemModelGeneration(VtBlocks.WINDMILL);
+
+        blockStateModelGenerator.registerSingleton(VtBlocks.HEATER, TexturedModel.CUBE_BOTTOM_TOP);
 
         blockStateModelGenerator.blockStateCollector.accept(
                 VariantsBlockStateSupplier
