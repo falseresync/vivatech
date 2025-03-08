@@ -141,12 +141,12 @@ public class GridsManager {
         return grids;
     }
 
-    public Grid findOrCreate(BlockPos u, BlockPos v) {
+    public Grid findOrCreate(BlockPos u, BlockPos v, WireType wireType) {
         var found = find(u, v);
         if (found != null) {
             return found;
         }
-        return create();
+        return create(wireType);
     }
 
     @Nullable
@@ -158,8 +158,8 @@ public class GridsManager {
         return gridLookup.get(v);
     }
 
-    public Grid create() {
-        var grid = new Grid(this, world);
+    public Grid create(WireType wireType) {
+        var grid = new Grid(this, world, wireType);
         grids.add(grid);
         return grid;
     }

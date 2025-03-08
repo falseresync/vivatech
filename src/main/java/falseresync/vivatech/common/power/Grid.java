@@ -3,12 +3,15 @@ package falseresync.vivatech.common.power;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameRules;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.connectivity.BiconnectivityInspector;
+import org.jgrapht.alg.scoring.BetweennessCentrality;
 import org.jgrapht.graph.SimpleGraph;
 
 import java.util.*;
@@ -20,22 +23,29 @@ public class Grid {
     private final Map<BlockPos, Appliance> appliances;
     private final GridsManager gridsManager;
     private final ServerWorld world;
+    private final WireType wireType;
+    private int overcurrentTicks = 0;
 
-    public Grid(GridsManager gridsManager, ServerWorld world) {
+    public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType) {
         this.gridsManager = gridsManager;
         this.world = world;
+        this.wireType = wireType;
         this.graph = new SimpleGraph<>(GridEdge.class);
         this.vertexCaches = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
         this.appliances = new Object2ReferenceRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
     }
 
-    public Grid(GridsManager gridsManager, ServerWorld world, Set<GridEdge> edges) {
-        this(gridsManager, world);
+    public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
+        this(gridsManager, world, wireType);
         edges.forEach(this::connect);
     }
 
     public GridSnapshot createSnapshot() {
-        return new GridSnapshot(graph.edgeSet());
+        return new GridSnapshot(wireType, graph.edgeSet());
+    }
+
+    public WireType getWireType() {
+        return wireType;
     }
 
     public boolean connect(GridEdge edge) {
@@ -106,7 +116,10 @@ public class Grid {
     }
 
     public boolean disconnect(GridVertex vertexU, GridVertex vertexV) {
-        var edge = new GridEdge(vertexU.pos(), vertexV.pos());
+        return disconnect(new GridEdge(vertexU.pos(), vertexV.pos()));
+    }
+
+    public boolean disconnect(GridEdge edge) {
         if (!graph.removeEdge(edge)) {
             return false;
         }
@@ -126,7 +139,7 @@ public class Grid {
             if (isolatedGraph.vertexSet().size() == 1) {
                 isolatedGraph.vertexSet().forEach(this::onVertexRemoved);
             } else {
-                var other = gridsManager.create();
+                var other = gridsManager.create(WireType.V_230);
                 other.merge(isolatedGraph);
             }
         }
@@ -168,11 +181,63 @@ public class Grid {
 
         float voltage = 0;
         if (consumption != 0 && generation != 0) {
-            voltage = 230 * generation / consumption;
+            voltage = wireType.voltage() * generation / consumption;
+        }
+
+        if (voltage >= wireType.voltage() * 2) {
+            overcurrentTicks += 1;
+        } else if (overcurrentTicks > 0) {
+            overcurrentTicks -= 1;
+        }
+
+        if (overcurrentTicks > wireType.overcurrentToleranceTime()) {
+            overcurrentTicks = 0;
+            onOvercurrent();
         }
 
         for (var appliance : appliances.values()) {
             appliance.gridTick(voltage);
+        }
+    }
+
+    private void onOvercurrent() {
+        var inspector = new BetweennessCentrality<>(graph);
+        var mostCentralVertex = inspector.getScores().entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue));
+        mostCentralVertex.map(Map.Entry::getKey).ifPresent(vertex -> {
+            var edges = graph.edgesOf(vertex);
+            int randomEntry = world.getRandom().nextInt(edges.size());
+            int currentEntry = 0;
+            for (var edge : edges) {
+                if (currentEntry == randomEntry) {
+                    burn(edge);
+                    break;
+                }
+                currentEntry++;
+            }
+        });
+    }
+
+    private void burn(GridEdge edge) {
+        disconnect(edge);
+        if (world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
+            spreadFire(edge.u());
+            spreadFire(edge.v());
+        }
+    }
+
+    private void spreadFire(BlockPos pos) {
+        int ignitedBlocks = 0;
+        int blocksToIgnite = world.getRandom().nextBetween(1, 4);
+        for (int j = 0; j < 10 && ignitedBlocks < blocksToIgnite; j++) {
+            var nearbyPos = pos.add(world.getRandom().nextBetween(-2, 2), world.getRandom().nextBetween(-2, 2), world.getRandom().nextBetween(-2, 2));
+            if (!world.canSetBlock(nearbyPos)) {
+                continue;
+            }
+
+            if (world.isAir(nearbyPos)) {
+                ignitedBlocks += 1;
+                world.setBlockState(nearbyPos, AbstractFireBlock.getState(world, nearbyPos));
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import falseresync.lib.registry.AutoRegistry;
 import falseresync.vivatech.common.power.Grid;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.ServerGridsLoader;
+import falseresync.vivatech.common.power.WireType;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VtServerReceivers;
 import net.fabricmc.api.ModInitializer;
@@ -32,7 +33,8 @@ public class Vivatech implements ModInitializer {
 		new AutoRegistry(MOD_ID, LOGGER)
 				.link(Registries.BLOCK_ENTITY_TYPE, VtBlockEntities.class)
 				.link(Registries.ITEM_GROUP, VtItemGroups.class)
-				.link(Registries.DATA_COMPONENT_TYPE, VtComponents.class);
+				.link(Registries.DATA_COMPONENT_TYPE, VtComponents.class)
+				.link(WireType.REGISTRY, WireType.class);
 		PowerSystem.registerAll();
 
 		VivatechNetworking.registerAll();
