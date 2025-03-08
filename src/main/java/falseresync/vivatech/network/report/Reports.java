@@ -8,7 +8,7 @@ import net.minecraft.registry.SimpleRegistry;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public class VivatechReports {
+public class Reports {
     public static final SimpleRegistry<Report> REGISTRY =
             FabricRegistryBuilder
                     .<Report>createSimple(RegistryKey.ofRegistry(vtId("reports")))

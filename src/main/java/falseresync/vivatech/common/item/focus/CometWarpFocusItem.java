@@ -2,7 +2,7 @@ package falseresync.vivatech.common.item.focus;
 
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.data.VivatechComponents;
-import falseresync.vivatech.network.report.VivatechReports;
+import falseresync.vivatech.network.report.Reports;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -48,11 +48,11 @@ public class CometWarpFocusItem extends FocusItem {
         if (user instanceof ServerPlayerEntity player) {
             if (user.isSneaking()) {
                 if (!Vivatech.getChargeManager().tryExpendWandCharge(wandStack, DEFAULT_PLACEMENT_COST, user)) {
-                    VivatechReports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
+                    Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
                     return TypedActionResult.fail(wandStack);
                 }
 
-                VivatechReports.COMET_WARP_ANCHOR_PLACED.sendTo(player);
+                Reports.COMET_WARP_ANCHOR_PLACED.sendTo(player);
                 var globalPos = GlobalPos.create(world.getRegistryKey(), user.getBlockPos());
                 wandStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, globalPos);
                 if (world.random.nextFloat() < 0.1f) {
@@ -61,7 +61,7 @@ public class CometWarpFocusItem extends FocusItem {
             } else {
                 var anchor = wandStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
                 if (anchor == null) {
-                    VivatechReports.COMET_WARP_NO_ANCHOR.sendTo(player);
+                    Reports.COMET_WARP_NO_ANCHOR.sendTo(player);
                     return TypedActionResult.fail(wandStack);
                 }
 
@@ -74,11 +74,11 @@ public class CometWarpFocusItem extends FocusItem {
                         ? DEFAULT_INTERDIMENSIONAL_COST
                         : DEFAULT_WARPING_COST;
                 if (!Vivatech.getChargeManager().tryExpendWandCharge(wandStack, warpingCost, user)) {
-                    VivatechReports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
+                    Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
                     return TypedActionResult.fail(wandStack);
                 }
 
-                VivatechReports.COMET_WARP_TELEPORTED.sendTo(player);
+                Reports.COMET_WARP_TELEPORTED.sendTo(player);
                 user.teleportTo(new TeleportTarget(destination, anchor.pos().toCenterPos(), Vec3d.ZERO, user.getYaw(), user.getPitch(), TeleportTarget.NO_OP));
                 wandStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
                 focusStack.damage(1, player, EquipmentSlot.MAINHAND);

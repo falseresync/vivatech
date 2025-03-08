@@ -22,8 +22,20 @@ public class VivatechItemGroups {
 
                         entries.add(VivatechItems.WIRE_POST);
 
+                        entries.add(VivatechItems.MORTAR_AND_PESTLE);
                         entries.add(VivatechItems.CONNECTOR);
                         entries.add(VivatechItems.PLIERS);
+
+
+                        entries.add(VivatechItems.GADGET);
+
+                        entries.add(VivatechItems.STARSHOOTER_FOCUS);
+                        entries.add(VivatechItems.LIGHTNING_FOCUS);
+                        entries.add(VivatechItems.COMET_WARP_FOCUS);
+                        entries.add(VivatechItems.ENERGY_VEIL_FOCUS);
+
+                        entries.add(VivatechItems.INSPECTOR_GOGGLES);
+                        entries.add(VivatechItems.FOCUSES_POUCH);
                     })
                     .build();
 }
