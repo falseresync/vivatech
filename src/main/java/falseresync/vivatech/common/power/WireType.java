@@ -8,12 +8,12 @@ import net.minecraft.registry.RegistryKey;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public record WireType(int voltage, int overcurrentToleranceTime) {
+public record WireType(int voltage, int maxCurrent, int overcurrentToleranceTime) {
     public static final Registry<WireType> REGISTRY =
             FabricRegistryBuilder.<WireType>createSimple(RegistryKey.ofRegistry(vtId("wire_types")))
                     .attribute(RegistryAttribute.MODDED)
                     .attribute(RegistryAttribute.SYNCED)
                     .buildAndRegister();
 
-    public static final @RegistryObject WireType V_230 = new WireType(230, 100);
+    public static final @RegistryObject WireType V_230 = new WireType(230, 32, 100);
 }

@@ -12,7 +12,8 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class VtBlocks {
     public static final GeneratorBlock GENERATOR = r("generator", GeneratorBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
-    public static final HeaterBlock HEATER = r("heater", HeaterBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
+    public static final WindmillBlock WINDMILL = r("windmill", WindmillBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
+    public static final HeaterBlock HEATER = r("heater", HeaterBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
     public static final WirePostBlock WIRE_POST = r("wire_post", WirePostBlock::new, AbstractBlock.Settings.copy(Blocks.LIGHTNING_ROD));
 
     private static <T extends Block> T r(String id, Function<AbstractBlock.Settings, T> block, AbstractBlock.Settings settings) {

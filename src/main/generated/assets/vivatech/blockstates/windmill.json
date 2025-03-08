@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "vivatech:block/windmill"
+    }
+  }
+}

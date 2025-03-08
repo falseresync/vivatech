@@ -18,6 +18,8 @@ public class VivatechModels extends FabricModelProvider {
         this.blockStateModelGenerator = blockStateModelGenerator;
 
         blockStateModelGenerator.registerSimpleCubeAll(VtBlocks.GENERATOR);
+        blockStateModelGenerator.registerSingleton(VtBlocks.WINDMILL, TexturedModel.PARTICLE);
+        blockStateModelGenerator.excludeFromSimpleItemModelGeneration(VtBlocks.WINDMILL);
 
         blockStateModelGenerator.blockStateCollector.accept(
                 VariantsBlockStateSupplier
@@ -39,6 +41,8 @@ public class VivatechModels extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+        itemModelGenerator.register(VtItems.WINDMILL, Models.GENERATED);
+
         itemModelGenerator.register(VtItems.CONNECTOR, Models.GENERATED);
         itemModelGenerator.register(VtItems.PLIERS, Models.GENERATED);
     }

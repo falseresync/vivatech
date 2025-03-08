@@ -184,7 +184,7 @@ public class Grid {
             voltage = wireType.voltage() * generation / consumption;
         }
 
-        if (voltage >= wireType.voltage() * 2) {
+        if (Math.max(generation, consumption) >= wireType.maxCurrent()) {
             overcurrentTicks += 1;
         } else if (overcurrentTicks > 0) {
             overcurrentTicks -= 1;
