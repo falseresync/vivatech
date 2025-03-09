@@ -65,6 +65,9 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
                 charging = !charging;
                 markDirty();
             }
+        } else {
+            charging = false;
+            markDirty();
         }
     }
 

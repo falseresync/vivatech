@@ -31,7 +31,7 @@ public abstract class WireManagementItem extends Item {
             return ActionResult.success(context.getWorld().isClient);
         }
 
-        if (connection.dimension() != world.getRegistryKey()) {
+        if (connection.dimension() != world.getRegistryKey() || connection.pos().equals(currentPos)) {
             return ActionResult.FAIL;
         }
 

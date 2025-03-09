@@ -27,7 +27,9 @@ public class PowerSystem {
     public static void registerAll() {
         APPLIANCE.registerSelf(
                 VivatechBlockEntities.GENERATOR,
-                VivatechBlockEntities.HEATER
+                VivatechBlockEntities.HEATER,
+                VivatechBlockEntities.CHARGER,
+                VivatechBlockEntities.STATIC_COMPENSATOR
         );
 
         GRID_VERTEX.registerForBlocks((world, pos, state, blockEntity, context) -> {

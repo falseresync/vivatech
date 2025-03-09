@@ -7,6 +7,7 @@ import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -93,14 +94,13 @@ public class Grid {
     public boolean remove(BlockPos pos, BlockState state) {
         var cache = vertexCaches.get(pos);
         if (cache == null) {
-            vertexCaches.remove(pos);
+            clearVertexAssociatedCollections(pos);
             return false;
         }
 
         var vertex = cache.find(state, null);
         if (vertex == null) {
-            vertexCaches.remove(pos);
-            gridsManager.getGridLookup().remove(pos);
+            clearVertexAssociatedCollections(pos);
             return false;
         }
 
@@ -111,6 +111,7 @@ public class Grid {
             return false;
         }
 
+        onVertexRemoved(vertex);
         partition();
         return true;
     }
@@ -136,10 +137,10 @@ public class Grid {
         }
 
         for (var isolatedGraph : inspector.getConnectedComponents()) {
-            if (isolatedGraph.vertexSet().size() == 1) {
+            if (isolatedGraph.vertexSet().size() <= 1) {
                 isolatedGraph.vertexSet().forEach(this::onVertexRemoved);
             } else {
-                var other = gridsManager.create(WireType.V_230);
+                var other = gridsManager.create(wireType);
                 other.merge(isolatedGraph);
             }
         }
@@ -161,10 +162,16 @@ public class Grid {
     }
 
     private void onVertexRemoved(GridVertex vertex) {
-        gridsManager.getGridLookup().remove(vertex.pos());
+        clearVertexAssociatedCollections(vertex.pos());
         if (vertex.appliance() != null) {
             vertex.appliance().onGridDisconnected();
         }
+    }
+
+    private void clearVertexAssociatedCollections(BlockPos pos) {
+        gridsManager.getGridLookup().remove(pos);
+        vertexCaches.remove(pos);
+        appliances.remove(pos);
     }
 
     public void tick() {
@@ -181,7 +188,13 @@ public class Grid {
 
         float voltage = 0;
         if (consumption != 0 && generation != 0) {
-            voltage = wireType.voltage() * generation / consumption;
+            var balance = generation / consumption;
+            voltage = wireType.voltage();
+            if (balance < 1) {
+                voltage *= MathHelper.sqrt(balance);
+            } else {
+                voltage *= 0.5f + balance / 2f;
+            }
         }
 
         if (Math.max(generation, consumption) >= wireType.maxCurrent()) {
