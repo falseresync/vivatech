@@ -28,7 +28,7 @@ public class VivatechItems {
     public static final BlockItem WIRE_POST = rBlockItem("wire_post", VivatechBlocks.WIRE_POST, new Item.Settings());
 
     public static final MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Settings().maxCount(1).maxDamage(16));
-    public static final ConnectorItem CONNECTOR = r("connector", ConnectorItem::new, new Item.Settings().maxCount(1));
+    public static final WireItem WIRE = r("wire", WireItem::new, new Item.Settings());
     public static final PliersItem PLIERS = r("pliers", PliersItem::new, new Item.Settings().maxCount(1));
 
     public static final GadgetItem GADGET = r("gadget", GadgetItem::new, new Item.Settings().maxCount(1));

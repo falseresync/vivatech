@@ -2,6 +2,8 @@ package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.power.GridVertex;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
 
@@ -11,9 +13,9 @@ public class PliersItem extends WireManagementItem {
     }
 
     @Override
-    protected ActionResult manageWire(World world, GridVertex vertexU, GridVertex vertexV) {
-        if (!world.isClient) {
-            var gridsManager = Vivatech.getServerGridsLoader().getGridsManager(world);
+    protected ActionResult manageWire(ItemUsageContext context, GridVertex vertexU, GridVertex vertexV) {
+        if (!context.getWorld().isClient) {
+            var gridsManager = Vivatech.getServerGridsLoader().getGridsManager(context.getWorld());
             var grid = gridsManager.find(vertexU.pos(), vertexV.pos());
             if (grid == null) {
                 return ActionResult.FAIL;

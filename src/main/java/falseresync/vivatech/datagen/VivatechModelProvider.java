@@ -72,7 +72,7 @@ public class VivatechModelProvider extends FabricModelProvider {
         itemModelGenerator.register(VivatechItems.WINDMILL, Models.GENERATED);
 
         itemModelGenerator.register(VivatechItems.MORTAR_AND_PESTLE, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.CONNECTOR, Models.GENERATED);
+        itemModelGenerator.register(VivatechItems.WIRE, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.PLIERS, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.INSPECTOR_GOGGLES, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.FOCUSES_POUCH, Models.GENERATED);

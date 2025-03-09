@@ -24,7 +24,7 @@ public class ChargerBlockEntityRenderer implements BlockEntityRenderer<ChargerBl
     @Override
     public void render(ChargerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         var world = entity.getWorld();
-        var stack = entity.getHeldStackCopy();
+        var stack = entity.getStackCopy();
         if (stack.isEmpty() || world == null) return;
 
         matrices.push();

@@ -1,7 +1,6 @@
 package falseresync.vivatech.common.block;
 
 import com.mojang.serialization.MapCodec;
-import falseresync.vivatech.common.VivatechUtil;
 import falseresync.vivatech.common.blockentity.ChargerBlockEntity;
 import falseresync.vivatech.common.blockentity.Ticking;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
@@ -52,15 +51,11 @@ public class ChargerBlock extends BlockWithEntity {
 
     @Override
     protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.getBlockEntity(pos) instanceof ChargerBlockEntity worktable) {
+        if (world.getBlockEntity(pos) instanceof ChargerBlockEntity charger) {
             if (world.isClient()) return ItemActionResult.CONSUME;
 
-            if (worktable.shouldExchangeFor(stack)) {
-                var exchanged = VivatechUtil.exchangeStackInSlotWithHand(player, hand, worktable.getStorage(), 0, 1, null);
-                if (exchanged == 1) {
-                    return ItemActionResult.CONSUME;
-                }
-            }
+            charger.exchangeOrDrop(player, hand);
+            return  ItemActionResult.SUCCESS;
         }
 
         return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
@@ -70,7 +65,7 @@ public class ChargerBlock extends BlockWithEntity {
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock())) {
             if (world.getBlockEntity(pos) instanceof ChargerBlockEntity worktable) {
-                ItemScatterer.spawn(world, pos, worktable.getInventory());
+                ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), worktable.getStackCopy());
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);

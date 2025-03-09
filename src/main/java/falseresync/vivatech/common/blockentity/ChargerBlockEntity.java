@@ -1,15 +1,12 @@
 package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.power.Appliance;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -17,23 +14,19 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 public class ChargerBlockEntity extends BlockEntity implements Ticking, Appliance {
-    protected final SimpleInventory inventory = new SimpleInventory(1) {
-        @Override
-        public int getMaxCountPerStack() {
-            return 1;
-        }
-    };
-    protected final InventoryStorage storage = InventoryStorage.of(inventory, null);
-    protected boolean enabled = false;
+    protected ItemStack stack = ItemStack.EMPTY;
+    protected boolean connected = false;
+    protected boolean operational = false;
     protected boolean charging = false;
+    protected int gridCheckCooldown = 0;
 
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
         super(VivatechBlockEntities.CHARGER, pos, state);
-        inventory.addListener(changed -> markDirty());
     }
 
     @Override
@@ -42,33 +35,32 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
             return;
         }
 
-        var heldStack = inventory.getStack(0);
-        if (!heldStack.isOf(VivatechItems.GADGET)) {
-            if (charging) {
-                charging = false;
+        if (operational) {
+            if (Vivatech.getChargeManager().isGadgetFullyCharged(stack)) {
+                if (charging) {
+                    charging = false;
+                    markDirty();
+                }
+                return;
+            }
+
+            if (!charging) {
+                charging = true;
                 markDirty();
             }
-            return;
-        }
 
-        if (Vivatech.getChargeManager().isGadgetFullyCharged(heldStack)) {
-            charging = false;
-            markDirty();
-            return;
+            Vivatech.getChargeManager().charge(stack, 1, null);
         }
+    }
 
-        if (enabled) {
-            Vivatech.getChargeManager().charge(heldStack, 1, null);
+    @Override
+    public void onGridConnected() {
+        connected = true;
+    }
 
-            var isFullyCharged = Vivatech.getChargeManager().isGadgetFullyCharged(heldStack);
-            if (charging && isFullyCharged || !charging && !isFullyCharged) {
-                charging = !charging;
-                markDirty();
-            }
-        } else {
-            charging = false;
-            markDirty();
-        }
+    @Override
+    public void onGridDisconnected() {
+        connected = false;
     }
 
     @Override
@@ -78,27 +70,31 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
 
     @Override
     public void gridTick(float voltage) {
-        enabled = voltage > 210 && voltage < 250;
+        if (connected && gridCheckCooldown == 0) {
+            operational = voltage > 210 && voltage < 250;
+            gridCheckCooldown = 10;
+        } else if (gridCheckCooldown > 0) {
+            gridCheckCooldown -= 1;
+        }
     }
 
-    public SimpleInventory getInventory() {
-        return inventory;
-    }
-
-    public InventoryStorage getStorage() {
-        return storage;
-    }
-
-    public ItemStack getHeldStackCopy() {
-        return inventory.getStack(0).copy();
+    public ItemStack getStackCopy() {
+        return stack.copy();
     }
 
     public boolean isCharging() {
         return charging;
     }
 
-    public boolean shouldExchangeFor(ItemStack stack) {
-        return stack.isOf(VivatechItems.GADGET) || stack.isEmpty();
+    public void exchangeOrDrop(PlayerEntity player, Hand hand) {
+        var stackInHand = player.getStackInHand(hand);
+        if (stackInHand.isOf(VivatechItems.GADGET) || stackInHand.isEmpty()) {
+            player.setStackInHand(hand, stack);
+            stack = stackInHand;
+        } else {
+            player.getInventory().offerOrDrop(stack);
+        }
+        markDirty();
     }
 
     @Override
@@ -112,9 +108,11 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
+        writeObservableStateNbt(nbt, registryLookup);
+    }
 
-        Inventories.writeNbt(nbt, inventory.getHeldStacks(), registryLookup);
-
+    private void writeObservableStateNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        nbt.put("stack", stack.encodeAllowEmpty(registryLookup));
         nbt.putBoolean("charging", charging);
     }
 
@@ -122,8 +120,7 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
 
-        inventory.getHeldStacks().clear();
-        Inventories.readNbt(nbt, inventory.getHeldStacks(), registryLookup);
+        stack = ItemStack.fromNbtOrEmpty(registryLookup, nbt.getCompound("stack"));
 
         charging = false;
         if (nbt.contains("charging", NbtElement.BYTE_TYPE)) {
@@ -139,6 +136,8 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
 
     @Override
     public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
-        return createNbt(registryLookup);
+        var nbt = super.toInitialChunkDataNbt(registryLookup);
+        writeObservableStateNbt(nbt, registryLookup);
+        return nbt;
     }
 }

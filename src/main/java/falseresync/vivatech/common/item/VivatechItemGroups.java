@@ -23,7 +23,7 @@ public class VivatechItemGroups {
                         entries.add(VivatechItems.WIRE_POST);
 
                         entries.add(VivatechItems.MORTAR_AND_PESTLE);
-                        entries.add(VivatechItems.CONNECTOR);
+                        entries.add(VivatechItems.WIRE);
                         entries.add(VivatechItems.PLIERS);
 
 

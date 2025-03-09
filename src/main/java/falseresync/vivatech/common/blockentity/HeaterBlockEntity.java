@@ -73,7 +73,7 @@ public class HeaterBlockEntity extends BlockEntity implements Ticking, Appliance
 
     @Override
     public float getElectricalCurrent() {
-        return - (1 + (float) cachedFurnaces.size() / 2);
+        return - (1f + cachedFurnaces.size()) / 2;
     }
 
     @Override
