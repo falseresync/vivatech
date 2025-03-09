@@ -17,18 +17,18 @@ public class StarshooterFocusItem extends FocusItem {
     }
 
     @Override
-    public TypedActionResult<ItemStack> focusUse(ItemStack wandStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
         if (user instanceof ServerPlayerEntity player) {
-            if (Vivatech.getChargeManager().tryExpendWandCharge(wandStack, 2, user)) {
+            if (Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, 2, user)) {
                 world.spawnEntity(new StarProjectileEntity(user, world));
                 focusStack.damage(1, user, EquipmentSlot.MAINHAND);
-                return TypedActionResult.success(wandStack);
+                return TypedActionResult.success(gadgetStack);
             }
 
-            Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
-            return TypedActionResult.fail(wandStack);
+            Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+            return TypedActionResult.fail(gadgetStack);
         }
 
-        return super.focusUse(wandStack, focusStack, world, user, hand);
+        return super.focusUse(gadgetStack, focusStack, world, user, hand);
     }
 }

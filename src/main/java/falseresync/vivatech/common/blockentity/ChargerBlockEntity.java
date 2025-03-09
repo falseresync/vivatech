@@ -51,16 +51,16 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
             return;
         }
 
-        if (Vivatech.getChargeManager().isWandFullyCharged(heldStack)) {
+        if (Vivatech.getChargeManager().isGadgetFullyCharged(heldStack)) {
             charging = false;
             markDirty();
             return;
         }
 
         if (enabled) {
-            heldStack.apply(VivatechComponents.CHARGE, 0, current -> current + 1);
+            Vivatech.getChargeManager().charge(heldStack, 1, null);
 
-            var isFullyCharged = Vivatech.getChargeManager().isWandFullyCharged(heldStack);
+            var isFullyCharged = Vivatech.getChargeManager().isGadgetFullyCharged(heldStack);
             if (charging && isFullyCharged || !charging && !isFullyCharged) {
                 charging = !charging;
                 markDirty();

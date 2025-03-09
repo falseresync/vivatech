@@ -43,8 +43,8 @@ public class BetterDrawContext extends DrawContext {
 
     public void drawNonDiscreteRect(Identifier texture, float x, float y, int u, int v, int regionW, int regionH, int texW, int texH) {
         drawTexturedQuad(texture,
-                x + u, x + u + regionW,
-                y + v, y + v + regionH,
+                x, x + regionW,
+                y, y + regionH,
                 (float) u / texW, (float) (u + regionW) / texW,
                 (float) v / texH, (float) (v + regionH) / texH);
     }

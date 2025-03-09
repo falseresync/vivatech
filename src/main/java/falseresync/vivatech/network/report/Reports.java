@@ -15,7 +15,7 @@ public class Reports {
                     .attribute(RegistryAttribute.SYNCED)
                     .buildAndRegister();
 
-    public static final @RegistryObject WandInsufficientChargeReport WAND_INSUFFICIENT_CHARGE = new WandInsufficientChargeReport();
+    public static final @RegistryObject GadgetInsufficientChargeReport GADGET_INSUFFICIENT_CHARGE = new GadgetInsufficientChargeReport();
 
     public static final @RegistryObject CometWarpNoAnchorReport COMET_WARP_NO_ANCHOR = new CometWarpNoAnchorReport();
     public static final @RegistryObject CometWarpAnchorPlacedReport COMET_WARP_ANCHOR_PLACED = new CometWarpAnchorPlacedReport();

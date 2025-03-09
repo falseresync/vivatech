@@ -30,39 +30,39 @@ public class CometWarpFocusItem extends FocusItem {
     }
 
     @Override
-    public void focusOnEquipped(ItemStack wandStack, ItemStack focusStack, PlayerEntity user) {
+    public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
         var anchor = focusStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor != null) {
-            wandStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, anchor);
+            gadgetStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, anchor);
         }
     }
 
     @Override
-    public void focusOnUnequipped(ItemStack wandStack, ItemStack focusStack, PlayerEntity user) {
-        var anchor = wandStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
+    public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
+        var anchor = gadgetStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
         focusStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, anchor);
     }
 
     @Override
-    public TypedActionResult<ItemStack> focusUse(ItemStack wandStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
         if (user instanceof ServerPlayerEntity player) {
             if (user.isSneaking()) {
-                if (!Vivatech.getChargeManager().tryExpendWandCharge(wandStack, DEFAULT_PLACEMENT_COST, user)) {
-                    Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
-                    return TypedActionResult.fail(wandStack);
+                if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, DEFAULT_PLACEMENT_COST, user)) {
+                    Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+                    return TypedActionResult.fail(gadgetStack);
                 }
 
                 Reports.COMET_WARP_ANCHOR_PLACED.sendTo(player);
                 var globalPos = GlobalPos.create(world.getRegistryKey(), user.getBlockPos());
-                wandStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, globalPos);
+                gadgetStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, globalPos);
                 if (world.random.nextFloat() < 0.1f) {
                     focusStack.damage(1, player, EquipmentSlot.MAINHAND);
                 }
             } else {
-                var anchor = wandStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
+                var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
                 if (anchor == null) {
                     Reports.COMET_WARP_NO_ANCHOR.sendTo(player);
-                    return TypedActionResult.fail(wandStack);
+                    return TypedActionResult.fail(gadgetStack);
                 }
 
                 var destination = ((ServerWorld) world).getServer().getWorld(anchor.dimension());
@@ -73,36 +73,36 @@ public class CometWarpFocusItem extends FocusItem {
                 var warpingCost = destination.getDimension() != world.getDimension()
                         ? DEFAULT_INTERDIMENSIONAL_COST
                         : DEFAULT_WARPING_COST;
-                if (!Vivatech.getChargeManager().tryExpendWandCharge(wandStack, warpingCost, user)) {
-                    Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
-                    return TypedActionResult.fail(wandStack);
+                if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, warpingCost, user)) {
+                    Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+                    return TypedActionResult.fail(gadgetStack);
                 }
 
                 Reports.COMET_WARP_TELEPORTED.sendTo(player);
                 user.teleportTo(new TeleportTarget(destination, anchor.pos().toCenterPos(), Vec3d.ZERO, user.getYaw(), user.getPitch(), TeleportTarget.NO_OP));
-                wandStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
+                gadgetStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
                 focusStack.damage(1, player, EquipmentSlot.MAINHAND);
             }
-            return TypedActionResult.success(wandStack);
+            return TypedActionResult.success(gadgetStack);
         }
 
-        return TypedActionResult.consume(wandStack);
+        return TypedActionResult.consume(gadgetStack);
     }
 
     @Override
-    public boolean focusHasGlint(ItemStack wandStack, ItemStack focusStack) {
-        return hasGlint(wandStack);
+    public boolean focusHasGlint(ItemStack gadgetStack, ItemStack focusStack) {
+        return hasGlint(gadgetStack);
     }
 
     @Override
-    public void focusAppendTooltip(ItemStack wandStack, ItemStack focusStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var anchor = wandStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
+    public void focusAppendTooltip(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor == null) {
-            tooltip.add(Text.translatable("tooltip.vivatech.wand.setup_anchor")
+            tooltip.add(Text.translatable("tooltip.vivatech.gadget.setup_anchor")
                     .styled(style -> style.withColor(Formatting.GRAY)));
         } else {
             tooltip.add(Text.translatable(
-                            "tooltip.vivatech.wand.has_anchor",
+                            "tooltip.vivatech.gadget.has_anchor",
                             anchor.dimension().getValue().getPath(),
                             anchor.pos().toShortString())
                     .styled(style -> style.withColor(Formatting.GRAY)));
@@ -119,7 +119,7 @@ public class CometWarpFocusItem extends FocusItem {
         var anchor = stack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor != null) {
             tooltip.add(Text.translatable(
-                            "tooltip.vivatech.wand.has_anchor",
+                            "tooltip.vivatech.gadget.has_anchor",
                             anchor.dimension().getValue().getPath(),
                             anchor.pos().toShortString())
                     .styled(style -> style.withColor(Formatting.GRAY)));

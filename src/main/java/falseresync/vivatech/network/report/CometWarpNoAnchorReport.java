@@ -9,6 +9,6 @@ public class CometWarpNoAnchorReport implements Report {
     @Override
     public void executeOnClient(ClientPlayerEntity player) {
         player.playSoundIfNotSilent(SoundEvents.BLOCK_LEVER_CLICK);
-        MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.translatable("hud.vivatech.wand.no_anchor"), false);
+        MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.translatable("hud.vivatech.gadget.no_anchor"), false);
     }
 }

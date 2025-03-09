@@ -33,7 +33,7 @@ public class ToolManager {
 
         TrinketEquipCallback.EVENT.register((stack, slot, entity) -> {
             if (entity instanceof PlayerEntity player) {
-                var gadgetStack = scanInventoryForWands(player.getInventory());
+                var gadgetStack = scanInventoryForGadgets(player.getInventory());
                 if (gadgetStack != null) {
                     setupChargeDisplay(player, gadgetStack);
                 }
@@ -54,7 +54,7 @@ public class ToolManager {
         });
 
         ClientPlayerInventoryEvents.SELECTED_SLOT_CHANGED.register((inventory, lastSelectedSlot) -> {
-            var gadgetStack = scanInventoryForWands(inventory);
+            var gadgetStack = scanInventoryForGadgets(inventory);
             if (gadgetStack != null) {
                 setupChargeDisplay(inventory.player, gadgetStack);
             } else {
@@ -64,7 +64,7 @@ public class ToolManager {
         });
 
         ClientPlayerInventoryEvents.CONTENTS_CHANGED.register(inventory -> {
-            var gadgetStack = scanInventoryForWands(inventory);
+            var gadgetStack = scanInventoryForGadgets(inventory);
             if (gadgetStack != null) {
                 setupChargeDisplay(inventory.player, gadgetStack);
                 scanInventoryAndSetupFocusPicker(inventory, gadgetStack, false);
@@ -76,7 +76,7 @@ public class ToolManager {
     }
 
     public void onKeyPressed(MinecraftClient client, ClientPlayerEntity player) {
-        var gadgetStack = scanInventoryForWands(player.getInventory());
+        var gadgetStack = scanInventoryForGadgets(player.getInventory());
         if (gadgetStack == null) {
             focusPicker.hide();
             return;
@@ -85,7 +85,7 @@ public class ToolManager {
     }
 
     @Nullable
-    private ItemStack scanInventoryForWands(PlayerInventory inventory) {
+    private ItemStack scanInventoryForGadgets(PlayerInventory inventory) {
         var gadgetStack = inventory.getMainHandStack();
         return gadgetStack.isIn(VivatechItemTags.GADGETS) ? gadgetStack : null;
     }
@@ -116,7 +116,7 @@ public class ToolManager {
         }
 
         if (focusStacks.isEmpty()) {
-            MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.translatable("hud.vivatech.wand.no_focuses"), false);
+            MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.translatable("hud.vivatech.gadget.no_focuses"), false);
             return;
         }
 

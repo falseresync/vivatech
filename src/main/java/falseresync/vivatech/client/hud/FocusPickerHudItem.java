@@ -22,10 +22,11 @@ import java.util.UUID;
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class FocusPickerHudItem implements HudItem {
-    protected static final Identifier SELECTION_TEX = vtId("textures/hud/wand/focus_picker_selection.png");
+    protected static final Identifier SELECTION_TEX = vtId("textures/hud/focus_picker.png");
     private static final int MARGIN = 2;
-    private static final int SEL_TEX_W = 22;
-    private static final int SEL_TEX_H = 22;
+    private static final int WIDGET_W = 22;
+    private static final int WIDGET_H = 22;
+    private static final int TEX_SIZE = 32;
     private static final int ITEM_W = 16;
     private static final int ITEM_H = 16;
     private static final int TEXT_H = 8;
@@ -40,7 +41,7 @@ public class FocusPickerHudItem implements HudItem {
     private final MinecraftClient client;
     private final TextRenderer textRenderer;
     private final LinkedList<ItemStack> focuses = new LinkedList<>();
-    private ItemStack wand;
+    private ItemStack gadget;
     private float baseOpacity = 1;
     private boolean isVisible = false;
     private int remainingDisplayTicks = 0;
@@ -60,8 +61,7 @@ public class FocusPickerHudItem implements HudItem {
             baseOpacity = getAnimatedBaseOpacity();
             var yOffsetPerItem = ITEM_H + MARGIN;
             var yOffset = (Math.min(focuses.size(), 3) - 1) * yOffsetPerItem;
-            var widgetW = SEL_TEX_W;
-            var widgetH = SEL_TEX_H + yOffset;
+            var widgetH = WIDGET_H + yOffset;
 
             var chargeDisplay = VivatechClient.getHud().getChargeDisplay();
             var x = 4 + (chargeDisplay.isVisible() ? chargeDisplay.getWidth() : 0);
@@ -70,17 +70,15 @@ public class FocusPickerHudItem implements HudItem {
             RenderSystem.enableBlend();
             context.setShaderColor(1, 1, 1, baseOpacity);
 
-            var selTexX = x;
-            var selTexY = y + yOffset;
-            context.drawSquare(SELECTION_TEX, selTexX, selTexY, 22);
+            context.drawSquare(SELECTION_TEX, x, y + yOffset, 22, TEX_SIZE);
 
-            var itemX = x + widgetW / 2 - ITEM_W / 2;
+            var itemX = x + WIDGET_W / 2 - ITEM_W / 2;
 
             if (animatingItems) {
                 var item1 = addGlintIfNecessary(focuses.peekLast());
-                int item1Y = y + SEL_TEX_H / 2 - ITEM_H / 2 + yOffset;
+                int item1Y = y + WIDGET_H / 2 - ITEM_H / 2 + yOffset;
                 float item1Scale = (float) Easing.easeOutCirc((double) (remainingItemsAnimationTicks) / ITEMS_ANIMATION_DURATION);
-                float item1Translation = (float) (SEL_TEX_H * Easing.easeInSine((double) (ITEMS_ANIMATION_DURATION - remainingItemsAnimationTicks) / ITEMS_ANIMATION_DURATION));
+                float item1Translation = (float) (WIDGET_H * Easing.easeInSine((double) (ITEMS_ANIMATION_DURATION - remainingItemsAnimationTicks) / ITEMS_ANIMATION_DURATION));
                 float item1Opacity = baseOpacity * remainingItemsAnimationTicks / ITEMS_ANIMATION_DURATION;
                 paintItem(context, item1, itemX, item1Y, item1Scale, item1Translation, item1Opacity, false);
 
@@ -106,7 +104,7 @@ public class FocusPickerHudItem implements HudItem {
                 }
             } else {
                 var item1 = addGlintIfNecessary(focuses.getFirst());
-                var item1Y = y + SEL_TEX_H / 2 - ITEM_H / 2 + yOffset;
+                var item1Y = y + WIDGET_H / 2 - ITEM_H / 2 + yOffset;
                 paintItem(context, item1, itemX, item1Y, 1f, 0f, baseOpacity, false);
 
                 if (focuses.size() > 1) {
@@ -128,7 +126,7 @@ public class FocusPickerHudItem implements HudItem {
 
     protected ItemStack addGlintIfNecessary(ItemStack stack) {
         ItemStack stackWithGlint = null;
-        if (wand.hasGlint() && stack != null) {
+        if (gadget.hasGlint() && stack != null) {
             stackWithGlint = stack.copy();
             stackWithGlint.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
@@ -215,7 +213,7 @@ public class FocusPickerHudItem implements HudItem {
 
     private void clear() {
         isVisible = false;
-        wand = null;
+        gadget = null;
         focuses.clear();
     }
 
@@ -230,10 +228,10 @@ public class FocusPickerHudItem implements HudItem {
     }
 
     /**
-     * @param wand has to be the same stack, not a copy
+     * @param gadget has to be the same stack, not a copy
      */
-    public void upload(ItemStack wand, LinkedList<ItemStack> newFocuses) {
-        this.wand = wand;
+    public void upload(ItemStack gadget, LinkedList<ItemStack> newFocuses) {
+        this.gadget = gadget;
 
         focuses.clear();
         focuses.addAll(newFocuses);
@@ -260,6 +258,6 @@ public class FocusPickerHudItem implements HudItem {
     }
 
     public boolean isVisible() {
-        return isVisible && !focuses.isEmpty() && wand != null;
+        return isVisible && !focuses.isEmpty() && gadget != null;
     }
 }

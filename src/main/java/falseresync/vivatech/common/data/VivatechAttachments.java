@@ -10,7 +10,7 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class VivatechAttachments {
     public static final AttachmentType<Boolean> HAS_INSPECTOR_GOGGLES = AttachmentRegistry.create(
-            vtId("has_trueseer_goggles"),
+            vtId("has_inspector_goggles"),
             builder -> builder.syncWith(PacketCodecs.BOOL, AttachmentSyncPredicate.targetOnly()).persistent(Codec.BOOL));
     public static final AttachmentType<Integer> ENERGY_VEIL_NETWORK_ID = AttachmentRegistry.create(
             vtId("energy_veil_id"),

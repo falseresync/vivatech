@@ -67,15 +67,15 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
             return;
         }
 
-        var wandStack = player.getMainHandStack();
-        if (!wandStack.isIn(VivatechItemTags.GADGETS)) {
+        var gadgetStack = player.getMainHandStack();
+        if (!gadgetStack.isIn(VivatechItemTags.GADGETS)) {
             return;
         }
 
-        var anchor = wandStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
+        var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor == null
                 || anchor.dimension() != context.world().getRegistryKey()
-                || !anchor.pos().isWithinDistance(player.getPos(), Vivatech.getConfig().trueseerGogglesDisplayRange)
+                || !anchor.pos().isWithinDistance(player.getPos(), Vivatech.getConfig().inspectorGogglesDisplayRange)
                 || !context.frustum().isVisible(Box.from(anchor.pos().toCenterPos()))) {
             return;
         }

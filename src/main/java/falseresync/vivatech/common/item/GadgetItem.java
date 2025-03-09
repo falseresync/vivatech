@@ -11,13 +11,11 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -74,6 +72,54 @@ public class GadgetItem extends Item {
         }
 
         return super.use(world, user, hand);
+    }
+
+
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+//        var activationResult = activateBlock(GADGET_BEHAVIORS, context);
+//        if (activationResult.isAccepted()) return activationResult;
+
+        var gadgetStack = context.getStack();
+        var focusStack = getEquipped(gadgetStack);
+        if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
+            return focusItem.focusUseOnBlock(gadgetStack, focusStack, context);
+        }
+
+        return super.useOnBlock(context);
+    }
+
+    @Override
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        var gadgetStack = user.getStackInHand(hand);
+        var focusStack = getEquipped(gadgetStack);
+        if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
+            return focusItem.focusUseOnEntity(gadgetStack, focusStack, user, entity, hand);
+        }
+
+        return super.useOnEntity(stack, user, entity, hand);
+    }
+
+    @Override
+    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+        var focusStack = getEquipped(stack);
+        if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
+            focusItem.focusUsageTick(world, user, stack, focusStack, remainingUseTicks);
+            return;
+        }
+
+        super.usageTick(world, user, stack, remainingUseTicks);
+    }
+
+
+    @Override
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        var focusStack = getEquipped(stack);
+        if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
+            return focusItem.focusFinishUsing(stack, focusStack, world, user);
+        }
+
+        return super.finishUsing(stack, world, user);
     }
 
 

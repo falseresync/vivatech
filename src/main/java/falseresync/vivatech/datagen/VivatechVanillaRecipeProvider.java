@@ -50,8 +50,8 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
                 .criterion("unlock_right_away", TickCriterion.Conditions.createTick())
                 .offerTo(exporter, item(VivatechItems.MORTAR_AND_PESTLE));
 
-//        ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.WAND)
-//                .input('w', VivatechItems.WAND_CORE)
+//        ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.GADGET)
+//                .input('w', VivatechItems.GADGET_CORE)
 //                .input('g', ConventionalItemTags.GOLD_INGOTS)
 //                .input('s', VivatechItems.METALLIZED_STICK)
 //                .pattern("  w")
@@ -59,7 +59,7 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
 //                .pattern("s  ")
 //                .criterion("has_diamond", conditionsFromTag(ConventionalItemTags.DIAMOND_GEMS))
 //                .criterion("has_amethyst", conditionsFromTag(ConventionalItemTags.AMETHYST_GEMS))
-//                .offerTo(exporter, item(VivatechItems.WAND));
+//                .offerTo(exporter, item(VivatechItems.GADGET));
         ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.INSPECTOR_GOGGLES)
                 .input('g', ConventionalItemTags.GOLD_NUGGETS)
                 .input('h', Items.CHAINMAIL_HELMET)

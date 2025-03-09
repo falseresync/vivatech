@@ -8,7 +8,7 @@ import net.minecraft.network.packet.CustomPayload;
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public record ChangeFocusC2SPayload(FocusDestination destination, int slot) implements CustomPayload {
-    public static final Id<ChangeFocusC2SPayload> ID = new Id<>(vtId("change_wand_focus"));
+    public static final Id<ChangeFocusC2SPayload> ID = new Id<>(vtId("change_gadget_focus"));
     public static final PacketCodec<RegistryByteBuf, ChangeFocusC2SPayload> PACKET_CODEC =
             PacketCodec.tuple(
                     PacketCodecs.INTEGER.xmap(it -> FocusDestination.values[it], FocusDestination::ordinal).cast(), ChangeFocusC2SPayload::destination,

@@ -12,9 +12,9 @@ public final class VivatechConfig implements ConfigData {
     @TranslatableEnum
     public InfiniteCharge infiniteCharge = InfiniteCharge.CREATIVE_ONLY;
 
-    @ConfigEntry.Category("general")
-    @TranslatableEnum
-    public PassiveCharge passiveCharge = PassiveCharge.DEFAULT;
+//    @ConfigEntry.Category("general")
+//    @TranslatableEnum
+//    public PassiveCharge passiveCharge = PassiveCharge.DEFAULT;
 
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip(count = 3)
@@ -29,7 +29,7 @@ public final class VivatechConfig implements ConfigData {
 
     @ConfigEntry.Category("performance")
     @ConfigEntry.BoundedDiscrete(min = 3, max = 32)
-    public int trueseerGogglesDisplayRange = 10;
+    public int inspectorGogglesDisplayRange = 10;
 
     @ConfigEntry.Category("performance")
     @TranslatableEnum

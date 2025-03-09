@@ -1,0 +1,48 @@
+{
+  "entity.star_projectile.explode": {
+    "subtitle": "sound.vivatech.entity.star_projectile.explode",
+    "sounds": [
+      {
+        "name": "random/explode1",
+        "volume": 0.1,
+        "pitch": 1.25
+      },
+      {
+        "name": "random/explode2",
+        "volume": 0.1,
+        "pitch": 1.25
+      },
+      {
+        "name": "random/explode3",
+        "volume": 0.1,
+        "pitch": 1.25
+      },
+      {
+        "name": "random/explode4",
+        "volume": 0.1,
+        "pitch": 1.25
+      }
+    ]
+  },
+  "focus.comet_warp.anchor_placed": {
+    "subtitle": "sound.vivatech.focus.comet_warp.anchor_placed",
+    "sounds": [
+      {
+        "name": "block/lodestone/lock1",
+        "pitch": 0.85
+      },
+      {
+        "name": "block/lodestone/lock1",
+        "pitch": 0.95
+      },
+      {
+        "name": "block/lodestone/lock2",
+        "pitch": 0.85
+      },
+      {
+        "name": "block/lodestone/lock2",
+        "pitch": 0.95
+      }
+    ]
+  }
+}

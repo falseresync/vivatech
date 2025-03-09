@@ -22,7 +22,7 @@ public class ChargeManager {
     });
 
     public ChargeManager() {
-//        WAND_CHARGE_SPENT.register((stack, cost, user) -> {
+//        GADGET_CHARGE_SPENT.register((stack, cost, user) -> {
 //            if (user != null) {
 //                // Maybe only compensate the cost? But that would be confusing
 //                var chargeShells = user.getAttached(VivatechAttachments.CHARGE_SHELLS);
@@ -30,18 +30,18 @@ public class ChargeManager {
 //                    return;
 //                }
 //
-//                var wandCurrent = stack.getOrDefault(VivatechComponents.WAND_CHARGE, 0);
-//                var wandMax = stack.getOrDefault(VivatechComponents.WAND_MAX_CHARGE, 0);
-//                var compensation = wandMax - wandCurrent;
+//                var gadgetCurrent = stack.getOrDefault(VivatechComponents.GADGET_CHARGE, 0);
+//                var gadgetMax = stack.getOrDefault(VivatechComponents.GADGET_MAX_CHARGE, 0);
+//                var compensation = gadgetMax - gadgetCurrent;
 //                var newShells = chargeShells.withChargeChange(-compensation);
 //                if (newShells != null) {
 //                    user.setAttached(VivatechAttachments.CHARGE_SHELLS, newShells);
-//                    stack.apply(VivatechComponents.WAND_CHARGE, 0, it -> it + compensation);
+//                    stack.apply(VivatechComponents.GADGET_CHARGE, 0, it -> it + compensation);
 //                }
 //            }
 //        });
 
-//        WAND_OVERCHARGED.register((stack, excess, user) -> {
+//        GADGET_OVERCHARGED.register((stack, excess, user) -> {
 //            if (user != null) {
 //                Vivatech.getChargeManager().applyShellCharge(user, excess);
 //            }
@@ -65,15 +65,15 @@ public class ChargeManager {
 //        }
 //    }
 
-    public boolean isWandFullyCharged(ItemStack stack) {
+    public boolean isGadgetFullyCharged(ItemStack stack) {
         return stack.getOrDefault(VivatechComponents.CHARGE, 0) >= stack.getOrDefault(VivatechComponents.MAX_CHARGE, 0);
     }
 
     public boolean cannotAddAnyCharge(ItemStack stack, PlayerEntity player) {
-        return isWandFullyCharged(stack);// && areShellsFull(player);
+        return isGadgetFullyCharged(stack);// && areShellsFull(player);
     }
 
-    public boolean tryExpendWandCharge(ItemStack stack, int cost, @Nullable PlayerEntity user) {
+    public boolean tryExpendGadgetCharge(ItemStack stack, int cost, @Nullable PlayerEntity user) {
         if (user != null && (user.isCreative() && Vivatech.getConfig().infiniteCharge.isCreativeOnly() || Vivatech.getConfig().infiniteCharge.isAlways())) {
             return true;
         }
@@ -90,7 +90,7 @@ public class ChargeManager {
         Preconditions.checkArgument(amount > 0, "Use tryExpendCharge to subtract charge");
         var current = stack.getOrDefault(VivatechComponents.CHARGE, 0);
         var max = stack.getOrDefault(VivatechComponents.MAX_CHARGE, 0);
-        stack.apply(VivatechComponents.MAX_CHARGE, 0, it -> Math.min(it + amount, max));
+        stack.apply(VivatechComponents.CHARGE, 0, it -> Math.min(it + amount, max));
         if (current + amount > max) {
             ChargeManager.OVERCHARGED.invoker().onOvercharged(stack, current + amount - max, user);
         }

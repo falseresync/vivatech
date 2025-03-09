@@ -23,9 +23,9 @@ public class LightningFocusItem extends FocusItem {
     }
 
     @Override
-    public TypedActionResult<ItemStack> focusUse(ItemStack wandStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
         if (user instanceof ServerPlayerEntity player) {
-            if (Vivatech.getChargeManager().tryExpendWandCharge(wandStack, 10, user)) {
+            if (Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, 10, user)) {
                 var lightning = EntityType.LIGHTNING_BOLT.create(world);
                 var maxDistance = MathHelper.clamp(VivatechUtil.findViewDistance(world) * 16 / 4F, 32, 128);
                 var raycastResult = user.raycast(maxDistance, 0, true);
@@ -39,14 +39,14 @@ public class LightningFocusItem extends FocusItem {
                 ((VivatechLightning) lightning).vivatech$setThunderless();
                 world.spawnEntity(lightning);
                 focusStack.damage(1, user, EquipmentSlot.MAINHAND);
-                return TypedActionResult.success(wandStack);
+                return TypedActionResult.success(gadgetStack);
             }
 
-            Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
-            return TypedActionResult.fail(wandStack);
+            Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+            return TypedActionResult.fail(gadgetStack);
         }
 
-        return TypedActionResult.consume(wandStack);
+        return TypedActionResult.consume(gadgetStack);
     }
 
     protected Vec3d findGroundPos(ServerWorld world, Vec3d posInAir) {

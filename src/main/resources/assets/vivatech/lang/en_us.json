@@ -67,7 +67,7 @@
   "text.autoconfig.vivatech.option.transmutation.transformationWeight": "Transformation weight",
   "text.autoconfig.vivatech.option.transmutation.doNothingWeight": "Do nothing weight",
 
-  "text.autoconfig.vivatech.option.trueseerGogglesDisplayRange": "Trueseer goggles display range",
+  "text.autoconfig.vivatech.option.inspectorGogglesDisplayRange": "Inspector goggles display range",
   "text.autoconfig.vivatech.option.animationParticlesAmount": "Animation particles amount",
   "text.autoconfig.vivatech.option.animationParticlesAmount.DEFAULT": "Normal",
   "text.autoconfig.vivatech.option.animationParticlesAmount.REDUCED": "Reduced",

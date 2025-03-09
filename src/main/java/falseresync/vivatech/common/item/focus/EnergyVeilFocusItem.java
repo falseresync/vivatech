@@ -44,7 +44,7 @@ public class EnergyVeilFocusItem extends FocusItem {
 
     @Override
     public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
-        resetWand(gadgetStack);
+        resetGadget(gadgetStack);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class EnergyVeilFocusItem extends FocusItem {
         if (user instanceof ServerPlayerEntity player
                 && !gadgetStack.contains(VivatechComponents.ENERGY_VEIL_UUID)
                 && !user.hasAttached(VivatechAttachments.ENERGY_VEIL_NETWORK_ID)) {
-            if (Vivatech.getChargeManager().tryExpendWandCharge(gadgetStack, STARTING_COST, user)) {
+            if (Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, STARTING_COST, user)) {
                 var veil = new EnergyVeilEntity(user, gadgetStack, world);
                 veil.setVeilRadius(2);
                 world.spawnEntity(veil);
@@ -63,7 +63,7 @@ public class EnergyVeilFocusItem extends FocusItem {
                 return TypedActionResult.success(gadgetStack);
             }
 
-            Reports.WAND_INSUFFICIENT_CHARGE.sendTo(player);
+            Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
             return TypedActionResult.fail(gadgetStack);
         }
         return TypedActionResult.pass(gadgetStack);
@@ -73,7 +73,7 @@ public class EnergyVeilFocusItem extends FocusItem {
     public void focusUsageTick(World world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
         findVeil(gadgetStack, world).ifPresent(veil -> {
             if (user instanceof ServerPlayerEntity player) {
-                if (!Vivatech.getChargeManager().tryExpendWandCharge(gadgetStack, CONTINUOUS_COST, player)) {
+                if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, CONTINUOUS_COST, player)) {
                     player.damage(world.getDamageSources().magic(), 0.1f);
                     var previousDeficit = gadgetStack.apply(VivatechComponents.CHARGE_DEFICIT, 0, it -> it + CONTINUOUS_COST);
                     if (previousDeficit != null && previousDeficit % (CONTINUOUS_COST * 35) == 0) {
@@ -116,7 +116,7 @@ public class EnergyVeilFocusItem extends FocusItem {
                             ParticleTypes.ELECTRIC_SPARK, ParticleTypes.EXPLOSION_EMITTER, Registries.SOUND_EVENT.getEntry(VivatechSounds.STAR_PROJECTILE_EXPLODE));
                 }
             });
-            resetWand(gadgetStack);
+            resetGadget(gadgetStack);
             focusStack.damage(1, user, EquipmentSlot.MAINHAND);
         }
         return gadgetStack;
@@ -141,7 +141,7 @@ public class EnergyVeilFocusItem extends FocusItem {
         });
     }
 
-    private void resetWand(ItemStack gadgetStack) {
+    private void resetGadget(ItemStack gadgetStack) {
         gadgetStack.remove(VivatechComponents.IN_USE);
         gadgetStack.remove(VivatechComponents.ITEM_BAR);
         gadgetStack.remove(VivatechComponents.CHARGE_DEFICIT);
