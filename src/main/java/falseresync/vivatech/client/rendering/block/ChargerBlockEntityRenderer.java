@@ -1,6 +1,8 @@
 package falseresync.vivatech.client.rendering.block;
 
 import falseresync.vivatech.client.rendering.RenderingUtil;
+import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.VivatechParticleTypes;
 import falseresync.vivatech.common.blockentity.ChargerBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -32,12 +34,12 @@ public class ChargerBlockEntityRenderer implements BlockEntityRenderer<ChargerBl
                 entity.isCharging() ? ModelTransformationMode.THIRD_PERSON_RIGHT_HAND : ModelTransformationMode.FIXED,
                 this.itemRenderer, matrices, vertexConsumers);
 
-//        if (entity.isCharging() && world.random.nextFloat() < Vivatech.getConfig().animationParticlesAmount.modifier) {
-//            var itemPos = entity.getPos().toCenterPos().add(0, -0.5, 0);
-//            var particlePos = itemPos.add(world.random.nextFloat() - 0.5, 2, world.random.nextFloat() - 0.5);
-//            var particleVelocity = particlePos.relativize(itemPos).multiply(5);
-//            RenderingUtil.addParticle(world, WizcraftParticleTypes.CHARGING, particlePos, particleVelocity);
-//        }
+        if (entity.isCharging() && world.random.nextFloat() < Vivatech.getConfig().animationParticlesAmount.modifier) {
+            var itemPos = entity.getPos().toCenterPos().add(0, -0.5, 0);
+            var particlePos = itemPos.add(world.random.nextFloat() - 0.5, 2, world.random.nextFloat() - 0.5);
+            var particleVelocity = particlePos.relativize(itemPos).multiply(5);
+            RenderingUtil.addParticle(world, VivatechParticleTypes.CHARGING, particlePos, particleVelocity);
+        }
 
         matrices.pop();
     }

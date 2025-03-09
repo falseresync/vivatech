@@ -23,6 +23,9 @@
 		],
 		"fabric-datagen": [
 			"falseresync.vivatech.datagen.VivatechDatagen"
+		],
+		"modmenu": [
+			"falseresync.vivatech.compat.modmenu.VivatechModMenuCompat"
 		]
 	},
 	"accessWidener" : "vivatech.accesswidener",
@@ -34,6 +37,8 @@
 		"fabricloader": ">=0.16.9",
 		"minecraft": "~1.21.1",
 		"java": ">=21",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"cloth-config": "*",
+		"trinkets": "*"
 	}
 }

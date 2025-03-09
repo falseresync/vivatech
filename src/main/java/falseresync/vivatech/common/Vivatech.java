@@ -48,6 +48,7 @@ public class Vivatech implements ModInitializer {
 				.link(Registries.ITEM_GROUP, VivatechItemGroups.class)
 				.link(Registries.DATA_COMPONENT_TYPE, VivatechComponents.class)
 				.link(Registries.ENTITY_TYPE, VivatechEntities.class)
+				.link(Registries.PARTICLE_TYPE, VivatechParticleTypes.class)
 				.link(Reports.REGISTRY, Reports.class)
 				.link(WireType.REGISTRY, WireType.class);
 		VivatechAttachments.init();

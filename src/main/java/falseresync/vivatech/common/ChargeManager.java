@@ -25,18 +25,18 @@ public class ChargeManager {
 //        WAND_CHARGE_SPENT.register((stack, cost, user) -> {
 //            if (user != null) {
 //                // Maybe only compensate the cost? But that would be confusing
-//                var chargeShells = user.getAttached(WizcraftAttachments.CHARGE_SHELLS);
+//                var chargeShells = user.getAttached(VivatechAttachments.CHARGE_SHELLS);
 //                if (chargeShells == null) {
 //                    return;
 //                }
 //
-//                var wandCurrent = stack.getOrDefault(WizcraftComponents.WAND_CHARGE, 0);
-//                var wandMax = stack.getOrDefault(WizcraftComponents.WAND_MAX_CHARGE, 0);
+//                var wandCurrent = stack.getOrDefault(VivatechComponents.WAND_CHARGE, 0);
+//                var wandMax = stack.getOrDefault(VivatechComponents.WAND_MAX_CHARGE, 0);
 //                var compensation = wandMax - wandCurrent;
 //                var newShells = chargeShells.withChargeChange(-compensation);
 //                if (newShells != null) {
-//                    user.setAttached(WizcraftAttachments.CHARGE_SHELLS, newShells);
-//                    stack.apply(WizcraftComponents.WAND_CHARGE, 0, it -> it + compensation);
+//                    user.setAttached(VivatechAttachments.CHARGE_SHELLS, newShells);
+//                    stack.apply(VivatechComponents.WAND_CHARGE, 0, it -> it + compensation);
 //                }
 //            }
 //        });
@@ -50,18 +50,18 @@ public class ChargeManager {
 
 //    public boolean areShellsFull(PlayerEntity player) {
 //        //noinspection DataFlowIssue
-//        return player.hasAttached(WizcraftAttachments.CHARGE_SHELLS)
-//                && player.getAttached(WizcraftAttachments.CHARGE_SHELLS).areShellsFull();
+//        return player.hasAttached(VivatechAttachments.CHARGE_SHELLS)
+//                && player.getAttached(VivatechAttachments.CHARGE_SHELLS).areShellsFull();
 //    }
 //
 //    public void applyShellCharge(PlayerEntity player, int amount) {
-//        var shells = player.getAttached(WizcraftAttachments.CHARGE_SHELLS);
+//        var shells = player.getAttached(VivatechAttachments.CHARGE_SHELLS);
 //        if (shells == null) {
 //            return;
 //        }
 //        var newShells = shells.withChargeChange(amount);
 //        if (newShells != null) {
-//            player.setAttached(WizcraftAttachments.CHARGE_SHELLS, newShells);
+//            player.setAttached(VivatechAttachments.CHARGE_SHELLS, newShells);
 //        }
 //    }
 

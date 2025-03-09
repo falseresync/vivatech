@@ -7,3 +7,4 @@ accessible field net/minecraft/server/world/ServerChunkLoadingManager watchDista
 accessible method net/minecraft/data/client/Models block (Ljava/lang/String;[Lnet/minecraft/data/client/TextureKey;)Lnet/minecraft/data/client/Model;
 accessible method net/minecraft/client/render/entity/LivingEntityRenderer getAnimationProgress (Lnet/minecraft/entity/LivingEntity;F)F
 accessible field net/minecraft/client/item/ModelPredicateProviderRegistry GLOBAL Ljava/util/Map;
+accessible method net/minecraft/client/particle/GlowParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDDDDLnet/minecraft/client/particle/SpriteProvider;)V

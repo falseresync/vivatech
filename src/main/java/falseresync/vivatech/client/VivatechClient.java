@@ -2,6 +2,7 @@ package falseresync.vivatech.client;
 
 import falseresync.vivatech.client.gui.VivatechGui;
 import falseresync.vivatech.client.hud.VivatechHud;
+import falseresync.vivatech.client.particle.VivatechParticleFactories;
 import falseresync.vivatech.client.rendering.VivatechRendering;
 import falseresync.vivatech.common.config.TranslatableEnum;
 import falseresync.vivatech.common.config.TranslatableEnumGuiProvider;
@@ -26,6 +27,7 @@ public class VivatechClient implements ClientModInitializer {
         );
         
         VivatechRendering.init();
+        VivatechParticleFactories.init();
         VivatechGui.init();
         VivatechKeybindings.init();
         VivatechClientReceivers.registerAll();

@@ -11,10 +11,10 @@ import org.lwjgl.glfw.GLFW;
 @Environment(EnvType.CLIENT)
 public final class VivatechKeybindings {
     public static final KeyBinding TOOL_CONTROL = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "key.wizcraft.tool_control",
+            "key.vivatech.tool_control",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_ALT,
-            "keyCategory.wizcraft"
+            "keyCategory.vivatech"
     ));
 
     public static void init() {

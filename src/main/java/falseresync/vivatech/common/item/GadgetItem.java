@@ -184,12 +184,12 @@ public class GadgetItem extends Item {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             tooltip.add(Text
-                    .translatable("tooltip.wizcraft.gadget.active_focus", focusStack.getName())
+                    .translatable("tooltip.vivatech.gadget.active_focus", focusStack.getName())
                     .styled(style -> style.withColor(Formatting.GRAY)));
             focusItem.focusAppendTooltip(stack, focusStack, context, tooltip, type);
         }
         tooltip.add(Text
-                .translatable("tooltip.wizcraft.gadget.change_focus", KeyBindingHelper.getBoundKeyOf(VivatechKeybindings.TOOL_CONTROL).getLocalizedText())
+                .translatable("tooltip.vivatech.gadget.change_focus", KeyBindingHelper.getBoundKeyOf(VivatechKeybindings.TOOL_CONTROL).getLocalizedText())
                 .styled(style -> style.withColor(Formatting.GRAY).withItalic(true)));
         super.appendTooltip(stack, context, tooltip, type);
     }
