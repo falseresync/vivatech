@@ -45,7 +45,7 @@ public class EnergyVeilEntity extends Entity implements Ownable {
         this(VivatechEntities.ENERGY_VEIL, world);
         Preconditions.checkArgument(controllingStack == null || owner != null,
                 "Owner must not be null if a controlling stack is present");
-        Preconditions.checkArgument(controllingStack == null || controllingStack.isIn(VivatechItemTags.WANDS),
+        Preconditions.checkArgument(controllingStack == null || controllingStack.isIn(VivatechItemTags.GADGETS),
                 "A controlling stack must be a wand");
         this.owner = owner;
         this.controllingStack = controllingStack;

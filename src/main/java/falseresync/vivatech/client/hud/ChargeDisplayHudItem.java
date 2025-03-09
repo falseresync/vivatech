@@ -22,9 +22,9 @@ public class ChargeDisplayHudItem implements HudItem {
     private static final int TEX_H = 64;
     private static final int SHELL_W = 16;
     private static final int SHELL_H = 16;
-    private static final int OVERLAY_U = 7;
+    private static final int OVERLAY_U = 6;
     private static final int OVERLAY_V = 16;
-    private static final int OVERLAY_W = 2;
+    private static final int OVERLAY_W = 3;
     private static final int OVERLAY_H = 32;
     private static final int ANIMATION_DURATION = 10;
     private static final int SHELL_NO_CHARGE_TINT = 0xAA_FF_FF_FF;

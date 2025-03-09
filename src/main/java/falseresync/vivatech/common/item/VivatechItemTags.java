@@ -8,7 +8,7 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class VivatechItemTags {
     public static final TagKey<Item> FOCUSES = TagKey.of(RegistryKeys.ITEM, vtId("focuses"));
-    public static final TagKey<Item> WANDS = TagKey.of(RegistryKeys.ITEM, vtId("wands"));
+    public static final TagKey<Item> GADGETS = TagKey.of(RegistryKeys.ITEM, vtId("gadgets"));
 
     public static void init() {
     }

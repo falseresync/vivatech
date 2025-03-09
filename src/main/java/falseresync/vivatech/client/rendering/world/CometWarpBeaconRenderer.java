@@ -68,7 +68,7 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
         }
 
         var wandStack = player.getMainHandStack();
-        if (!wandStack.isIn(VivatechItemTags.WANDS)) {
+        if (!wandStack.isIn(VivatechItemTags.GADGETS)) {
             return;
         }
 

@@ -5,6 +5,7 @@ import falseresync.vivatech.common.VivatechUtil;
 import falseresync.vivatech.common.blockentity.ChargerBlockEntity;
 import falseresync.vivatech.common.blockentity.Ticking;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -36,6 +37,11 @@ public class ChargerBlock extends BlockWithEntity {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ChargerBlockEntity(pos, state);
+    }
+
+    @Override
+    protected BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 
     @Nullable

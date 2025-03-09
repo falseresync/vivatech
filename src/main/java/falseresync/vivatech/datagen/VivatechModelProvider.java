@@ -12,10 +12,20 @@ import net.minecraft.data.client.*;
 import net.minecraft.util.Identifier;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
+import static net.minecraft.data.client.TexturedModel.makeFactory;
 
 public class VivatechModelProvider extends FabricModelProvider {
+    public static class VivatechModels {
+        public static final Model ADEQUATE_CUBE_COLUMN_HORIZONTAL = new Model(Optional.of(vtId("block/cube_column_horizontal")), Optional.empty(), TextureKey.SIDE, TextureKey.END);
+    }
+
+    public static class VivatechTexturedModels {
+        public static final TexturedModel.Factory ADEQUATE_CUBE_COLUMN_HORIZONTAL = makeFactory(TextureMap::sideEnd, VivatechModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+    }
+
     private BlockStateModelGenerator blockStateModelGenerator;
 
     public VivatechModelProvider(FabricDataOutput output) {
@@ -26,8 +36,8 @@ public class VivatechModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         this.blockStateModelGenerator = blockStateModelGenerator;
 
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GENERATOR, TexturedModel.CUBE_COLUMN_HORIZONTAL);
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GEARBOX, TexturedModel.CUBE_COLUMN_HORIZONTAL);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GENERATOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GEARBOX, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
         registerWindmill();
         blockStateModelGenerator.registerSingleton(VivatechBlocks.HEATER, TexturedModel.CUBE_BOTTOM_TOP);
         blockStateModelGenerator.registerSingleton(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_BOTTOM_TOP);
@@ -65,6 +75,7 @@ public class VivatechModelProvider extends FabricModelProvider {
         itemModelGenerator.register(VivatechItems.CONNECTOR, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.PLIERS, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.INSPECTOR_GOGGLES, Models.GENERATED);
+        itemModelGenerator.register(VivatechItems.FOCUSES_POUCH, Models.GENERATED);
 
         itemModelGenerator.register(VivatechItems.GADGET, Models.HANDHELD_ROD);
 

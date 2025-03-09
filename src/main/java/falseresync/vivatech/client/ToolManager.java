@@ -87,7 +87,7 @@ public class ToolManager {
     @Nullable
     private ItemStack scanInventoryForWands(PlayerInventory inventory) {
         var gadgetStack = inventory.getMainHandStack();
-        return gadgetStack.isIn(VivatechItemTags.WANDS) ? gadgetStack : null;
+        return gadgetStack.isIn(VivatechItemTags.GADGETS) ? gadgetStack : null;
     }
 
     private void setupChargeDisplay(PlayerEntity player, ItemStack gadgetStack) {

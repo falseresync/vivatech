@@ -17,6 +17,7 @@ public class VivatechItemTagProvider extends FabricTagProvider.ItemTagProvider {
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
         getOrCreateTagBuilder(VivatechItemTags.FOCUSES).add(FOCUSES);
+        getOrCreateTagBuilder(VivatechItemTags.GADGETS).add(VivatechItems.GADGET);
     }
 
     public static final Item[] FOCUSES = new Item[] {

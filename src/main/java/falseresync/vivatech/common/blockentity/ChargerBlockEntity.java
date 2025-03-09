@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -19,7 +18,6 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ChargerBlockEntity extends BlockEntity implements Ticking, Appliance {
@@ -30,15 +28,54 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
         }
     };
     protected final InventoryStorage storage = InventoryStorage.of(inventory, null);
+    protected boolean enabled = false;
     protected boolean charging = false;
 
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
         super(VivatechBlockEntities.CHARGER, pos, state);
+        inventory.addListener(changed -> markDirty());
     }
 
     @Override
     public void tick() {
+        if (world.isClient) {
+            return;
+        }
 
+        var heldStack = inventory.getStack(0);
+        if (!heldStack.isOf(VivatechItems.GADGET)) {
+            if (charging) {
+                charging = false;
+                markDirty();
+            }
+            return;
+        }
+
+        if (Vivatech.getChargeManager().isWandFullyCharged(heldStack)) {
+            charging = false;
+            markDirty();
+            return;
+        }
+
+        if (enabled) {
+            heldStack.apply(VivatechComponents.CHARGE, 0, current -> current + 1);
+
+            var isFullyCharged = Vivatech.getChargeManager().isWandFullyCharged(heldStack);
+            if (charging && isFullyCharged || !charging && !isFullyCharged) {
+                charging = !charging;
+                markDirty();
+            }
+        }
+    }
+
+    @Override
+    public float getElectricalCurrent() {
+        return charging ? - 0.5f : 0;
+    }
+
+    @Override
+    public void gridTick(float voltage) {
+        enabled = voltage > 210 && voltage < 250;
     }
 
     public SimpleInventory getInventory() {
@@ -61,39 +98,11 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
         return stack.isOf(VivatechItems.GADGET) || stack.isEmpty();
     }
 
-    protected void tick(World world, BlockPos pos, BlockState state) {
-        if (world.isClient()) {
-            return;
-        }
-
-        var heldStack = inventory.getStack(0);
-        if (!heldStack.isOf(VivatechItems.GADGET)) {
-            if (charging) {
-                charging = false;
-                markDirty();
-            }
-            return;
-        }
-
-        if (Vivatech.getChargeManager().isWandFullyCharged(heldStack)) return;
-
-        if (world.isNight() && world.random.nextFloat() < 0.25 || world.random.nextFloat() < 0.0625) {
-            heldStack.apply(VivatechComponents.CHARGE, 0, current -> current + 1);
-
-            var isFullyCharged = Vivatech.getChargeManager().isWandFullyCharged(heldStack);
-            if (charging && isFullyCharged || !charging && !isFullyCharged) {
-                charging = !charging;
-                markDirty();
-            }
-        }
-    }
-
     @Override
     public void markDirty() {
         super.markDirty();
         if (world != null) {
             world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_ALL);
-//            world.getBlockEntity(pos.up(2), VivatechBlockEntities.LENS).ifPresent(lens -> lens.setOn(charging));
         }
     }
 

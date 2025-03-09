@@ -21,7 +21,7 @@ public class VivatechServerReceivers {
     private static void changeWandFocus(ChangeFocusC2SPayload payload, ServerPlayNetworking.Context context) {
         var player = context.player();
         var wandStack = player.getMainHandStack();
-        if (!wandStack.isIn(VivatechItemTags.WANDS)) {
+        if (!wandStack.isIn(VivatechItemTags.GADGETS)) {
             return;
         }
 
