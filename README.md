@@ -1,12 +1,22 @@
 # Vivatech
 
+![Wind turbines](https://cdn.modrinth.com/data/Z7LQgxZt/images/38f3d32f3f2e929bee55ed3ce4d1be277ec0e0e5.png)
+
 ## Power grid
 
-Realistic
+Fiddle with a realistic(-ish!) power grid! No energy storage to speak of; balance generation
+and demand to keep your devices functional or risk getting in trouble!
+
+![Wires](https://cdn.modrinth.com/data/Z7LQgxZt/images/6df5592a6006b4abb46c5d1815e1bb1f076da916.png)
+![Heaters](https://cdn.modrinth.com/data/Z7LQgxZt/images/ac18406cffabcdc478d957f01505e83c61ac4949.png)
 
 ## Gadget
 
-Cool
+Use your gadget - it is quite a useful tool that allows you to pass energy through focuses to create many
+desirable effects!
+
+![Energy veil](https://cdn.modrinth.com/data/Z7LQgxZt/images/a2cbf8ddd257e614506310dfd303379cd89e5269.png)
+![Comet Warp beacon](https://cdn.modrinth.com/data/Z7LQgxZt/images/9622554f2c728f8ee0b20d4b073fe15ed60b869e.png)
 
 #### Starshooter focus
 
