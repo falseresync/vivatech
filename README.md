@@ -1,5 +1,3 @@
-# Vivatech
-
 ![Wind turbines](https://cdn.modrinth.com/data/Z7LQgxZt/images/38f3d32f3f2e929bee55ed3ce4d1be277ec0e0e5.png)
 
 ## Power grid
@@ -7,31 +5,45 @@
 Fiddle with a realistic(-ish!) power grid! No energy storage to speak of; balance generation
 and demand to keep your devices functional or risk getting in trouble!
 
+#### Wires
+
+Wires are the core of your Grid! Use Wire to connect wire posts, and voila - it transfers electricity. But be mindful - you need way more than just one wire to connect far away points. And you can of course use pliers to cut connections.
+
+#### Heaters
+
+Heaters are nifty machines that allow you to save up on fuel, or even go full renewable :) Connect them to the grid and you can heat up nearby furnaces without any coal!
+
+#### Probe
+
+A probe is your best friend in troubleshooting the system, as well as preventing catastrophic failures. Use it to measure Voltage and Current on a Wire post and see if it matches your expectations
+
+#### Wind turbines
+
+To generate power you can use Wind turbines - place a Gearbox (You wouldn't want the veeery slow wind to cut your electricity supply, would you?), attach a Turbine, and behind the Gearbox place a Generator.
+
 ![Wires](https://cdn.modrinth.com/data/Z7LQgxZt/images/6df5592a6006b4abb46c5d1815e1bb1f076da916.png)
 ![Heaters](https://cdn.modrinth.com/data/Z7LQgxZt/images/ac18406cffabcdc478d957f01505e83c61ac4949.png)
 
+
 ## Gadget
 
-Use your gadget - it is quite a useful tool that allows you to pass energy through focuses to create many
-desirable effects!
-
-![Energy veil](https://cdn.modrinth.com/data/Z7LQgxZt/images/a2cbf8ddd257e614506310dfd303379cd89e5269.png)
-![Comet Warp beacon](https://cdn.modrinth.com/data/Z7LQgxZt/images/9622554f2c728f8ee0b20d4b073fe15ed60b869e.png)
+Use your gadget - it is quite a useful tool
+that allows you to pass energy through focuses to create many desirable effects!
 
 #### Starshooter focus
 
-Have you ever wanted to shoot stars at your enemies? Now you can! 
+Have you ever wanted to shoot stars at your enemies? Now you can!
 Stars explode your enemy, but don't explode blocks (a.k.a. building-safe :D)
 
 #### Lightning focus
 
-Now, how about playing a Zeus? You can do that with Lightning focus! 
+Now, how about playing a Zeus? You can do that with Lightning focus!
 For some charge you can easily shoot lightning left and right!
 
 #### Comet Warp focus
 
-Everyone has to venture into a crowd of enemies sometimes. Or to just teleport home without hassle. 
-Use the nifty Comet Warp focus to setup a recall point and then teleport to it from any location 
+Everyone has to venture into a crowd of enemies sometimes. Or to just teleport home without hassle.
+Use the nifty Comet Warp focus to setup a recall point and then teleport to it from any location
 or dimension for just some wand charge!
 
 #### Energy Veil focus
@@ -39,6 +51,14 @@ or dimension for just some wand charge!
 Just because you don't have armor, doesn't mean you can't have protection! Use this focus to create a barrier
 made of concentrated energy panels around yourself which will repel projectiles and any nasties coming your way!
 Be careful not to use up all your charge though :)
+
+#### Inspector goggles and Focuses pouch
+
+These are your best friends when dealing with focuses! You can use them to store every focus in just one Trinket slot, as well as see the remaining charge on your Gadget. Maybe even more!
+
+![Energy veil](https://cdn.modrinth.com/data/Z7LQgxZt/images/a2cbf8ddd257e614506310dfd303379cd89e5269.png)
+![Comet Warp beacon](https://cdn.modrinth.com/data/Z7LQgxZt/images/9622554f2c728f8ee0b20d4b073fe15ed60b869e.png)
+
 
 ## Acknowledgements
 
