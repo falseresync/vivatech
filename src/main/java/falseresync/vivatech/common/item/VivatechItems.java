@@ -19,7 +19,7 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 public class VivatechItems {
     public static final BlockItem GENERATOR = rBlockItem("generator", VivatechBlocks.GENERATOR, new Item.Settings());
     public static final BlockItem GEARBOX = rBlockItem("gearbox", VivatechBlocks.GEARBOX, new Item.Settings());
-    public static final BlockItem WINDMILL = rBlockItem("windmill", VivatechBlocks.WINDMILL, new Item.Settings());
+    public static final BlockItem WIND_TURBINE = rBlockItem("wind_turbine", VivatechBlocks.WIND_TURBINE, new Item.Settings());
 
     public static final BlockItem HEATER = rBlockItem("heater", VivatechBlocks.HEATER, new Item.Settings());
     public static final BlockItem STATIC_COMPENSATOR = rBlockItem("static_compensator", VivatechBlocks.STATIC_COMPENSATOR, new Item.Settings());
@@ -30,6 +30,9 @@ public class VivatechItems {
     public static final MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Settings().maxCount(1).maxDamage(16));
     public static final WireItem WIRE = r("wire", WireItem::new, new Item.Settings());
     public static final PliersItem PLIERS = r("pliers", PliersItem::new, new Item.Settings().maxCount(1));
+    public static final ProbeItem PROBE = r("probe", ProbeItem::new, new Item.Settings().maxCount(1));
+    public static final InspectorGogglesItem INSPECTOR_GOGGLES = r("inspector_goggles", InspectorGogglesItem::new, new Item.Settings().maxCount(1));
+    public static final FocusesPouchItem FOCUSES_POUCH = r("focuses_pouch", FocusesPouchItem::new, new Item.Settings().maxCount(1));
 
     public static final GadgetItem GADGET = r("gadget", GadgetItem::new, new Item.Settings().maxCount(1));
 
@@ -38,9 +41,6 @@ public class VivatechItems {
     public static final LightningFocusItem LIGHTNING_FOCUS = r("lightning_focus", LightningFocusItem::new, FOCUS_SETTINGS.maxDamage(128));
     public static final CometWarpFocusItem COMET_WARP_FOCUS = r("comet_warp_focus", CometWarpFocusItem::new, FOCUS_SETTINGS.maxDamage(16));
     public static final EnergyVeilFocusItem ENERGY_VEIL_FOCUS = r("energy_veil_focus", EnergyVeilFocusItem::new, FOCUS_SETTINGS.maxDamage(64));
-
-    public static final InspectorGogglesItem INSPECTOR_GOGGLES = r("inspector_goggles", InspectorGogglesItem::new, new Item.Settings().maxCount(1));
-    public static final FocusesPouchItem FOCUSES_POUCH = r("focuses_pouch", FocusesPouchItem::new, new Item.Settings().maxCount(1));
 
     private static <T extends Item> T r(String id, Function<Item.Settings, T> item, Item.Settings settings) {
         var fullId = vtId(id);

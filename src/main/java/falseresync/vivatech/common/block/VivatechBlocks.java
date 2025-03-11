@@ -13,7 +13,7 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 public class VivatechBlocks {
     public static final GeneratorBlock GENERATOR = r("generator", GeneratorBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
     public static final GearboxBlock GEARBOX = r("gearbox", GearboxBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
-    public static final WindmillBlock WINDMILL = r("windmill", WindmillBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
+    public static final WindTurbineBlock WIND_TURBINE = r("wind_turbine", WindTurbineBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
 
     public static final HeaterBlock HEATER = r("heater", HeaterBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
     public static final StaticCompensatorBlock STATIC_COMPENSATOR = r("static_compensator", StaticCompensatorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));

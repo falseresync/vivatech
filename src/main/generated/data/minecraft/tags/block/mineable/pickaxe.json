@@ -2,7 +2,7 @@
   "values": [
     "vivatech:generator",
     "vivatech:gearbox",
-    "vivatech:windmill",
+    "vivatech:wind_turbine",
     "vivatech:heater",
     "vivatech:static_compensator",
     "vivatech:charger",

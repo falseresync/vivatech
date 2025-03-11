@@ -3,16 +3,24 @@ package falseresync.vivatech.common.item;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.power.GridVertex;
 import falseresync.vivatech.common.power.PowerSystem;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 
 public abstract class WireManagementItem extends Item {
     public WireManagementItem(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+        return false;
     }
 
     @Override

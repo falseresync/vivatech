@@ -17,7 +17,7 @@ public class VivatechBlockLootTableProvider extends FabricBlockLootTableProvider
     public void generate() {
         addDrop(VivatechBlocks.GENERATOR, drops(VivatechItems.GENERATOR));
         addDrop(VivatechBlocks.GEARBOX, drops(VivatechItems.GEARBOX));
-        addDrop(VivatechBlocks.WINDMILL, drops(VivatechItems.WINDMILL));
+        addDrop(VivatechBlocks.WIND_TURBINE, drops(VivatechItems.WIND_TURBINE));
         addDrop(VivatechBlocks.HEATER, drops(VivatechItems.HEATER));
         addDrop(VivatechBlocks.STATIC_COMPENSATOR, drops(VivatechItems.STATIC_COMPENSATOR));
         addDrop(VivatechBlocks.CHARGER, drops(VivatechItems.CHARGER));

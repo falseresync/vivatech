@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.block;
 
 import com.mojang.serialization.MapCodec;
-import falseresync.vivatech.common.blockentity.WindmillBlockEntity;
+import falseresync.vivatech.common.blockentity.WindTurbineBlockEntity;
 import falseresync.vivatech.common.blockentity.Ticking;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import net.minecraft.block.*;
@@ -23,9 +23,9 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
-public class WindmillBlock extends BlockWithEntity {
+public class WindTurbineBlock extends BlockWithEntity {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    public static final MapCodec<WindmillBlock> CODEC = createCodec(WindmillBlock::new);
+    public static final MapCodec<WindTurbineBlock> CODEC = createCodec(WindTurbineBlock::new);
 
     public static final VoxelShape SHAPE_SOUTH = createCuboidShape(-16, -16, 4, 32, 32, 16);
     public static final VoxelShape SHAPE_NORTH = createCuboidShape(-16, -16, 0, 32, 32, 12);
@@ -33,13 +33,13 @@ public class WindmillBlock extends BlockWithEntity {
     public static final VoxelShape SHAPE_EAST = createCuboidShape(4, -16, -16, 16, 32, 32);
     public static final VoxelShape SHAPE_WEST = createCuboidShape(0, -16, -16, 12, 32, 32);
 
-    protected WindmillBlock(AbstractBlock.Settings settings) {
+    protected WindTurbineBlock(AbstractBlock.Settings settings) {
         super(settings);
         setDefaultState(stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
     @Override
-    protected MapCodec<WindmillBlock> getCodec() {
+    protected MapCodec<WindTurbineBlock> getCodec() {
         return CODEC;
     }
 
@@ -87,13 +87,13 @@ public class WindmillBlock extends BlockWithEntity {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new WindmillBlockEntity(pos, state);
+        return new WindTurbineBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VivatechBlockEntities.WINDMILL, Ticking.getDefaultTicker());
+        return validateTicker(type, VivatechBlockEntities.WIND_TURBINE, Ticking.getDefaultTicker());
     }
 
     @Override

@@ -24,8 +24,8 @@ public class GeneratorBlockEntity extends BlockEntity implements Ticking, Applia
         if (connected) {
             var facing = getCachedState().get(GearboxBlock.FACING);
             var gearboxState = world.getBlockState(pos.offset(facing));
-            var windmillState = world.getBlockState(pos.offset(facing, 2));
-            generating = gearboxState.isOf(VivatechBlocks.GEARBOX) && windmillState.isOf(VivatechBlocks.WINDMILL);
+            var wind_turbineState = world.getBlockState(pos.offset(facing, 2));
+            generating = gearboxState.isOf(VivatechBlocks.GEARBOX) && wind_turbineState.isOf(VivatechBlocks.WIND_TURBINE);
         }
     }
 

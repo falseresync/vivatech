@@ -1,7 +1,7 @@
 package falseresync.vivatech.client.rendering.block;
 
-import falseresync.vivatech.common.block.WindmillBlock;
-import falseresync.vivatech.common.blockentity.WindmillBlockEntity;
+import falseresync.vivatech.common.block.WindTurbineBlock;
+import falseresync.vivatech.common.blockentity.WindTurbineBlockEntity;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -16,12 +16,12 @@ import net.minecraft.util.math.RotationAxis;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public class WindmillBlockEntityRenderer implements BlockEntityRenderer<WindmillBlockEntity> {
-    public static final EntityModelLayer LAYER = new EntityModelLayer(vtId("windmill"), "main");
-    public static final SpriteIdentifier TEX = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, vtId("block/windmill"));
+public class WindTurbineBlockEntityRenderer implements BlockEntityRenderer<WindTurbineBlockEntity> {
+    public static final EntityModelLayer LAYER = new EntityModelLayer(vtId("wind_turbine"), "main");
+    public static final SpriteIdentifier TEX = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, vtId("block/wind_turbine"));
     private final ModelPart model;
 
-    public WindmillBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
+    public WindTurbineBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
         model = ctx.getLayerModelPart(LAYER);
         model.setDefaultTransform(ModelTransform.pivot(8, 8, 0));
         model.resetTransform();
@@ -38,16 +38,16 @@ public class WindmillBlockEntityRenderer implements BlockEntityRenderer<Windmill
     }
 
     @Override
-    public void render(WindmillBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(WindTurbineBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
-        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(entity.getCachedState().get(WindmillBlock.FACING).getOpposite().asRotation()), 0.5f, 0.5f, 0.5f);
+        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(entity.getCachedState().get(WindTurbineBlock.FACING).getOpposite().asRotation()), 0.5f, 0.5f, 0.5f);
         model.roll = entity.getRotationProgress(tickDelta);
         model.render(matrices, TEX.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout), light, overlay);
         matrices.pop();
     }
 
     @Override
-    public boolean rendersOutsideBoundingBox(WindmillBlockEntity blockEntity) {
+    public boolean rendersOutsideBoundingBox(WindTurbineBlockEntity blockEntity) {
         return true;
     }
 }

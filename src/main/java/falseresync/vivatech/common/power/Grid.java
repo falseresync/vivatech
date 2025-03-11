@@ -26,6 +26,8 @@ public class Grid {
     private final ServerWorld world;
     private final WireType wireType;
     private int overcurrentTicks = 0;
+    private float lastVoltage = 0;
+    private float lastCurrent = 0;
 
     public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType) {
         this.gridsManager = gridsManager;
@@ -197,7 +199,8 @@ public class Grid {
             }
         }
 
-        if (Math.max(generation, consumption) >= wireType.maxCurrent()) {
+        var current = Math.max(generation, consumption);
+        if (current >= wireType.maxCurrent()) {
             overcurrentTicks += 1;
         } else if (overcurrentTicks > 0) {
             overcurrentTicks -= 1;
@@ -211,6 +214,9 @@ public class Grid {
         for (var appliance : appliances.values()) {
             appliance.gridTick(voltage);
         }
+
+        lastVoltage = voltage;
+        lastCurrent = current;
     }
 
     private void onOvercurrent() {
@@ -252,5 +258,13 @@ public class Grid {
                 world.setBlockState(nearbyPos, AbstractFireBlock.getState(world, nearbyPos));
             }
         }
+    }
+
+    public float getLastVoltage() {
+        return lastVoltage;
+    }
+
+    public float getLastCurrent() {
+        return lastCurrent;
     }
 }

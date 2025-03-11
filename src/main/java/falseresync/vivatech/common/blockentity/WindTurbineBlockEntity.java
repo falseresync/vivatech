@@ -5,13 +5,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public class WindmillBlockEntity extends BlockEntity implements Ticking {
+public class WindTurbineBlockEntity extends BlockEntity implements Ticking {
     private static final float rotationSpeed = 0.5f / 360;
     private float lastRotationProgress;
     private float rotationProgress;
 
-    public WindmillBlockEntity(BlockPos pos, BlockState state) {
-        super(VivatechBlockEntities.WINDMILL, pos, state);
+    public WindTurbineBlockEntity(BlockPos pos, BlockState state) {
+        super(VivatechBlockEntities.WIND_TURBINE, pos, state);
     }
 
     @Override

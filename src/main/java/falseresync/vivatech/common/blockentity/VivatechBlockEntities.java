@@ -7,8 +7,8 @@ import net.minecraft.block.entity.BlockEntityType;
 public class VivatechBlockEntities {
     public static final @RegistryObject BlockEntityType<GeneratorBlockEntity> GENERATOR =
             BlockEntityType.Builder.create(GeneratorBlockEntity::new, VivatechBlocks.GENERATOR).build();
-    public static final @RegistryObject BlockEntityType<WindmillBlockEntity> WINDMILL =
-            BlockEntityType.Builder.create(WindmillBlockEntity::new, VivatechBlocks.WINDMILL).build();
+    public static final @RegistryObject BlockEntityType<WindTurbineBlockEntity> WIND_TURBINE =
+            BlockEntityType.Builder.create(WindTurbineBlockEntity::new, VivatechBlocks.WIND_TURBINE).build();
 
     public static final @RegistryObject BlockEntityType<HeaterBlockEntity> HEATER =
             BlockEntityType.Builder.create(HeaterBlockEntity::new, VivatechBlocks.HEATER).build();

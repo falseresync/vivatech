@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "vivatech:windmill"
+          "name": "vivatech:wind_turbine"
         }
       ],
       "rolls": 1.0

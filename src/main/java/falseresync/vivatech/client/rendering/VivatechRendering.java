@@ -2,7 +2,7 @@ package falseresync.vivatech.client.rendering;
 
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import falseresync.vivatech.client.rendering.block.ChargerBlockEntityRenderer;
-import falseresync.vivatech.client.rendering.block.WindmillBlockEntityRenderer;
+import falseresync.vivatech.client.rendering.block.WindTurbineBlockEntityRenderer;
 import falseresync.vivatech.client.rendering.entity.EnergyVeilFeatureRenderer;
 import falseresync.vivatech.client.rendering.entity.EnergyVeilModel;
 import falseresync.vivatech.client.rendering.entity.StarProjectileRenderer;
@@ -27,18 +27,18 @@ import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class VivatechRendering {
     public static void init() {
-        EntityModelLayerRegistry.registerModelLayer(WindmillBlockEntityRenderer.LAYER, WindmillBlockEntityRenderer::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(WindTurbineBlockEntityRenderer.LAYER, WindTurbineBlockEntityRenderer::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(EnergyVeilFeatureRenderer.LAYER, EnergyVeilModel::getTexturedModelData);
 
         EntityRendererRegistry.register(VivatechEntities.STAR_PROJECTILE, StarProjectileRenderer::new);
         EntityRendererRegistry.register(VivatechEntities.ENERGY_VEIL, EmptyEntityRenderer::new);
 
-        BlockEntityRendererFactories.register(VivatechBlockEntities.WINDMILL, WindmillBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(VivatechBlockEntities.WIND_TURBINE, WindTurbineBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(VivatechBlockEntities.CHARGER, ChargerBlockEntityRenderer::new);
 
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(),
                 VivatechBlocks.WIRE_POST,
-                VivatechBlocks.WINDMILL
+                VivatechBlocks.WIND_TURBINE
         );
 
         ModelPredicateProviderRegistry.GLOBAL.put(vtId("focus_plating"), (stack, world, entity, seed) -> stack.getOrDefault(VivatechComponents.FOCUS_PLATING, -1));

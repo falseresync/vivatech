@@ -1,7 +1,7 @@
 {
   "block.vivatech.generator": "Generator",
   "block.vivatech.gearbox": "Gearbox",
-  "block.vivatech.windmill": "Windmill",
+  "block.vivatech.wind_turbine": "Wind turbine",
 
   "block.vivatech.heater": "Heater",
   "block.vivatech.static_compensator": "Static compensator",
@@ -10,13 +10,14 @@
   "block.vivatech.wire_post": "Wire post",
 
   "itemGroup.vivatech.general": "Vivatech",
-  
+
+  "item.vivatech.mortar_and_pestle": "Mortar and pestle",
   "item.vivatech.wire": "Wire",
   "item.vivatech.pliers": "Pliers",
+  "item.vivatech.probe": "Probe",
   "item.vivatech.inspector_goggles": "Inspector goggles",
   "item.vivatech.focuses_pouch": "Focuses pouch",
-  "item.vivatech.mortar_and_pestle": "Mortar and pestle",
-  
+
   "item.vivatech.gadget": "Gadget",
   "item.vivatech.starshooter_focus": "Starshooter focus",
   "item.vivatech.lightning_focus": "Lightning focus",

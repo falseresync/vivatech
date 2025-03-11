@@ -18,7 +18,7 @@ public class VivatechBlockTagProvider extends FabricTagProvider.BlockTagProvider
         getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                 .add(VivatechBlocks.GENERATOR)
                 .add(VivatechBlocks.GEARBOX)
-                .add(VivatechBlocks.WINDMILL)
+                .add(VivatechBlocks.WIND_TURBINE)
                 .add(VivatechBlocks.HEATER)
                 .add(VivatechBlocks.STATIC_COMPENSATOR)
                 .add(VivatechBlocks.CHARGER)
