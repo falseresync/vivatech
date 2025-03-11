@@ -2,6 +2,8 @@ package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.power.Appliance;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import net.minecraft.block.AbstractFurnaceBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -48,11 +50,19 @@ public class HeaterBlockEntity extends BlockEntity implements Ticking, Appliance
 
         for (AbstractFurnaceBlockEntity furnace : cachedFurnaces.values()) {
             if (furnace.getStack(1).isEmpty()) {
-                furnace.fuelTime = 100;
-                if (furnace.burnTime < furnace.fuelTime) {
-                    furnace.burnTime += 2;
+                var changed = false;
+                if (furnace.burnTime == 0) {
+                    furnace.fuelTime = 100;
+                    world.setBlockState(furnace.getPos(), furnace.getCachedState().with(AbstractFurnaceBlock.LIT, true), Block.NOTIFY_ALL);
+                    changed = true;
                 }
-                furnace.markDirty();
+                if (furnace.burnTime < 100) {
+                    furnace.burnTime += 2;
+                    changed = true;
+                }
+                if (changed) {
+                    furnace.markDirty();
+                }
             }
         }
     }
