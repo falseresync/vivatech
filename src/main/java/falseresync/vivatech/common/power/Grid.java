@@ -5,7 +5,9 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
@@ -106,9 +108,7 @@ public class Grid {
             return false;
         }
 
-        for (var edge : graph.edgesOf(vertex)) {
-            gridsManager.onWireRemoved(edge.toServerWire());
-        }
+        graph.edgesOf(vertex).forEach(this::onWireRemoved);
         if (!graph.removeVertex(vertex)) {
             return false;
         }
@@ -127,7 +127,7 @@ public class Grid {
             return false;
         }
 
-        gridsManager.onWireRemoved(edge.toServerWire());
+        onWireRemoved(edge);
         partition();
         return true;
     }
@@ -168,6 +168,12 @@ public class Grid {
         if (vertex.appliance() != null) {
             vertex.appliance().onGridDisconnected();
         }
+    }
+
+    private void onWireRemoved(GridEdge edge) {
+        var serverWire = edge.toServerWire();
+        gridsManager.onWireRemoved(serverWire);
+        serverWire.drop(world, wireType);
     }
 
     private void clearVertexAssociatedCollections(BlockPos pos) {

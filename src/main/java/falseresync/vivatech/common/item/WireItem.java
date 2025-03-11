@@ -9,9 +9,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Colors;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -21,16 +22,26 @@ public class WireItem extends WireManagementItem {
     }
 
     @Override
-    protected ActionResult manageWire(ItemUsageContext context, GridVertex vertexU, GridVertex vertexV) {
-        if (!context.getWorld().isClient) {
-            var gridsManager = Vivatech.getServerGridsLoader().getGridsManager(context.getWorld());
-            var grid = gridsManager.findOrCreate(vertexU.pos(), vertexV.pos(), WireType.V_230);
+    protected ActionResult manageWire(ItemUsageContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV) {
+        if (context.getPlayer() instanceof ServerPlayerEntity player) {
+            var stack = context.getStack();
+            if (!connection.pos().isWithinDistance(player.getPos(), stack.getCount() * 5D/4)) {
+                stack.remove(VivatechComponents.ITEM_BAR);
+                player.dropItem(stack.copy(), true);
+                player.getInventory().dropSelectedItem(true);
+                return ActionResult.FAIL;
+            }
+
+            var grid = Vivatech.getServerGridsLoader().getGridsManager(context.getWorld())
+                    .findOrCreate(vertexU.pos(), vertexV.pos(), WireType.V_230);
             if (grid.getWireType() != WireType.V_230) {
                 return ActionResult.FAIL;
             }
+
             if (grid.connect(vertexU, vertexV)) {
-                context.getStack().remove(VivatechComponents.ITEM_BAR);
-                context.getStack().decrement((int) (vertexU.pos().subtract(vertexV.pos()).toBottomCenterPos().length() * 4D/5));
+                stack.remove(VivatechComponents.ITEM_BAR);
+                stack.decrement(MathHelper.ceil(vertexU.pos().subtract(vertexV.pos()).toCenterPos().length()));
+                player.setStackInHand(context.getHand(), stack);
                 return ActionResult.SUCCESS;
             }
         }
@@ -53,17 +64,8 @@ public class WireItem extends WireManagementItem {
                 return;
             }
 
-            if (!connection.pos().isWithinDistance(player.getPos(), stack.getCount() * 5D/4)) {
-                stack.remove(VivatechComponents.CONNECTION);
-                stack.remove(VivatechComponents.ITEM_BAR);
-                player.getInventory().removeStack(player.getInventory().getSlotWithStack(stack));
-                var middle = player.getPos().add(connection.pos().toCenterPos()).multiply(0.5f);
-                ItemScatterer.spawn(world, middle.x, middle.y, middle.z, stack);
-                return;
-            }
-
             stack.set(VivatechComponents.ITEM_BAR, new ItemBarComponent(
-                    MathHelper.clamp(Math.round(13 - (float) (connection.pos().getSquaredDistance(player.getPos()) * 13 / Math.pow(stack.getCount() * 5D/4, 2))), 0, 13),
+                    MathHelper.clamp(Math.round(13 - (float) (connection.pos().getSquaredDistance(player.getPos()) * 13 / Math.pow(stack.getCount(), 2))), 1, 13),
                     Colors.WHITE
             ));
         }
