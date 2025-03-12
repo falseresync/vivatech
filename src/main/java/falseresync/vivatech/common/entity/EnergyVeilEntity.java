@@ -146,15 +146,15 @@ public class EnergyVeilEntity extends Entity implements Ownable {
     }
 
     private boolean isComingFromAboveOrBelow(Entity entity) {
-        return entity.getY() > (getY() + getVeilVisibleRadius() + 0.25) || entity.getEyeY() < (getY() - 0.25);
+        return entity.getY() > (getY() + getVisibleRadius() + 0.25) || entity.getEyeY() < (getY() - 0.25);
     }
 
     private boolean isInside(Entity entity) {
-        return entity.getPos().squaredDistanceTo(getPos()) <= Math.pow(getVeilVisibleRadius(), 2);
+        return entity.getPos().squaredDistanceTo(getPos()) <= Math.pow(getVisibleRadius(), 2);
     }
 
     private boolean isOnTheEdge(Entity entity) {
-        return entity.getPos().squaredDistanceTo(getPos()) <= Math.pow(getVeilRadius(), 2);
+        return entity.getPos().squaredDistanceTo(getPos()) <= Math.pow(getRadius(), 2);
     }
 
     @Override
@@ -162,17 +162,17 @@ public class EnergyVeilEntity extends Entity implements Ownable {
         return true;
     }
 
-    public final float getVeilRadius() {
+    public final float getRadius() {
         return dataTracker.get(RADIUS);
     }
 
-    public final void setVeilRadius(float radius) {
+    public final void setRadius(float radius) {
         Preconditions.checkArgument(radius >= 2 && radius <= 4, "Veil radius cannot be smaller than 2 or greater than 4");
         dataTracker.set(RADIUS, radius);
     }
 
-    public final float getVeilVisibleRadius() {
-        return getVeilRadius() - SCREENS_OFFSET;
+    public final float getVisibleRadius() {
+        return getRadius() - SCREENS_OFFSET;
     }
 
     @Nullable
@@ -186,7 +186,7 @@ public class EnergyVeilEntity extends Entity implements Ownable {
     }
 
     private EntityDimensions getDimensions() {
-        return EntityDimensions.changing(getVeilRadius() * 2, getVeilRadius() * 2);
+        return EntityDimensions.changing(getRadius() * 2, getRadius() * 2);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class EnergyVeilEntity extends Entity implements Ownable {
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         if (nbt.contains("radius", NbtElement.FLOAT_TYPE)) {
-            setVeilRadius(nbt.getFloat("radius"));
+            setRadius(nbt.getFloat("radius"));
         }
         if (nbt.contains("age", NbtElement.INT_TYPE)) {
             age = nbt.getInt("age");
@@ -225,7 +225,7 @@ public class EnergyVeilEntity extends Entity implements Ownable {
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-        nbt.putFloat("radius", getVeilRadius());
+        nbt.putFloat("radius", getRadius());
         nbt.putInt("age", age);
         nbt.putInt("life_expectancy", getLifeExpectancy());
         if (owner != null) {

@@ -55,7 +55,7 @@ public class EnergyVeilFocusItem extends FocusItem {
                 && !user.hasAttached(VivatechAttachments.ENERGY_VEIL_NETWORK_ID)) {
             if (Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, STARTING_COST, user)) {
                 var veil = new EnergyVeilEntity(user, gadgetStack, world);
-                veil.setVeilRadius(2);
+                veil.setRadius(2);
                 world.spawnEntity(veil);
                 gadgetStack.set(VivatechComponents.ENERGY_VEIL_UUID, veil.getUuid());
                 gadgetStack.set(VivatechComponents.IN_USE, true);

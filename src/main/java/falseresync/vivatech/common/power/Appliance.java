@@ -1,13 +1,6 @@
 package falseresync.vivatech.common.power;
 
-import net.minecraft.util.math.BlockPos;
-
 public interface Appliance {
-    /**
-     * Must not change
-     */
-    BlockPos getPos();
-
     /**
      * Only called when first connected. <br/>
      * Does not get called when a grid changes through mergers and partitions.
@@ -33,5 +26,11 @@ public interface Appliance {
      * It is advisable to minimize the cost of this method. Do expensive calculations in the regular tick methods
      */
     default void gridTick(float voltage) {
+    }
+
+    default void onGridFrozen() {
+    }
+
+    default void onGridUnfrozen() {
     }
 }

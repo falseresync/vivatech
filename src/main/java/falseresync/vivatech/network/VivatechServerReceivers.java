@@ -15,7 +15,7 @@ public class VivatechServerReceivers {
     }
 
     private static void onRequestWires(RequestWiresC2SPayload payload, ServerPlayNetworking.Context context) {
-        Vivatech.getServerGridsLoader().onWiresRequested(context.player().getServerWorld(), payload.chunks());
+        Vivatech.getServerGridsLoader().onWiresRequested(context.player().getWorld().getRegistryKey(), payload.chunks());
     }
     
     private static void changeGadgetFocus(ChangeFocusC2SPayload payload, ServerPlayNetworking.Context context) {

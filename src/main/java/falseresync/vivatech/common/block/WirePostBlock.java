@@ -4,10 +4,7 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.power.GridVertex;
 import falseresync.vivatech.common.power.GridVertexProvider;
 import falseresync.vivatech.common.power.PowerSystem;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -65,7 +62,7 @@ public class WirePostBlock extends Block implements GridVertexProvider {
     protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         var facing = state.get(FACING);
         var otherPos = pos.offset(facing);
-        return world.getBlockState(otherPos).isSideSolidFullSquare(world, otherPos, facing.getOpposite());
+        return world.getBlockState(otherPos).isSideSolid(world, otherPos, facing.getOpposite(), SideShapeType.CENTER);
     }
 
     @Override

@@ -42,12 +42,6 @@ public class VivatechClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             clientWireManager.tick();
         });
-
-        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            if (clientWireManager != null) {
-                clientWireManager.queueUnsyncedChunk(chunk.getPos());
-            }
-        });
     }
 
     public static ClientWireManager getClientWireManager() {

@@ -1,13 +1,16 @@
 package falseresync.vivatech.common.power;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.PathUtil;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -27,15 +30,50 @@ public class ServerGridsLoader {
 
     public ServerGridsLoader(MinecraftServer server) {
         this.server = server;
+
+        ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                if (blockEntity instanceof Appliance appliance) {
+                    for (var grid : getGridsManager(world).getGrids()) {
+                        if (grid.containsAppliance(appliance)) {
+                            grid.onApplianceUnloaded(appliance);
+                        }
+                    }
+                }
+            }
+        });
+
+        ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+            if (gridsManagers.isEmpty()) {
+                return; // Prevent from running on world start, we don't need that
+            }
+            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                if (blockEntity instanceof Appliance appliance) {
+                    for (var grid : getGridsManager(world).getGrids()) {
+                        if (grid.containsUnloadedAppliance(appliance)) {
+                            grid.onApplianceLoaded(appliance);
+                        }
+                    }
+                }
+            }
+        });
+
+        ServerLifecycleEvents.AFTER_SAVE.register((_ignored, flush, force) -> save());
+
         load();
+    }
+
+    public void tick(World world) {
+        getGridsManager(world).getGrids().forEach(Grid::tick);
+        sendWires();
     }
 
     public GridsManager getGridsManager(World world) {
         return gridsManagers.get(world.getRegistryKey());
     }
 
-    public void onWiresRequested(ServerWorld world, List<ChunkPos> requestedChunks) {
-        gridsManagers.get(world.getRegistryKey()).onWiresRequested(requestedChunks);
+    public void onWiresRequested(RegistryKey<World> key, List<ChunkPos> requestedChunks) {
+        gridsManagers.get(key).onWiresRequested(requestedChunks);
     }
 
     public void sendWires() {

@@ -2,12 +2,11 @@ package falseresync.vivatech.common.power;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
@@ -24,20 +23,23 @@ public class Grid {
     private final SimpleGraph<GridVertex, GridEdge> graph;
     private final Map<BlockPos, BlockApiCache<GridVertex, Void>> vertexCaches;
     private final Map<BlockPos, Appliance> appliances;
+    private final Set<Appliance> unloadedAppliances;
     private final GridsManager gridsManager;
     private final ServerWorld world;
     private final WireType wireType;
     private int overcurrentTicks = 0;
     private float lastVoltage = 0;
     private float lastCurrent = 0;
+    private boolean frozen = false;
 
     public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType) {
         this.gridsManager = gridsManager;
         this.world = world;
         this.wireType = wireType;
-        this.graph = new SimpleGraph<>(GridEdge.class);
-        this.vertexCaches = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
-        this.appliances = new Object2ReferenceRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
+        graph = new SimpleGraph<>(GridEdge.class);
+        vertexCaches = new Object2ObjectRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
+        appliances = new Object2ReferenceRBTreeMap<>(Comparator.comparingLong(BlockPos::asLong));
+        unloadedAppliances = new ReferenceOpenHashSet<>();
     }
 
     public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
@@ -144,6 +146,14 @@ public class Grid {
             } else {
                 var other = gridsManager.create(wireType);
                 other.merge(isolatedGraph);
+                var iterator = unloadedAppliances.iterator();
+                while (iterator.hasNext()) {
+                    var unloadedAppliance = iterator.next();
+                    if (other.containsAppliance(unloadedAppliance)) {
+                        other.onApplianceUnloaded(unloadedAppliance);
+                        iterator.remove();
+                    }
+                }
             }
         }
 
@@ -154,7 +164,7 @@ public class Grid {
         gridsManager.getGridLookup().put(vertex.pos(), this);
         vertexCaches.put(vertex.pos(), BlockApiCache.create(PowerSystem.GRID_VERTEX, world, vertex.pos()));
         if (vertex.appliance() != null) {
-            if (!appliances.containsValue(vertex.appliance())) {
+            if (!containsAppliance(vertex.appliance())) {
                 appliances.put(vertex.pos(), vertex.appliance());
                 if (!isTransferred) {
                     vertex.appliance().onGridConnected();
@@ -182,7 +192,35 @@ public class Grid {
         appliances.remove(pos);
     }
 
+    public boolean containsAppliance(Appliance appliance) {
+        return appliances.containsValue(appliance);
+    }
+
+    public boolean containsUnloadedAppliance(Appliance appliance) {
+        return unloadedAppliances.contains(appliance);
+    }
+
+    public void onApplianceLoaded(Appliance appliance) {
+        unloadedAppliances.remove(appliance);
+        if (unloadedAppliances.isEmpty()) {
+            frozen = false;
+            appliances.values().forEach(Appliance::onGridUnfrozen);
+        }
+    }
+
+    public void onApplianceUnloaded(Appliance appliance) {
+        unloadedAppliances.add(appliance);
+        if (!frozen) {
+            frozen = true;
+            appliances.values().forEach(Appliance::onGridFrozen);
+        }
+    }
+
     public void tick() {
+        if (frozen) {
+            return;
+        }
+
         float generation = 0;
         float consumption = 0;
         for (var appliance : appliances.values()) {

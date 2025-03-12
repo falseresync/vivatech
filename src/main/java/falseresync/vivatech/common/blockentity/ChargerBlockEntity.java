@@ -14,8 +14,10 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import org.jetbrains.annotations.Nullable;
 
 public class ChargerBlockEntity extends BlockEntity implements Ticking, Appliance {
@@ -61,6 +63,11 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
     @Override
     public void onGridDisconnected() {
         connected = false;
+    }
+
+    @Override
+    public void onGridFrozen() {
+        operational = false;
     }
 
     @Override

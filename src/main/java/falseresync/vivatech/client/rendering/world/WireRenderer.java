@@ -53,7 +53,7 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
 
     @Override
     public void afterEntities(WorldRenderContext context) {
-        var wires = VivatechClient.getClientWireManager().getWires();
+        var wires = VivatechClient.getClientWireManager().getWires(context.world().getRegistryKey());
         if (wires.isEmpty()) {
             return;
         }

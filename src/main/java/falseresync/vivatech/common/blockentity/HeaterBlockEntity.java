@@ -1,5 +1,6 @@
 package falseresync.vivatech.common.blockentity;
 
+import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.power.Appliance;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.block.AbstractFurnaceBlock;
@@ -10,7 +11,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
 
 import java.util.*;
 
@@ -82,6 +85,11 @@ public class HeaterBlockEntity extends BlockEntity implements Ticking, Appliance
     }
 
     @Override
+    public void onGridFrozen() {
+        enabled = false;
+    }
+
+    @Override
     public float getElectricalCurrent() {
         return - (1f + cachedFurnaces.size()) / 2;
     }
@@ -89,6 +97,8 @@ public class HeaterBlockEntity extends BlockEntity implements Ticking, Appliance
     @Override
     public void gridTick(float voltage) {
         enabled = voltage > 210 && voltage < 250;
+        if (getPos().getZ() == -180)
+        Vivatech.LOGGER.info("I grid ticked %s".formatted((world instanceof ServerWorld serverWorld) ? serverWorld.getChunkManager().isChunkLoaded(ChunkSectionPos.getSectionCoord(getPos().getX()), ChunkSectionPos.getSectionCoord(getPos().getZ())) : "nada"));
     }
 
     @Override
