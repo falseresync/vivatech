@@ -42,9 +42,7 @@ public class GridsManager {
 
     public void tick() {
         for (Grid grid : grids) {
-            if (!grid.isFrozen()) {
-                grid.tick();
-            }
+            grid.tick();
         }
     }
 

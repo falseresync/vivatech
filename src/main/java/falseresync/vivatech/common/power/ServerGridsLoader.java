@@ -1,8 +1,6 @@
 package falseresync.vivatech.common.power;
 
-import falseresync.vivatech.common.VivatechUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
@@ -28,24 +26,6 @@ public class ServerGridsLoader {
 
     public ServerGridsLoader(MinecraftServer server) {
         this.server = server;
-
-        VivatechUtil.CHUNK_STOP_TICKING.register((world, chunkPos) -> {
-            for (var grid : getGridsManager(world).getGrids()) {
-                if (grid.tracksChunk(chunkPos)) {
-                    grid.onChunkUnloaded(chunkPos);
-                }
-            }
-        });
-
-        VivatechUtil.CHUNK_START_TICKING.register((world, chunkPos) -> {
-            for (var grid : getGridsManager(world).getGrids()) {
-                if (grid.tracksChunk(chunkPos)) {
-                    grid.onChunkLoaded(chunkPos);
-                }
-            }
-        });
-
-        ServerLifecycleEvents.AFTER_SAVE.register((_ignored, flush, force) -> save());
         load();
     }
 
