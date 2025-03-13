@@ -38,9 +38,6 @@ public class ServerGridsLoader {
         });
 
         VivatechUtil.CHUNK_START_TICKING.register((world, chunkPos) -> {
-            if (gridsManagers.isEmpty()) {
-                return; // Prevent from running on world start, we don't need that
-            }
             for (var grid : getGridsManager(world).getGrids()) {
                 if (grid.tracksChunk(chunkPos)) {
                     grid.onChunkLoaded(chunkPos);
@@ -54,7 +51,7 @@ public class ServerGridsLoader {
 
     public void tick(World world) {
         if (world.getTickManager().shouldTick()) {
-            getGridsManager(world).getGrids().forEach(Grid::tick);
+            getGridsManager(world).tick();
         }
         sendWires();
     }
@@ -70,6 +67,12 @@ public class ServerGridsLoader {
     public void sendWires() {
         for (var gridsManager : gridsManagers.values()) {
             gridsManager.sendWires();
+        }
+    }
+
+    public void close() {
+        for (GridsManager gridsManager : gridsManagers.values()) {
+            gridsManager.close();
         }
     }
 

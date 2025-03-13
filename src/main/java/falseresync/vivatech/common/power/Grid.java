@@ -2,7 +2,7 @@ package falseresync.vivatech.common.power;
 
 import falseresync.vivatech.common.VivatechUtil;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
@@ -48,7 +48,9 @@ public class Grid {
 
     public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
         this(gridsManager, world, wireType);
-        edges.forEach(this::connect);
+        for (GridEdge edge : edges) {
+            connect(edge);
+        }
     }
 
     public GridSnapshot createSnapshot() {
@@ -151,7 +153,8 @@ public class Grid {
                 while (iterator.hasNext()) {
                     var chunkPos = iterator.next();
                     if (other.tracksChunk(chunkPos)) {
-                        other.onChunkUnloaded(chunkPos);
+                        other.unloadedChunks.add(chunkPos);
+                        other.frozen = true;
                         iterator.remove();
                     }
                 }
@@ -167,14 +170,14 @@ public class Grid {
             if (!appliances.containsValue(vertex.appliance())) {
                 onApplianceAdded(vertex.appliance(), transferred);
                 var appliancePos = vertex.appliance().getPos();
-                trackedChunks.computeIfAbsent(new ChunkPos(appliancePos), key -> new ReferenceOpenHashSet<>()).add(appliancePos);
+                trackedChunks.computeIfAbsent(new ChunkPos(appliancePos), key -> new ObjectOpenHashSet<>()).add(appliancePos);
             }
         }
     }
 
-    private void onApplianceAdded(Appliance appliance, boolean transferred) {
+    private void onApplianceAdded(Appliance appliance, boolean shouldInitialize) {
         appliances.put(appliance.getPos(), appliance);
-        if (!transferred) {
+        if (!shouldInitialize) {
             appliance.onGridConnected();
         }
     }
@@ -232,20 +235,20 @@ public class Grid {
 
     public void onChunkLoaded(ChunkPos chunkPos) {
         unloadedChunks.remove(chunkPos);
-        refreshApplianceReferences(chunkPos);
         if (frozen && unloadedChunks.isEmpty()) {
             frozen = false;
+            refreshApplianceReferences();
             appliances.values().forEach(Appliance::onGridUnfrozen);
         }
     }
 
-    private void refreshApplianceReferences(ChunkPos chunkPos) {
-        for (var pos : trackedChunks.get(chunkPos)) {
-            graph.vertexSet().stream().filter(it -> it.pos().equals(pos)).findAny().ifPresent(oldVertex -> {
-                var appliance = PowerSystem.APPLIANCE.find(world, pos, null);
-                VivatechUtil.replaceVertex(graph, oldVertex, new GridVertex(pos, appliance));
-                onApplianceAdded(appliance, false);
-            });
+    private void refreshApplianceReferences() {
+        for (GridVertex oldVertex : graph.vertexSet()) {
+            if (oldVertex.appliance() != null) {
+                var appliance = PowerSystem.APPLIANCE.find(world, oldVertex.appliance().getPos(), null);
+                VivatechUtil.replaceVertexUndirected(graph, oldVertex, new GridVertex(oldVertex.pos(), appliance));
+                onApplianceAdded(appliance, true);
+            }
         }
     }
 
@@ -258,10 +261,6 @@ public class Grid {
     }
 
     public void tick() {
-        if (frozen) {
-            return;
-        }
-
         float generation = 0;
         float consumption = 0;
         for (var appliance : appliances.values()) {

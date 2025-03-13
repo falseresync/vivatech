@@ -27,6 +27,9 @@ public class GridsManager {
     public static final Codec<List<GridSnapshot>> CODEC = GridSnapshot.CODEC.listOf();
     private final ServerWorld world;
     private final Set<Grid> grids = new ReferenceOpenHashSet<>();
+    /**
+     * Tracks vertex positions
+     */
     private final Map<BlockPos, Grid> gridLookup = new Object2ReferenceRBTreeMap<>();
     private final Map<ChunkPos, Set<Wire>> wires = PowerSystem.createChunkPosKeyedMap();
     private final Map<ChunkPos, Set<Wire>> addedWires = PowerSystem.createChunkPosKeyedMap();
@@ -35,6 +38,14 @@ public class GridsManager {
 
     public GridsManager(ServerWorld world) {
         this.world = world;
+    }
+
+    public void tick() {
+        for (Grid grid : grids) {
+            if (!grid.isFrozen()) {
+                grid.tick();
+            }
+        }
     }
 
     public void onWireAdded(Wire wire) {
@@ -126,5 +137,14 @@ public class GridsManager {
         var grid = new Grid(this, world, wireType);
         grids.add(grid);
         return grid;
+    }
+
+    public void close() {
+        grids.clear();
+        gridLookup.clear();
+        wires.clear();
+        addedWires.clear();
+        removedWires.clear();
+        requestedChunks.clear();
     }
 }

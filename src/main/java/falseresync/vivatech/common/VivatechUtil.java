@@ -50,10 +50,16 @@ public class VivatechUtil {
                 .flatMap(entries -> entries.getRandom(random).map(RegistryEntry::value));
     }
 
-    public static <V, E> void replaceVertex(Graph<V, E> graph, V oldVertex, V newVertex) {
+    public static <V, E> void replaceVertexUndirected(Graph<V, E> graph, V oldVertex, V newVertex) {
         graph.addVertex(newVertex);
-        for (E edge : graph.edgesOf(oldVertex)) graph.addEdge(newVertex, graph.getEdgeTarget(edge), edge);
-        for (E edge : graph.incomingEdgesOf(oldVertex)) graph.addEdge(graph.getEdgeSource(edge), newVertex, edge);
+        for (E edge : graph.edgesOf(oldVertex)) {
+            var source = graph.getEdgeSource(edge);
+            if (source != oldVertex) {
+                graph.addEdge(newVertex, source, edge);
+            } else {
+                graph.addEdge(newVertex, graph.getEdgeTarget(edge), edge);
+            }
+        }
         graph.removeVertex(oldVertex);
     }
 

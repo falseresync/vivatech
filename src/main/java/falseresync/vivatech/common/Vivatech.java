@@ -78,6 +78,10 @@ public class Vivatech implements ModInitializer {
             serverGridsLoader = new ServerGridsLoader(server);
         });
 
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            serverGridsLoader.close();
+        });
+
         ServerTickEvents.END_WORLD_TICK.register(world -> {
             serverGridsLoader.tick(world);
         });
