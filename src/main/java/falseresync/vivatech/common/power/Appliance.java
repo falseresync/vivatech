@@ -1,6 +1,13 @@
 package falseresync.vivatech.common.power;
 
+import net.minecraft.util.math.BlockPos;
+
 public interface Appliance {
+    /**
+     * Must not change
+     */
+    BlockPos getPos();
+
     /**
      * Only called when first connected. <br/>
      * Does not get called when a grid changes through mergers and partitions.

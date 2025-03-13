@@ -3,6 +3,7 @@ package falseresync.vivatech.common.power;
 import falseresync.vivatech.common.block.VivatechBlocks;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
@@ -20,8 +21,12 @@ public class PowerSystem {
     public static final WorldSavePath SAVE_PATH = new WorldSavePath("power_systems");
     public static final int DATA_VERSION = 100;
 
-    public static Map<ChunkPos, Set<Wire>> createWireMap() {
+    public static <T> Map<ChunkPos, Set<T>> createChunkPosKeyedMap() {
         return new Object2ObjectRBTreeMap<>(Comparator.comparingLong(ChunkPos::toLong));
+    }
+
+    public static <T> Set<ChunkPos> createChunkPosSet() {
+        return new ObjectRBTreeSet<>(Comparator.comparingLong(ChunkPos::toLong));
     }
 
     public static void registerAll() {

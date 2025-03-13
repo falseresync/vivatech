@@ -1,10 +1,8 @@
 package falseresync.vivatech.common.power;
 
+import falseresync.vivatech.common.VivatechUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
@@ -31,40 +29,33 @@ public class ServerGridsLoader {
     public ServerGridsLoader(MinecraftServer server) {
         this.server = server;
 
-        ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
-            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-                if (blockEntity instanceof Appliance appliance) {
-                    for (var grid : getGridsManager(world).getGrids()) {
-                        if (grid.containsAppliance(appliance)) {
-                            grid.onApplianceUnloaded(appliance);
-                        }
-                    }
+        VivatechUtil.CHUNK_STOP_TICKING.register((world, chunkPos) -> {
+            for (var grid : getGridsManager(world).getGrids()) {
+                if (grid.tracksChunk(chunkPos)) {
+                    grid.onChunkUnloaded(chunkPos);
                 }
             }
         });
 
-        ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+        VivatechUtil.CHUNK_START_TICKING.register((world, chunkPos) -> {
             if (gridsManagers.isEmpty()) {
                 return; // Prevent from running on world start, we don't need that
             }
-            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-                if (blockEntity instanceof Appliance appliance) {
-                    for (var grid : getGridsManager(world).getGrids()) {
-                        if (grid.containsUnloadedAppliance(appliance)) {
-                            grid.onApplianceLoaded(appliance);
-                        }
-                    }
+            for (var grid : getGridsManager(world).getGrids()) {
+                if (grid.tracksChunk(chunkPos)) {
+                    grid.onChunkLoaded(chunkPos);
                 }
             }
         });
 
         ServerLifecycleEvents.AFTER_SAVE.register((_ignored, flush, force) -> save());
-
         load();
     }
 
     public void tick(World world) {
-        getGridsManager(world).getGrids().forEach(Grid::tick);
+        if (world.getTickManager().shouldTick()) {
+            getGridsManager(world).getGrids().forEach(Grid::tick);
+        }
         sendWires();
     }
 
@@ -78,9 +69,7 @@ public class ServerGridsLoader {
 
     public void sendWires() {
         for (var gridsManager : gridsManagers.values()) {
-            gridsManager.sendRequestedWires();
-            gridsManager.sendAddedWires();
-            gridsManager.sendRemovedWires();
+            gridsManager.sendWires();
         }
     }
 

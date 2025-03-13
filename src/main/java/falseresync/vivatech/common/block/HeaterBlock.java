@@ -12,7 +12,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,19 +32,7 @@ public class HeaterBlock extends BlockWithEntity {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
         if (!world.isClient) {
             if (world.getBlockEntity(pos) instanceof HeaterBlockEntity heater) {
-                heater.scan(sourcePos);
-            }
-        }
-    }
-
-    @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        super.onBlockAdded(state, world, pos, oldState, notify);
-        if (!world.isClient) {
-            if (world.getBlockEntity(pos) instanceof HeaterBlockEntity heater) {
-                for (var direction : Direction.values()) {
-                    heater.scan(pos.offset(direction));
-                }
+                heater.scheduleScan();
             }
         }
     }

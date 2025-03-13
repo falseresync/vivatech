@@ -3,7 +3,8 @@
   "package": "falseresync.vivatech.common.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "LightningEntityMixin"
+    "LightningEntityMixin",
+    "ServerChunkLoadingManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
