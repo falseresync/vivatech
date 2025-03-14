@@ -1,9 +1,11 @@
 package falseresync.vivatech.client;
 
+import falseresync.lib.logging.BetterLogger;
 import falseresync.vivatech.client.gui.VivatechGui;
 import falseresync.vivatech.client.hud.VivatechHud;
 import falseresync.vivatech.client.particle.VivatechParticleFactories;
 import falseresync.vivatech.client.rendering.VivatechRendering;
+import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.config.TranslatableEnum;
 import falseresync.vivatech.common.config.TranslatableEnumGuiProvider;
 import falseresync.vivatech.common.config.VivatechConfig;
@@ -13,8 +15,10 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import org.slf4j.LoggerFactory;
 
 public class VivatechClient implements ClientModInitializer {
+    public static final BetterLogger LOGGER = new BetterLogger(LoggerFactory.getLogger(Vivatech.MOD_ID), "Vivatech / Client");
     private static ClientWireManager clientWireManager;
     private static VivatechHud hud;
     private static ToolManager toolManager;
@@ -42,6 +46,8 @@ public class VivatechClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             clientWireManager.tick();
         });
+
+        LOGGER.info("Initialized");
     }
 
     public static ClientWireManager getClientWireManager() {

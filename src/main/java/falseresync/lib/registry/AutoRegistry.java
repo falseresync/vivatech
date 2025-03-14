@@ -55,16 +55,16 @@ public class AutoRegistry {
                 try {
                     var registryObject = field.get(holderClass);
                     if (registryObject == null) {
-                        logger.warn("Found a null @RegistryObject field, discarding: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                        logger.warn("[AutoRegistry / %s] Found a null @RegistryObject field, discarding: %s at %s".formatted(modId, field.getName(), holderClass.getCanonicalName()));
                         continue;
                     }
 
                     //noinspection unchecked
                     Registry.register(registry, Identifier.of(modId, field.getName().toLowerCase()), (T) registryObject);
                 } catch (IllegalAccessException e) {
-                    throw new InaccessibleObjectException("Couldn't read a @RegistryObject field: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                    throw new InaccessibleObjectException("[AutoRegistry / %s] Couldn't read a @RegistryObject field: %s at %s".formatted(modId, field.getName(), holderClass.getCanonicalName()));
                 } catch (ClassCastException e) {
-                    throw new IllegalArgumentException("A @RegistryObject field's type doesn't match the provided registry: %s at %s".formatted(field.getName(), holderClass.getCanonicalName()));
+                    throw new IllegalArgumentException("[AutoRegistry / %s] A @RegistryObject field's type doesn't match the provided registry: %s at %s".formatted(modId, field.getName(), holderClass.getCanonicalName()));
                 }
             }
         }

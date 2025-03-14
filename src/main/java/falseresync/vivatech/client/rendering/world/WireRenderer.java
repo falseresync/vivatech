@@ -72,12 +72,12 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
         var cameraPos = context.camera().getPos();
 
         for (var wire : wires) {
-            var wireEnd = wire.start().relativize(wire.end()).toVector3f();
-            var light = WorldRenderer.getLightmapCoordinates(context.world(), BlockPos.ofFloored(wire.middle()));
+            var wireEnd = wire.end().sub(wire.start(), new Vector3f());
+            var light = WorldRenderer.getLightmapCoordinates(context.world(), BlockPos.ofFloored(wire.middle().x, wire.middle().y, wire.middle().z));
 
             matrices.push();
 
-            var cameraAdjustment = cameraPos.relativize(wire.start());
+            var cameraAdjustment = wire.start().sub(cameraPos.toVector3f(), new Vector3f());
             matrices.translate(cameraAdjustment.x, cameraAdjustment.y, cameraAdjustment.z);
 
             var positionMatrix = matrices.peek().getPositionMatrix();

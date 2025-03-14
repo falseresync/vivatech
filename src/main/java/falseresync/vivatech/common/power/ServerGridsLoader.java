@@ -75,9 +75,11 @@ public class ServerGridsLoader {
                     throw eOuter;
                 }
             } catch (IOException e) {
-                LOGGER.error("Couldn't access power systems in {}", filePath, e);
+                LOGGER.error("Couldn't access power systems in %s".formatted(filePath));
+                LOGGER.error(e);
             } catch (IllegalStateException e) {
-                LOGGER.error("Couldn't parse power systems in {}", filePath, e);
+                LOGGER.error("Couldn't parse power systems in %s".formatted(filePath));
+                LOGGER.error(e);
             }
         }
 
@@ -111,9 +113,11 @@ public class ServerGridsLoader {
 
             fileOutputStream.close();
         } catch (IOException e) {
-            LOGGER.error("Couldn't save power systems to {}", filePath, e);
+            LOGGER.error("Couldn't save power systems to %s".formatted(filePath));
+            LOGGER.error(e);
         } catch (IllegalStateException e) {
-            LOGGER.error("Couldn't serialize power systems for {}", filePath, e);
+            LOGGER.error("Couldn't serialize power systems for %s".formatted(filePath));
+            LOGGER.error(e);
         }
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
 
 import java.util.Objects;
 
@@ -16,9 +17,9 @@ public record Wire(
         ImmutableSet<BlockPos> positions,
         BlockPos u,
         BlockPos v,
-        @Environment(EnvType.CLIENT) Vec3d start,
-        @Environment(EnvType.CLIENT) Vec3d end,
-        Vec3d middle,
+        Vector3f start,
+        Vector3f end,
+        Vector3f middle,
         ChunkPos chunkPos
 ) {
     public static final PacketCodec<RegistryByteBuf, Wire> PACKET_CODEC = PacketCodec.tuple(
@@ -28,15 +29,19 @@ public record Wire(
     );
 
     public static Wire createServerWire(BlockPos u, BlockPos v) {
-        var middle = u.add(v).toCenterPos().multiply(0.5f);
+        var middle = toCenterPos(u.add(v)).mul(0.5f);
         var chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z));
         return new Wire(ImmutableSet.of(u, v), u, v, null, null, middle, chunkPos);
     }
 
     public static Wire createClientWire(BlockPos u, BlockPos v) {
-        var middle = u.add(v).toCenterPos().multiply(0.5f);
+        var middle = toCenterPos(u.add(v)).mul(0.5f);
         var chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z));
-        return new Wire(ImmutableSet.of(u, v), u, v, u.toCenterPos(), v.toCenterPos(), middle, chunkPos);
+        return new Wire(ImmutableSet.of(u, v), u, v, toCenterPos(u), toCenterPos(v), middle, chunkPos);
+    }
+
+    private static Vector3f toCenterPos(BlockPos pos) {
+        return new Vector3f(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
     }
 
     public void drop(World world, WireType type) {
