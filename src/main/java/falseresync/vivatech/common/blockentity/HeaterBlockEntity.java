@@ -114,6 +114,7 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking, Applian
                 furnace.burnTime = cachedBurnTimes.removeInt(direction);
             }
         }
+        cachedBurnTimes.clear();
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.PathUtil;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -26,7 +27,6 @@ public class ServerGridsLoader {
 
     public ServerGridsLoader(MinecraftServer server) {
         this.server = server;
-        load();
     }
 
     public void tick(World world) {
@@ -50,20 +50,12 @@ public class ServerGridsLoader {
         }
     }
 
-    public void close() {
-        for (GridsManager gridsManager : gridsManagers.values()) {
-            gridsManager.close();
+    public void load(ServerWorld world) {
+        var gridsManager = new GridsManager(world);
+        for (var snapshot : loadSnapshots(world)) {
+            gridsManager.getGrids().add(snapshot.reconstruct(gridsManager, world));
         }
-    }
-
-    public void load() {
-        for (var world : server.getWorlds()) {
-            var gridsManager = new GridsManager(world);
-            for (var snapshot : loadSnapshots(world)) {
-                gridsManager.getGrids().add(snapshot.reconstruct(gridsManager, world));
-            }
-            gridsManagers.put(world.getRegistryKey(), gridsManager);
-        }
+        gridsManagers.put(world.getRegistryKey(), gridsManager);
     }
 
     private List<GridSnapshot> loadSnapshots(World world) {
@@ -92,35 +84,36 @@ public class ServerGridsLoader {
         return List.of();
     }
 
-    public void save() {
-        for (var world : server.getWorlds()) {
-            var snapshots = gridsManagers.get(world.getRegistryKey()).getGrids().stream().map(Grid::createSnapshot).toList();
-            var filePath = server.getSavePath(PowerSystem.SAVE_PATH).resolve(PowerSystem.createFileName(world) + ".nbt");
-            try {
-                PathUtil.createDirectories(filePath.getParent());
-                var fileOutputStream = Files.newOutputStream(filePath);
+    public void save(ServerWorld world) {
+        var snapshots = gridsManagers.get(world.getRegistryKey()).getGrids().stream()
+                .filter(grid -> !grid.isEmpty())
+                .map(Grid::createSnapshot)
+                .toList();
+        var filePath = server.getSavePath(PowerSystem.SAVE_PATH).resolve(PowerSystem.createFileName(world) + ".nbt");
+        try {
+            PathUtil.createDirectories(filePath.getParent());
+            var fileOutputStream = Files.newOutputStream(filePath);
 
-                try (var dataOutput = new DataOutputStream(fileOutputStream)) {
-                    var nbt = new NbtCompound();
-                    nbt.putInt("data_version", PowerSystem.DATA_VERSION);
-                    nbt.put("grids", GridsManager.CODEC.encodeStart(NbtOps.INSTANCE, snapshots).getOrThrow());
-                    NbtIo.writeCompound(nbt, dataOutput);
-                } catch (Throwable eOuter) {
-                    try {
-                        fileOutputStream.close();
-                    } catch (Throwable eInner) {
-                        eOuter.addSuppressed(eInner);
-                    }
-
-                    throw eOuter;
+            try (var dataOutput = new DataOutputStream(fileOutputStream)) {
+                var nbt = new NbtCompound();
+                nbt.putInt("data_version", PowerSystem.DATA_VERSION);
+                nbt.put("grids", GridsManager.CODEC.encodeStart(NbtOps.INSTANCE, snapshots).getOrThrow());
+                NbtIo.writeCompound(nbt, dataOutput);
+            } catch (Throwable eOuter) {
+                try {
+                    fileOutputStream.close();
+                } catch (Throwable eInner) {
+                    eOuter.addSuppressed(eInner);
                 }
 
-                fileOutputStream.close();
-            } catch (IOException e) {
-                LOGGER.error("Couldn't save power systems to {}", filePath, e);
-            } catch (IllegalStateException e) {
-                LOGGER.error("Couldn't serialize power systems for {}", filePath, e);
+                throw eOuter;
             }
+
+            fileOutputStream.close();
+        } catch (IOException e) {
+            LOGGER.error("Couldn't save power systems to {}", filePath, e);
+        } catch (IllegalStateException e) {
+            LOGGER.error("Couldn't serialize power systems for {}", filePath, e);
         }
     }
 

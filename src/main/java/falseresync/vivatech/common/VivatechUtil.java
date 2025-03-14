@@ -1,5 +1,6 @@
 package falseresync.vivatech.common;
 
+import it.unimi.dsi.fastutil.Pair;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -20,6 +21,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.Graph;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -50,17 +52,24 @@ public class VivatechUtil {
                 .flatMap(entries -> entries.getRandom(random).map(RegistryEntry::value));
     }
 
-    public static <V, E> void replaceVertexUndirected(Graph<V, E> graph, V oldVertex, V newVertex) {
-        graph.addVertex(newVertex);
-        for (E edge : graph.edgesOf(oldVertex)) {
-            var source = graph.getEdgeSource(edge);
-            if (source != oldVertex) {
-                graph.addEdge(newVertex, source, edge);
-            } else {
-                graph.addEdge(newVertex, graph.getEdgeTarget(edge), edge);
+    public static <V, E> void replaceVertexIgnoringUndirectedEdgeEquality(Graph<V, E> graph, V oldVertex, V newVertex) {
+        if (!oldVertex.equals(newVertex)) {
+            graph.addVertex(newVertex);
+            var toAddBack = new HashSet<Pair<V, E>>(); // Because CMEs
+            for (E edge : graph.edgesOf(oldVertex)) {
+                var source = graph.getEdgeSource(edge);
+                if (source != oldVertex) {
+                    toAddBack.add(Pair.of(source, edge));
+                } else {
+                    toAddBack.add(Pair.of(graph.getEdgeTarget(edge), edge));
+                }
             }
+            for (var pair : toAddBack) {
+                graph.removeEdge(pair.right());
+                graph.addEdge(newVertex, pair.left(), pair.right());
+            }
+            graph.removeVertex(oldVertex);
         }
-        graph.removeVertex(oldVertex);
     }
 
     /**

@@ -1,9 +1,10 @@
 package falseresync.vivatech.common.power;
 
+import falseresync.vivatech.common.VivatechUtil;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceObjectPair;
 import net.minecraft.block.AbstractFireBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -45,17 +46,19 @@ public class Grid {
 
     public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
         this(gridsManager, world, wireType);
-        for (GridEdge edge : edges) {
-            connect(edge);
-        }
+        edges.forEach(this::connect);
     }
 
     public GridSnapshot createSnapshot() {
-        return new GridSnapshot(wireType, graph.edgeSet());
+        return new GridSnapshot(wireType, Set.copyOf(graph.edgeSet()));
     }
 
     public WireType getWireType() {
         return wireType;
+    }
+
+    public boolean isEmpty() {
+        return graph.vertexSet().isEmpty();
     }
 
     public boolean connect(GridEdge edge) {
@@ -103,21 +106,34 @@ public class Grid {
         }
     }
 
-    public boolean remove(BlockPos pos, BlockState state) {
-        var vertex = PowerSystem.GRID_VERTEX.find(world, pos, state, null, null);
+    public boolean remove(BlockPos pos) {
+        var vertex = findVertex(pos);
         if (vertex == null) {
-            onVertexRemoved(pos, null);
+            onVertexRemoved(pos, null, true);
             return false;
         }
 
-        graph.edgesOf(vertex).forEach(this::onWireRemoved);
+        var edges = Set.copyOf(graph.edgesOf(vertex));
         if (!graph.removeVertex(vertex)) {
             return false;
         }
+        for (GridEdge edge : edges) {
+            onWireRemoved(edge);
+        }
 
-        onVertexRemoved(vertex);
+        onVertexRemoved(vertex, true);
         partition();
         return true;
+    }
+
+    @Nullable
+    private GridVertex findVertex(BlockPos pos) {
+        for (GridVertex vertex : graph.vertexSet()) {
+            if (vertex.pos().equals(pos)) {
+                return vertex;
+            }
+        }
+        return null;
     }
 
     public boolean disconnect(GridVertex vertexU, GridVertex vertexV) {
@@ -142,7 +158,7 @@ public class Grid {
 
         for (var isolatedGraph : inspector.getConnectedComponents()) {
             if (isolatedGraph.vertexSet().size() <= 1) {
-                isolatedGraph.vertexSet().forEach(this::onVertexRemoved);
+                isolatedGraph.vertexSet().forEach(vertex -> onVertexRemoved(vertex, false));
             } else {
                 var other = gridsManager.create(wireType);
                 other.merge(isolatedGraph);
@@ -170,11 +186,11 @@ public class Grid {
         }
     }
 
-    private void onVertexRemoved(GridVertex vertex) {
-        onVertexRemoved(vertex.pos(), vertex.appliance() != null ? vertex.appliance().getPos() : null);
+    private void onVertexRemoved(GridVertex vertex, boolean removeGridIfEmpty) {
+        onVertexRemoved(vertex.pos(), vertex.appliance() != null ? vertex.appliance().getPos() : null, removeGridIfEmpty);
     }
 
-    private void onVertexRemoved(BlockPos pos, @Nullable BlockPos appliancePos) {
+    private void onVertexRemoved(BlockPos pos, @Nullable BlockPos appliancePos, boolean removeGridIfEmpty) {
         gridsManager.getGridLookup().remove(pos);
 
         if (appliancePos != null) {
@@ -186,6 +202,13 @@ public class Grid {
                 }
             }
         }
+
+        if (removeGridIfEmpty) {
+            if (graph.vertexSet().size() <= 1) {
+                graph.vertexSet().forEach(vertex -> onVertexRemoved(vertex, false));
+                gridsManager.getGrids().remove(this);
+            }
+        }
     }
 
     private boolean onApplianceRemoved(BlockPos appliancePos) {
@@ -194,6 +217,7 @@ public class Grid {
             if (appliance != null) {
                 appliance.onGridDisconnected();
             }
+
             var applianceChunkPos = new ChunkPos(appliancePos);
             if (trackedChunks.containsKey(applianceChunkPos)) {
                 var trackedPositionsInChunk = trackedChunks.get(applianceChunkPos);
@@ -202,6 +226,7 @@ public class Grid {
                     trackedChunks.remove(applianceChunkPos);
                 }
             }
+
             return true;
         }
         return false;
@@ -213,18 +238,53 @@ public class Grid {
         serverWire.drop(world, wireType);
     }
 
-    private void checkIfFrozen() {
+    private void pollChunks() {
+        var becameFrozen = false;
         for (ChunkPos chunkPos : trackedChunks.keySet()) {
             if (!world.shouldTickBlocksInChunk(chunkPos.toLong())) {
-                frozen = true;
-                return;
+                becameFrozen = true;
+                break;
             }
         }
-        frozen = false;
+
+        if (becameFrozen) {
+            if (!frozen) {
+                for (Appliance appliance : appliances.values()) {
+                    appliance.onGridFrozen();
+                }
+            }
+            frozen = true;
+            return;
+        }
+
+        if (frozen) {
+            frozen = false;
+            refreshApplianceReferences();
+            for (Appliance appliance : appliances.values()) {
+                appliance.onGridUnfrozen();
+            }
+        }
+    }
+
+    private void refreshApplianceReferences() {
+        // Because CME
+        var appliancesToUpdate = new ObjectOpenHashSet<ReferenceObjectPair<Appliance, GridVertex>>();
+        for (GridVertex oldVertex : graph.vertexSet()) {
+            if (oldVertex.appliance() != null) {
+                var appliance = PowerSystem.APPLIANCE.find(world, oldVertex.appliance().getPos(), null);
+                appliancesToUpdate.add(ReferenceObjectPair.of(appliance, oldVertex));
+            }
+        }
+        for (var pair : appliancesToUpdate) {
+            var oldVertex = pair.right();
+            var appliance = pair.left();
+            VivatechUtil.replaceVertexIgnoringUndirectedEdgeEquality(graph, oldVertex, new GridVertex(oldVertex.pos(), appliance));
+            onApplianceAdded(appliance, true);
+        }
     }
 
     public void tick() {
-        checkIfFrozen();
+        pollChunks();
         if (frozen) {
             return;
         }

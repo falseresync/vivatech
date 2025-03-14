@@ -28,7 +28,7 @@ public class GridsManager {
     private final ServerWorld world;
     private final Set<Grid> grids = new ReferenceOpenHashSet<>();
     /**
-     * Tracks vertex positions
+     * Tracks vertex positions, NOT appliances!
      */
     private final Map<BlockPos, Grid> gridLookup = new Object2ReferenceRBTreeMap<>();
     private final Map<ChunkPos, Set<Wire>> wires = PowerSystem.createChunkPosKeyedMap();

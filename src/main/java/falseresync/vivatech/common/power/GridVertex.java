@@ -11,7 +11,7 @@ public record GridVertex(BlockPos pos, @Nullable Appliance appliance) implements
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GridVertex vertex)) return false;
-        return Objects.equals(pos, vertex.pos) && Objects.equals(appliance, vertex.appliance);
+        return pos.equals(vertex.pos) && appliance == vertex.appliance();
     }
 
     @Override

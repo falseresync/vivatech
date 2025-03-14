@@ -90,7 +90,7 @@ public class WirePostBlock extends Block implements GridVertexProvider {
         if (!world.isClient) {
             var grid = Vivatech.getServerGridsLoader().getGridsManager(world).getGridLookup().get(pos);
             if (grid != null) {
-                grid.remove(pos, state);
+                grid.remove(pos);
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);

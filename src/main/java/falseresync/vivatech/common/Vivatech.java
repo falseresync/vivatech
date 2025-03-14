@@ -22,6 +22,7 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -74,19 +75,21 @@ public class Vivatech implements ModInitializer {
 
         TransmutationFocusBehavior.register();
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             serverGridsLoader = new ServerGridsLoader(server);
         });
 
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            serverGridsLoader.close();
+        ServerWorldEvents.LOAD.register((server, world) -> {
+            serverGridsLoader.load(world);
+            LOGGER.info("Loaded %s grids in %s".formatted(serverGridsLoader.getGridsManager(world).getGrids().size(), world.getRegistryKey().getValue()));
         });
 
-        ServerLifecycleEvents.AFTER_SAVE.register((server, flush, force) -> {
-            serverGridsLoader.save();
+        ServerWorldEvents.UNLOAD.register((server, world) -> {
+            serverGridsLoader.save(world);
+            LOGGER.info("Saved %s grids in %s".formatted(serverGridsLoader.getGridsManager(world).getGrids().size(), world.getRegistryKey().getValue()));
         });
 
-        ServerTickEvents.END_WORLD_TICK.register(world -> {
+        ServerTickEvents.START_WORLD_TICK.register(world -> {
             serverGridsLoader.tick(world);
         });
     }
