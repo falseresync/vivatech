@@ -1,11 +1,9 @@
 package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.item.VivatechItems;
-import falseresync.vivatech.common.power.Appliance;
+import falseresync.vivatech.common.item.VivatechItemTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -14,21 +12,19 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
 import org.jetbrains.annotations.Nullable;
 
-public class ChargerBlockEntity extends BlockEntity implements Ticking, Appliance {
+public class ChargerBlockEntity extends BaseAppliance implements Ticking {
     protected ItemStack stack = ItemStack.EMPTY;
-    protected boolean connected = false;
-    protected boolean operational = false;
+    protected boolean canCharge = false;
+    protected boolean couldChargeLastTick = false;
     protected boolean charging = false;
-    protected int gridCheckCooldown = 0;
 
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
         super(VivatechBlockEntities.CHARGER, pos, state);
+        setAcceptableVoltage(220, 240);
     }
 
     @Override
@@ -37,52 +33,30 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
             return;
         }
 
-        if (operational) {
-            if (Vivatech.getChargeManager().isGadgetFullyCharged(stack)) {
-                if (charging) {
-                    charging = false;
+        canCharge = isOperational() && !Vivatech.getChargeManager().isGadgetFullyCharged(stack);
+
+        if (canCharge) {
+            if (couldChargeLastTick) {
+                if (!charging) {
+                    charging = true;
                     markDirty();
                 }
-                return;
-            }
 
-            if (!charging) {
-                charging = true;
+                Vivatech.getChargeManager().charge(stack, 1, null);
+            }
+        } else {
+            if (charging) {
+                charging = false;
                 markDirty();
             }
-
-            Vivatech.getChargeManager().charge(stack, 1, null);
         }
-    }
 
-    @Override
-    public void onGridConnected() {
-        connected = true;
-    }
-
-    @Override
-    public void onGridDisconnected() {
-        connected = false;
-    }
-
-    @Override
-    public void onGridFrozen() {
-        operational = false;
+        couldChargeLastTick = canCharge;
     }
 
     @Override
     public float getElectricalCurrent() {
-        return charging ? - 0.5f : 0;
-    }
-
-    @Override
-    public void gridTick(float voltage) {
-        if (connected && gridCheckCooldown == 0) {
-            operational = voltage > 210 && voltage < 250;
-            gridCheckCooldown = 10;
-        } else if (gridCheckCooldown > 0) {
-            gridCheckCooldown -= 1;
-        }
+        return canCharge ? -0.5f : 0;
     }
 
     public ItemStack getStackCopy() {
@@ -95,7 +69,7 @@ public class ChargerBlockEntity extends BlockEntity implements Ticking, Applianc
 
     public void exchangeOrDrop(PlayerEntity player, Hand hand) {
         var stackInHand = player.getStackInHand(hand);
-        if (stackInHand.isOf(VivatechItems.GADGET) || stackInHand.isEmpty()) {
+        if (stackInHand.isIn(VivatechItemTags.CHARGEABLE) || stackInHand.isEmpty()) {
             player.setStackInHand(hand, stack);
             stack = stackInHand;
         } else {

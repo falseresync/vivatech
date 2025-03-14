@@ -19,6 +19,11 @@ public abstract class BaseAppliance extends BlockEntity implements Appliance {
     }
 
     @Override
+    public BlockPos getAppliancePos() {
+        return getPos();
+    }
+
+    @Override
     public void onGridConnected() {
         connected = true;
     }

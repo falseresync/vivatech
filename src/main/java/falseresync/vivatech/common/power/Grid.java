@@ -173,21 +173,21 @@ public class Grid {
         if (vertex.appliance() != null) {
             if (!appliances.containsValue(vertex.appliance())) {
                 onApplianceAdded(vertex.appliance(), shouldInitialize);
-                var appliancePos = vertex.appliance().getPos();
+                var appliancePos = vertex.appliance().getAppliancePos();
                 trackedChunks.computeIfAbsent(new ChunkPos(appliancePos), key -> new ObjectOpenHashSet<>()).add(appliancePos);
             }
         }
     }
 
     private void onApplianceAdded(Appliance appliance, boolean shouldInitialize) {
-        appliances.put(appliance.getPos(), appliance);
+        appliances.put(appliance.getAppliancePos(), appliance);
         if (shouldInitialize) {
             appliance.onGridConnected();
         }
     }
 
     private void onVertexRemoved(GridVertex vertex, boolean removeGridIfEmpty) {
-        onVertexRemoved(vertex.pos(), vertex.appliance() != null ? vertex.appliance().getPos() : null, removeGridIfEmpty);
+        onVertexRemoved(vertex.pos(), vertex.appliance() != null ? vertex.appliance().getAppliancePos() : null, removeGridIfEmpty);
     }
 
     private void onVertexRemoved(BlockPos pos, @Nullable BlockPos appliancePos, boolean removeGridIfEmpty) {
@@ -271,7 +271,7 @@ public class Grid {
         var appliancesToUpdate = new ObjectOpenHashSet<ReferenceObjectPair<Appliance, GridVertex>>();
         for (GridVertex oldVertex : graph.vertexSet()) {
             if (oldVertex.appliance() != null) {
-                var appliance = PowerSystem.APPLIANCE.find(world, oldVertex.appliance().getPos(), null);
+                var appliance = PowerSystem.APPLIANCE.find(world, oldVertex.appliance().getAppliancePos(), null);
                 appliancesToUpdate.add(ReferenceObjectPair.of(appliance, oldVertex));
             }
         }

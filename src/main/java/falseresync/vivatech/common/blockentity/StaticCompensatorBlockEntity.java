@@ -5,7 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 
-public class StaticCompensatorBlockEntity extends BlockEntity implements Ticking, Appliance {
+public class StaticCompensatorBlockEntity extends BaseAppliance implements Ticking {
     public StaticCompensatorBlockEntity(BlockPos pos, BlockState state) {
         super(VivatechBlockEntities.STATIC_COMPENSATOR, pos, state);
     }

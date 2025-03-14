@@ -6,7 +6,7 @@ public interface Appliance {
     /**
      * Must not change
      */
-    BlockPos getPos();
+    BlockPos getAppliancePos();
 
     /**
      * Only called when first connected. <br/>
