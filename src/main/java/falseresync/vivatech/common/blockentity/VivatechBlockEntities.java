@@ -12,8 +12,11 @@ public class VivatechBlockEntities {
 
     public static final @RegistryObject BlockEntityType<HeaterBlockEntity> HEATER =
             BlockEntityType.Builder.create(HeaterBlockEntity::new, VivatechBlocks.HEATER).build();
-    public static final @RegistryObject BlockEntityType<StaticCompensatorBlockEntity> STATIC_COMPENSATOR =
-            BlockEntityType.Builder.create(StaticCompensatorBlockEntity::new, VivatechBlocks.STATIC_COMPENSATOR).build();
     public static final @RegistryObject BlockEntityType<ChargerBlockEntity> CHARGER =
             BlockEntityType.Builder.create(ChargerBlockEntity::new, VivatechBlocks.CHARGER).build();
+
+    public static final @RegistryObject BlockEntityType<StaticCompensatorBlockEntity> STATIC_COMPENSATOR =
+            BlockEntityType.Builder.create(StaticCompensatorBlockEntity::new, VivatechBlocks.STATIC_COMPENSATOR).build();
+    public static final @RegistryObject BlockEntityType<ContactorBlockEntity> CONTACTOR =
+            BlockEntityType.Builder.create(ContactorBlockEntity::new, VivatechBlocks.CONTACTOR).build();
 }

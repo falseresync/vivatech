@@ -82,7 +82,8 @@ public class WirePostBlock extends Block implements GridVertexProvider {
 
     @Override
     public GridVertex getGridVertex(World world, BlockPos pos, BlockState state) {
-        return new GridVertex(pos, PowerSystem.APPLIANCE.find(world, pos.offset(state.get(FACING)), null));
+        var facing = state.get(FACING);
+        return new GridVertex(pos, PowerSystem.APPLIANCE.find(world, pos.offset(facing), facing));
     }
 
     @Override

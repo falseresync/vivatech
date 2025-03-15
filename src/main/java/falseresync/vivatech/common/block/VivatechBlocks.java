@@ -16,8 +16,10 @@ public class VivatechBlocks {
     public static final WindTurbineBlock WIND_TURBINE = r("wind_turbine", WindTurbineBlock::new, AbstractBlock.Settings.copy(Blocks.CAULDRON));
 
     public static final HeaterBlock HEATER = r("heater", HeaterBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
-    public static final StaticCompensatorBlock STATIC_COMPENSATOR = r("static_compensator", StaticCompensatorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
     public static final ChargerBlock CHARGER = r("charger", ChargerBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
+
+    public static final StaticCompensatorBlock STATIC_COMPENSATOR = r("static_compensator", StaticCompensatorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
+    public static final StaticCompensatorBlock CONTACTOR = r("contactor", StaticCompensatorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
 
     public static final WirePostBlock WIRE_POST = r("wire_post", WirePostBlock::new, AbstractBlock.Settings.copy(Blocks.LIGHTNING_ROD));
 

@@ -17,13 +17,15 @@ public class VivatechItemGroups {
                         entries.add(VivatechItems.WIND_TURBINE);
 
                         entries.add(VivatechItems.HEATER);
-                        entries.add(VivatechItems.STATIC_COMPENSATOR);
                         entries.add(VivatechItems.CHARGER);
+
+                        entries.add(VivatechItems.STATIC_COMPENSATOR);
+                        entries.add(VivatechItems.CONTACTOR);
 
                         entries.add(VivatechItems.WIRE_POST);
 
-                        entries.add(VivatechItems.MORTAR_AND_PESTLE);
                         entries.add(VivatechItems.WIRE);
+                        entries.add(VivatechItems.MORTAR_AND_PESTLE);
                         entries.add(VivatechItems.PLIERS);
                         entries.add(VivatechItems.PROBE);
                         entries.add(VivatechItems.INSPECTOR_GOGGLES);

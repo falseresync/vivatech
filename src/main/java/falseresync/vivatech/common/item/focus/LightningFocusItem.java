@@ -2,6 +2,7 @@ package falseresync.vivatech.common.item.focus;
 
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.VivatechUtil;
+import falseresync.vivatech.common.data.VivatechAttachments;
 import falseresync.vivatech.network.report.Reports;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -36,7 +37,7 @@ public class LightningFocusItem extends FocusItem {
                 //noinspection DataFlowIssue
                 lightning.refreshPositionAfterTeleport(pos);
                 lightning.setChanneler(player);
-                ((VivatechLightning) lightning).vivatech$setThunderless();
+                lightning.setAttached(VivatechAttachments.THUNDERLESS_LIGHTNING, true);
                 world.spawnEntity(lightning);
                 focusStack.damage(1, user, EquipmentSlot.MAINHAND);
                 return TypedActionResult.success(gadgetStack);
@@ -54,9 +55,5 @@ public class LightningFocusItem extends FocusItem {
                 posInAir.x,
                 world.getTopY(Heightmap.Type.MOTION_BLOCKING, (int) posInAir.x, (int) posInAir.z),
                 posInAir.z);
-    }
-
-    public interface VivatechLightning {
-        void vivatech$setThunderless();
     }
 }

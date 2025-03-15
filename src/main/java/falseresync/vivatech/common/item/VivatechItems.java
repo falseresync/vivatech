@@ -22,13 +22,15 @@ public class VivatechItems {
     public static final BlockItem WIND_TURBINE = rBlockItem("wind_turbine", VivatechBlocks.WIND_TURBINE, new Item.Settings());
 
     public static final BlockItem HEATER = rBlockItem("heater", VivatechBlocks.HEATER, new Item.Settings());
-    public static final BlockItem STATIC_COMPENSATOR = rBlockItem("static_compensator", VivatechBlocks.STATIC_COMPENSATOR, new Item.Settings());
     public static final BlockItem CHARGER = rBlockItem("charger", VivatechBlocks.CHARGER, new Item.Settings());
+
+    public static final BlockItem STATIC_COMPENSATOR = rBlockItem("static_compensator", VivatechBlocks.STATIC_COMPENSATOR, new Item.Settings());
+    public static final BlockItem CONTACTOR = rBlockItem("contactor", VivatechBlocks.CONTACTOR, new Item.Settings());
 
     public static final BlockItem WIRE_POST = rBlockItem("wire_post", VivatechBlocks.WIRE_POST, new Item.Settings());
 
-    public static final MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Settings().maxCount(1).maxDamage(16));
     public static final WireItem WIRE = r("wire", WireItem::new, new Item.Settings());
+    public static final MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Settings().maxCount(1).maxDamage(16));
     public static final PliersItem PLIERS = r("pliers", PliersItem::new, new Item.Settings().maxCount(1));
     public static final ProbeItem PROBE = r("probe", ProbeItem::new, new Item.Settings().maxCount(1));
     public static final InspectorGogglesItem INSPECTOR_GOGGLES = r("inspector_goggles", InspectorGogglesItem::new, new Item.Settings().maxCount(1));
