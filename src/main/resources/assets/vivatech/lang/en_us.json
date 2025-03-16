@@ -4,8 +4,10 @@
   "block.vivatech.wind_turbine": "Wind turbine",
 
   "block.vivatech.heater": "Heater",
-  "block.vivatech.static_compensator": "Static compensator",
   "block.vivatech.charger": "Charger",
+
+  "block.vivatech.static_compensator": "Static compensator",
+  "block.vivatech.contactor": "Contactor",
 
   "block.vivatech.wire_post": "Wire post",
 
@@ -13,6 +15,7 @@
 
   "item.vivatech.mortar_and_pestle": "Mortar and pestle",
   "item.vivatech.wire": "Wire",
+  "item.vivatech.screwdriver": "Screwdriver",
   "item.vivatech.pliers": "Pliers",
   "item.vivatech.probe": "Probe",
   "item.vivatech.inspector_goggles": "Inspector goggles",

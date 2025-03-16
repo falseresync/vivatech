@@ -26,6 +26,7 @@ public class VivatechItemGroups {
 
                         entries.add(VivatechItems.WIRE);
                         entries.add(VivatechItems.MORTAR_AND_PESTLE);
+                        entries.add(VivatechItems.SCREWDRIVER);
                         entries.add(VivatechItems.PLIERS);
                         entries.add(VivatechItems.PROBE);
                         entries.add(VivatechItems.INSPECTOR_GOGGLES);

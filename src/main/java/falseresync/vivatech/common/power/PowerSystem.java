@@ -38,14 +38,6 @@ public class PowerSystem {
                 VivatechBlockEntities.STATIC_COMPENSATOR
         );
 
-        APPLIANCE.registerForBlocks((world, pos, state, blockEntity, context) -> {
-            if (world.getBlockEntity(pos) instanceof ApplianceProvider applianceProvider) {
-                return applianceProvider.getAppliance(context);
-            }
-
-            return null;
-        }, VivatechBlocks.CONTACTOR);
-
         GRID_VERTEX.registerForBlocks((world, pos, state, blockEntity, context) -> {
             if (state.getBlock() instanceof GridVertexProvider provider) {
                 return provider.getGridVertex(world, pos, state);

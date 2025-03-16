@@ -31,6 +31,7 @@ public class VivatechItems {
 
     public static final WireItem WIRE = r("wire", WireItem::new, new Item.Settings());
     public static final MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Settings().maxCount(1).maxDamage(16));
+    public static final Item SCREWDRIVER = r("screwdriver", Item::new, new Item.Settings().maxCount(1));
     public static final PliersItem PLIERS = r("pliers", PliersItem::new, new Item.Settings().maxCount(1));
     public static final ProbeItem PROBE = r("probe", ProbeItem::new, new Item.Settings().maxCount(1));
     public static final InspectorGogglesItem INSPECTOR_GOGGLES = r("inspector_goggles", InspectorGogglesItem::new, new Item.Settings().maxCount(1));

@@ -1,0 +1,7 @@
+{
+  "parent": "vivatech:block/cube_column_horizontal",
+  "textures": {
+    "end": "vivatech:block/contactor_top",
+    "side": "vivatech:block/contactor_side"
+  }
+}

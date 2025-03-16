@@ -17,6 +17,4 @@ public class VivatechBlockEntities {
 
     public static final @RegistryObject BlockEntityType<StaticCompensatorBlockEntity> STATIC_COMPENSATOR =
             BlockEntityType.Builder.create(StaticCompensatorBlockEntity::new, VivatechBlocks.STATIC_COMPENSATOR).build();
-    public static final @RegistryObject BlockEntityType<ContactorBlockEntity> CONTACTOR =
-            BlockEntityType.Builder.create(ContactorBlockEntity::new, VivatechBlocks.CONTACTOR).build();
 }

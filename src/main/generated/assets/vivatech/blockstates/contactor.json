@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "vivatech:block/contactor",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "vivatech:block/contactor"
+    },
+    "facing=south": {
+      "model": "vivatech:block/contactor",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "vivatech:block/contactor",
+      "y": 270
+    }
+  }
+}

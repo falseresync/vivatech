@@ -38,20 +38,24 @@ public class VivatechModelProvider extends FabricModelProvider {
 
         blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GENERATOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GEARBOX, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
-        registerWind_Turbine();
+        registerWindTurbine();
+
         blockStateModelGenerator.registerSingleton(VivatechBlocks.HEATER, TexturedModel.CUBE_BOTTOM_TOP);
-        blockStateModelGenerator.registerSingleton(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_BOTTOM_TOP);
         blockStateModelGenerator.registerSingleton(VivatechBlocks.CHARGER, TexturedModel.CUBE_BOTTOM_TOP);
+
+        blockStateModelGenerator.registerSingleton(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_BOTTOM_TOP);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.CONTACTOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+
         registerWirePost();
     }
 
-    private void registerWind_Turbine() {
-        var wind_turbineModelId = TexturedModel.PARTICLE.upload(VivatechBlocks.WIND_TURBINE, blockStateModelGenerator.modelCollector);
+    private void registerWindTurbine() {
+        var windTurbineModelId = TexturedModel.PARTICLE.upload(VivatechBlocks.WIND_TURBINE, blockStateModelGenerator.modelCollector);
         blockStateModelGenerator.blockStateCollector.accept(
                 VariantsBlockStateSupplier
                         .create(
                                 VivatechBlocks.WIND_TURBINE,
-                                BlockStateVariant.create().put(VariantSettings.MODEL, wind_turbineModelId)
+                                BlockStateVariant.create().put(VariantSettings.MODEL, windTurbineModelId)
                         ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
         );
         blockStateModelGenerator.excludeFromSimpleItemModelGeneration(VivatechBlocks.WIND_TURBINE);
@@ -73,6 +77,7 @@ public class VivatechModelProvider extends FabricModelProvider {
 
         itemModelGenerator.register(VivatechItems.MORTAR_AND_PESTLE, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.WIRE, Models.GENERATED);
+        itemModelGenerator.register(VivatechItems.SCREWDRIVER, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.PLIERS, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.PROBE, Models.GENERATED);
         itemModelGenerator.register(VivatechItems.INSPECTOR_GOGGLES, Models.GENERATED);

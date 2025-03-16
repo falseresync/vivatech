@@ -3,6 +3,7 @@ package falseresync.vivatech.common.block;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 
@@ -19,7 +20,7 @@ public class VivatechBlocks {
     public static final ChargerBlock CHARGER = r("charger", ChargerBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
 
     public static final StaticCompensatorBlock STATIC_COMPENSATOR = r("static_compensator", StaticCompensatorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
-    public static final StaticCompensatorBlock CONTACTOR = r("contactor", StaticCompensatorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK));
+    public static final ContactorBlock CONTACTOR = r("contactor", ContactorBlock::new, AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).pistonBehavior(PistonBehavior.BLOCK));
 
     public static final WirePostBlock WIRE_POST = r("wire_post", WirePostBlock::new, AbstractBlock.Settings.copy(Blocks.LIGHTNING_ROD));
 

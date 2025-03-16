@@ -1,8 +1,6 @@
 package falseresync.vivatech.common.power;
 
 import com.google.common.collect.ImmutableSet;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -22,6 +20,12 @@ public record Wire(
         Vector3f middle,
         ChunkPos chunkPos
 ) {
+    public enum DropRule {
+        NO_DROP,
+        PARTIAL,
+        FULL
+    }
+
     public static final PacketCodec<RegistryByteBuf, Wire> PACKET_CODEC = PacketCodec.tuple(
             BlockPos.PACKET_CODEC, Wire::u,
             BlockPos.PACKET_CODEC, Wire::v,
@@ -44,8 +48,14 @@ public record Wire(
         return new Vector3f(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
     }
 
-    public void drop(World world, WireType type) {
-        ItemScatterer.spawn(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), MathHelper.floor(u.subtract(v).toCenterPos().length())));
+    public void drop(World world, WireType type, DropRule dropRule) {
+        switch (dropRule) {
+            case NO_DROP -> {}
+            case PARTIAL ->
+                    ItemScatterer.spawn(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), MathHelper.floor(u.subtract(v).toCenterPos().length() * world.random.nextFloat())));
+            case FULL ->
+                    ItemScatterer.spawn(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), MathHelper.floor(u.subtract(v).toCenterPos().length())));
+        }
     }
 
     @Override

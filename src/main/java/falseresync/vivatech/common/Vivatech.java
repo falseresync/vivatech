@@ -9,6 +9,7 @@ import falseresync.vivatech.common.data.VivatechAttachments;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.entity.VivatechEntities;
 import falseresync.vivatech.common.item.VivatechItemGroups;
+import falseresync.vivatech.common.item.VivatechItemTags;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
@@ -59,6 +60,7 @@ public class Vivatech implements ModInitializer {
 
         VivatechBlocks.registerAll();
         VivatechItems.registerAll();
+        VivatechItemTags.init();
         new AutoRegistry(MOD_ID, LOGGER.getDelegate())
                 .link(Registries.BLOCK_ENTITY_TYPE, VivatechBlockEntities.class)
                 .link(Registries.ITEM_GROUP, VivatechItemGroups.class)
