@@ -3,6 +3,8 @@ package falseresync.vivatech.common.item;
 import falseresync.vivatech.client.VivatechKeybindings;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.focus.FocusItem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -225,6 +227,7 @@ public class GadgetItem extends Item {
         return super.hasGlint(stack);
     }
 
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var focusStack = getEquipped(stack);
