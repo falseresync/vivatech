@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.VivatechUtil;
-import falseresync.vivatech.common.power.Appliance;
+import falseresync.vivatech.common.power.grid.Appliance;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceArrayMap;

@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.blockentity;
 
 import com.google.common.base.Preconditions;
-import falseresync.vivatech.common.power.Appliance;
+import falseresync.vivatech.common.power.grid.Appliance;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;

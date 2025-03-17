@@ -3,6 +3,8 @@ package falseresync.vivatech.common.power;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
+import falseresync.vivatech.common.power.grid.Grid;
+import falseresync.vivatech.common.power.grid.GridSnapshot;
 import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.common.power.wire.WireType;
 import falseresync.vivatech.network.s2c.WiresS2CPayload;

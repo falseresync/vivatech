@@ -2,7 +2,7 @@ package falseresync.vivatech.common.block;
 
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.item.VivatechItems;
-import falseresync.vivatech.common.power.GridEdge;
+import falseresync.vivatech.common.power.grid.GridEdge;
 import falseresync.vivatech.common.power.wire.Wire;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

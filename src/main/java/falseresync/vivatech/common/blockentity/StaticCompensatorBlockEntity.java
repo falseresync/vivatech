@@ -1,8 +1,6 @@
 package falseresync.vivatech.common.blockentity;
 
-import falseresync.vivatech.common.power.Appliance;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class StaticCompensatorBlockEntity extends BaseAppliance implements Ticking {

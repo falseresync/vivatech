@@ -1,4 +1,4 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.grid;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

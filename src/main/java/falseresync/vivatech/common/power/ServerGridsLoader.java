@@ -1,5 +1,6 @@
 package falseresync.vivatech.common.power;
 
+import falseresync.vivatech.common.power.grid.GridSnapshot;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;

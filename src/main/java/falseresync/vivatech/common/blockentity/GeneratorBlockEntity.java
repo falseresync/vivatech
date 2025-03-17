@@ -2,9 +2,7 @@ package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.block.GearboxBlock;
 import falseresync.vivatech.common.block.VivatechBlocks;
-import falseresync.vivatech.common.power.Appliance;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class GeneratorBlockEntity extends BaseAppliance implements Ticking {

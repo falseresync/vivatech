@@ -2,6 +2,9 @@ package falseresync.vivatech.common.power;
 
 import falseresync.vivatech.common.block.VivatechBlocks;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
+import falseresync.vivatech.common.power.grid.Appliance;
+import falseresync.vivatech.common.power.grid.GridVertex;
+import falseresync.vivatech.common.power.grid.GridVertexProvider;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;

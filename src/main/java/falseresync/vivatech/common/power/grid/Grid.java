@@ -1,6 +1,8 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.grid;
 
 import falseresync.vivatech.common.VivatechUtil;
+import falseresync.vivatech.common.power.PowerSystem;
+import falseresync.vivatech.common.power.WorldPowerSystem;
 import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.common.power.wire.WireType;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
@@ -124,7 +126,7 @@ public class Grid {
             return false;
         }
         for (GridEdge edge : edges) {
-            onWireRemoved(edge, Wire.DropRule.FULL);
+            removeWire(edge, Wire.DropRule.FULL);
         }
 
         onVertexRemoved(vertex, true);
@@ -151,7 +153,7 @@ public class Grid {
             return false;
         }
 
-        onWireRemoved(edge, dropRule);
+        removeWire(edge, dropRule);
         partition();
         return true;
     }
@@ -178,19 +180,19 @@ public class Grid {
         worldPowerSystem.getGridLookup().put(vertex.pos(), this);
         if (vertex.appliance() != null) {
             if (!appliances.containsValue(vertex.appliance())) {
-                onApplianceAdded(vertex.appliance(), shouldInitialize);
-                var appliancePos = vertex.appliance().getAppliancePos();
-                trackedChunks.computeIfAbsent(new ChunkPos(appliancePos), key -> new ObjectOpenHashSet<>()).add(appliancePos);
+                addAppliance(vertex.appliance(), shouldInitialize);
             }
         }
     }
 
-    private void onApplianceAdded(Appliance appliance, boolean shouldInitialize) {
-        if (appliances.get(appliance.getAppliancePos()) == appliance) {
+    private void addAppliance(Appliance appliance, boolean shouldInitialize) {
+        var pos = appliance.getAppliancePos();
+        if (appliances.get(pos) == appliance) {
             throw new IllegalStateException("Cannot cache the same appliance twice");
-        } else {
-            appliances.put(appliance.getAppliancePos(), appliance);
         }
+
+        appliances.put(pos, appliance);
+        trackedChunks.computeIfAbsent(new ChunkPos(pos), key -> new ObjectOpenHashSet<>()).add(pos);
         if (shouldInitialize) {
             appliance.onGridConnected();
         }
@@ -204,10 +206,10 @@ public class Grid {
         worldPowerSystem.getGridLookup().remove(pos);
 
         if (appliancePos != null) {
-            onApplianceRemoved(appliancePos);
+            removeAppliance(appliancePos);
         } else {
             for (var direction : Direction.values()) {
-                if (onApplianceRemoved(pos.offset(direction))) {
+                if (removeAppliance(pos.offset(direction))) {
                     break;
                 }
             }
@@ -221,7 +223,7 @@ public class Grid {
         }
     }
 
-    private boolean onApplianceRemoved(BlockPos appliancePos) {
+    private boolean removeAppliance(BlockPos appliancePos) {
         if (appliances.containsKey(appliancePos)) {
             var appliance = appliances.remove(appliancePos);
             if (appliance != null) {
@@ -242,7 +244,7 @@ public class Grid {
         return false;
     }
 
-    private void onWireRemoved(GridEdge edge, Wire.DropRule dropRule) {
+    private void removeWire(GridEdge edge, Wire.DropRule dropRule) {
         var serverWire = edge.toServerWire();
         worldPowerSystem.removeWire(serverWire);
         serverWire.drop(world, wireType, dropRule);
@@ -291,7 +293,7 @@ public class Grid {
             var oldVertex = pair.right();
             var appliance = pair.left();
             VivatechUtil.replaceVertexIgnoringUndirectedEdgeEquality(graph, oldVertex, new GridVertex(oldVertex.pos(), oldVertex.direction(), appliance));
-            onApplianceAdded(appliance, true);
+            addAppliance(appliance, true);
         }
     }
 
@@ -336,7 +338,11 @@ public class Grid {
         }
 
         for (var appliance : appliances.values()) {
-            appliance.gridTick(voltage);
+            if (appliance instanceof GridAwareAppliance gridAware) {
+                gridAware.gridAwareTick(this, voltage);
+            } else {
+                appliance.gridTick(voltage);
+            }
         }
 
         lastVoltage = voltage;

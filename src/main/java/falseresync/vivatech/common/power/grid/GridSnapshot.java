@@ -1,7 +1,8 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.grid;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import falseresync.vivatech.common.power.WorldPowerSystem;
 import falseresync.vivatech.common.power.wire.WireType;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.world.ServerWorld;

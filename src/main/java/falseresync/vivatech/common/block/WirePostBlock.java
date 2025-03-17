@@ -1,8 +1,8 @@
 package falseresync.vivatech.common.block;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.power.GridVertex;
-import falseresync.vivatech.common.power.GridVertexProvider;
+import falseresync.vivatech.common.power.grid.GridVertex;
+import falseresync.vivatech.common.power.grid.GridVertexProvider;
 import falseresync.vivatech.common.power.PowerSystem;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;

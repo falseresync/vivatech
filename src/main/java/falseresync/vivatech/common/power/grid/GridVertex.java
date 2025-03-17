@@ -1,8 +1,7 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.grid;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;

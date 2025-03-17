@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.power.GridVertex;
+import falseresync.vivatech.common.power.grid.GridVertex;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.network.ServerPlayerEntity;

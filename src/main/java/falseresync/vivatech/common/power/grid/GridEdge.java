@@ -1,4 +1,4 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.grid;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.mojang.serialization.Codec;

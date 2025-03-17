@@ -3,7 +3,7 @@ package falseresync.vivatech.common.item;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.data.ItemBarComponent;
 import falseresync.vivatech.common.data.VivatechComponents;
-import falseresync.vivatech.common.power.GridVertex;
+import falseresync.vivatech.common.power.grid.GridVertex;
 import falseresync.vivatech.common.power.wire.WireType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
