@@ -3,7 +3,7 @@ package falseresync.vivatech.common.block;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.power.GridEdge;
-import falseresync.vivatech.common.power.Wire;
+import falseresync.vivatech.common.power.wire.Wire;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -93,7 +93,7 @@ public class ContactorBlock extends Block implements RestrictsWirePostPlacement 
 
     private static void manageGridConnection(BlockState state, World world, BlockPos pos) {
         var facing = state.get(FACING);
-        var gridsLookup = Vivatech.getServerGridsLoader().getGridsManager(world).getGridLookup();
+        var gridsLookup = Vivatech.getPowerSystem().in(world.getRegistryKey()).getGridLookup();
 
         var posU = pos.offset(facing.rotateYClockwise());
         var gridU = gridsLookup.get(posU);

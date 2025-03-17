@@ -2,6 +2,7 @@ package falseresync.vivatech.common.power;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import falseresync.vivatech.common.power.wire.WireType;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.world.ServerWorld;
 
@@ -16,7 +17,7 @@ public record GridSnapshot(WireType wireType, Set<GridEdge> edges) {
                     .forGetter(GridSnapshot::edges)
     ).apply(instance, GridSnapshot::new));
 
-    public Grid reconstruct(GridsManager gridsManager, ServerWorld world) {
-        return new Grid(gridsManager, world, wireType, edges);
+    public Grid reconstruct(WorldPowerSystem worldPowerSystem, ServerWorld world) {
+        return new Grid(worldPowerSystem, world, wireType, edges);
     }
 }

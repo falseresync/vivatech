@@ -14,7 +14,7 @@ import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.ServerGridsLoader;
-import falseresync.vivatech.common.power.WireType;
+import falseresync.vivatech.common.power.wire.WireType;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VivatechServerReceivers;
 import falseresync.vivatech.network.report.Reports;
@@ -33,10 +33,10 @@ public class Vivatech implements ModInitializer {
     public static final BetterLogger LOGGER = new BetterLogger(LoggerFactory.getLogger(MOD_ID), "Vivatech");
     private static ChargeManager chargeManager;
     private static VivatechConfig config;
-    private static ServerGridsLoader serverGridsLoader;
+    private static PowerSystem powerSystem;
 
-    public static ServerGridsLoader getServerGridsLoader() {
-        return serverGridsLoader;
+    public static PowerSystem getPowerSystem() {
+        return powerSystem;
     }
 
     public static ChargeManager getChargeManager() {
@@ -80,21 +80,7 @@ public class Vivatech implements ModInitializer {
         TransmutationFocusBehavior.register();
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            serverGridsLoader = new ServerGridsLoader(server);
-        });
-
-        ServerWorldEvents.LOAD.register((server, world) -> {
-            serverGridsLoader.load(world);
-            LOGGER.info("Loaded %s grids in %s".formatted(serverGridsLoader.getGridsManager(world).getGrids().size(), world.getRegistryKey().getValue()));
-        });
-
-        ServerWorldEvents.UNLOAD.register((server, world) -> {
-            serverGridsLoader.save(world);
-            LOGGER.info("Saved %s grids in %s".formatted(serverGridsLoader.getGridsManager(world).getGrids().size(), world.getRegistryKey().getValue()));
-        });
-
-        ServerTickEvents.START_WORLD_TICK.register(world -> {
-            serverGridsLoader.tick(world);
+            powerSystem = new PowerSystem(server);
         });
 
         LOGGER.info("Initialized");

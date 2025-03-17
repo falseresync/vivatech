@@ -2,6 +2,7 @@ package falseresync.vivatech.common.power;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.mojang.serialization.Codec;
+import falseresync.vivatech.common.power.wire.Wire;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;

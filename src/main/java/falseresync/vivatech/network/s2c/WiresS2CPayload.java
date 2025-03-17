@@ -1,6 +1,6 @@
 package falseresync.vivatech.network.s2c;
 
-import falseresync.vivatech.common.power.Wire;
+import falseresync.vivatech.common.power.wire.Wire;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;

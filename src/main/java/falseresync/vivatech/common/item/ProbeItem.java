@@ -25,7 +25,7 @@ public class ProbeItem extends Item {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (context.getPlayer() instanceof ServerPlayerEntity player) {
-            var grid = Vivatech.getServerGridsLoader().getGridsManager(context.getWorld()).getGridLookup().get(context.getBlockPos());
+            var grid = Vivatech.getPowerSystem().in(context.getWorld().getRegistryKey()).getGridLookup().get(context.getBlockPos());
             if (grid != null) {
                 var message = Text.literal("Voltage: %d - Current: %.2f".formatted(Math.round(grid.getLastVoltage()), grid.getLastCurrent()));
                 player.networkHandler.sendPacket(new OverlayMessageS2CPacket(message));

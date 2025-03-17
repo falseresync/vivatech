@@ -1,6 +1,6 @@
 package falseresync.vivatech.client;
 
-import falseresync.vivatech.common.power.Wire;
+import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.network.c2s.RequestWiresC2SPayload;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

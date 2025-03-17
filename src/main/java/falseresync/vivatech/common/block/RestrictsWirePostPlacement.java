@@ -16,14 +16,6 @@ public interface RestrictsWirePostPlacement {
 
     boolean allowsWirePostsAt(BlockView world, BlockPos pos, Direction direction);
 
-    static boolean allowHorizontal(Direction direction) {
-        return HORIZONTAL.contains(direction);
-    }
-
-    static boolean allowVertical(Direction direction) {
-        return VERTICAL.contains(direction);
-    }
-
     static boolean allowRotatedAboutFacing(Direction facing, Direction direction) {
         return (switch (facing.getAxis()) {
             case X -> ROTATED_ABOUT_X;
@@ -42,14 +34,14 @@ public interface RestrictsWirePostPlacement {
     interface AllowHorizontal extends RestrictsWirePostPlacement {
         @Override
         default boolean allowsWirePostsAt(BlockView world, BlockPos pos, Direction direction) {
-            return allowHorizontal(direction);
+            return HORIZONTAL.contains(direction);
         }
     }
 
     interface AllowVertical extends RestrictsWirePostPlacement {
         @Override
         default boolean allowsWirePostsAt(BlockView world, BlockPos pos, Direction direction) {
-            return allowVertical(direction);
+            return VERTICAL.contains(direction);
         }
     }
 }

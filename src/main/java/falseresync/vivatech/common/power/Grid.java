@@ -1,6 +1,8 @@
 package falseresync.vivatech.common.power;
 
 import falseresync.vivatech.common.VivatechUtil;
+import falseresync.vivatech.common.power.wire.Wire;
+import falseresync.vivatech.common.power.wire.WireType;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceObjectPair;
@@ -27,7 +29,7 @@ public class Grid {
     private final SimpleGraph<GridVertex, GridEdge> graph;
     private final Map<BlockPos, Appliance> appliances;
     private final Map<ChunkPos, Set<BlockPos>> trackedChunks;
-    private final GridsManager gridsManager;
+    private final WorldPowerSystem worldPowerSystem;
     private final ServerWorld world;
     private final WireType wireType;
     private int overcurrentTicks = 0;
@@ -35,8 +37,8 @@ public class Grid {
     private float lastCurrent = 0;
     private boolean frozen = false;
 
-    public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType) {
-        this.gridsManager = gridsManager;
+    public Grid(WorldPowerSystem worldPowerSystem, ServerWorld world, WireType wireType) {
+        this.worldPowerSystem = worldPowerSystem;
         this.world = world;
         this.wireType = wireType;
         graph = new SimpleGraph<>(GridEdge.class);
@@ -44,8 +46,8 @@ public class Grid {
         trackedChunks = PowerSystem.createChunkPosKeyedMap();
     }
 
-    public Grid(GridsManager gridsManager, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
-        this(gridsManager, world, wireType);
+    public Grid(WorldPowerSystem worldPowerSystem, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
+        this(worldPowerSystem, world, wireType);
         edges.forEach(this::connect);
     }
 
@@ -85,7 +87,7 @@ public class Grid {
             var edge = edgeSupplier.get();
             var wasModified = graph.addEdge(vertexU, vertexV, edge);
             if (wasModified && !noWire) {
-                gridsManager.onWireAdded(edge.toServerWire());
+                worldPowerSystem.addWire(edge.toServerWire());
             }
             return wasModified;
         }
@@ -93,13 +95,13 @@ public class Grid {
     }
 
     private void initOrMerge(GridVertex vertex) {
-        var otherGrid = gridsManager.getGridLookup().get(vertex.pos());
+        var otherGrid = worldPowerSystem.getGridLookup().get(vertex.pos());
         if (otherGrid == null) {
             graph.addVertex(vertex);
             onVertexAdded(vertex, true);
         } else if (otherGrid != this) {
             merge(otherGrid.graph);
-            gridsManager.getGrids().remove(otherGrid);
+            worldPowerSystem.remove(otherGrid);
         }
     }
 
@@ -164,16 +166,16 @@ public class Grid {
             if (isolatedGraph.vertexSet().size() <= 1) {
                 isolatedGraph.vertexSet().forEach(vertex -> onVertexRemoved(vertex, false));
             } else {
-                var other = gridsManager.create(wireType);
+                var other = worldPowerSystem.create(wireType);
                 other.merge(isolatedGraph);
             }
         }
 
-        gridsManager.getGrids().remove(this);
+        worldPowerSystem.remove(this);
     }
 
     private void onVertexAdded(GridVertex vertex, boolean shouldInitialize) {
-        gridsManager.getGridLookup().put(vertex.pos(), this);
+        worldPowerSystem.getGridLookup().put(vertex.pos(), this);
         if (vertex.appliance() != null) {
             if (!appliances.containsValue(vertex.appliance())) {
                 onApplianceAdded(vertex.appliance(), shouldInitialize);
@@ -199,7 +201,7 @@ public class Grid {
     }
 
     private void onVertexRemoved(BlockPos pos, @Nullable BlockPos appliancePos, boolean removeGridIfEmpty) {
-        gridsManager.getGridLookup().remove(pos);
+        worldPowerSystem.getGridLookup().remove(pos);
 
         if (appliancePos != null) {
             onApplianceRemoved(appliancePos);
@@ -214,7 +216,7 @@ public class Grid {
         if (removeGridIfEmpty) {
             if (graph.vertexSet().size() <= 1) {
                 graph.vertexSet().forEach(vertex -> onVertexRemoved(vertex, false));
-                gridsManager.getGrids().remove(this);
+                worldPowerSystem.remove(this);
             }
         }
     }
@@ -242,7 +244,7 @@ public class Grid {
 
     private void onWireRemoved(GridEdge edge, Wire.DropRule dropRule) {
         var serverWire = edge.toServerWire();
-        gridsManager.onWireRemoved(serverWire);
+        worldPowerSystem.removeWire(serverWire);
         serverWire.drop(world, wireType, dropRule);
     }
 

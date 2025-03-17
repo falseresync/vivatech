@@ -1,4 +1,4 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.wire;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.item.ItemStack;

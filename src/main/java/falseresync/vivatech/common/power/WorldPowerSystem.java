@@ -1,7 +1,10 @@
 package falseresync.vivatech.common.power;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
+import falseresync.vivatech.common.power.wire.Wire;
+import falseresync.vivatech.common.power.wire.WireType;
 import falseresync.vivatech.network.s2c.WiresS2CPayload;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
@@ -23,7 +26,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class GridsManager {
+public class WorldPowerSystem {
     public static final Codec<List<GridSnapshot>> CODEC = GridSnapshot.CODEC.listOf();
     private final ServerWorld world;
     private final Set<Grid> grids = new ReferenceOpenHashSet<>();
@@ -36,7 +39,7 @@ public class GridsManager {
     private final Map<ChunkPos, Set<Wire>> removedWires = PowerSystem.createChunkPosKeyedMap();
     private final List<ChunkPos> requestedChunks = new ObjectArrayList<>();
 
-    public GridsManager(ServerWorld world) {
+    public WorldPowerSystem(ServerWorld world) {
         this.world = world;
     }
 
@@ -46,41 +49,41 @@ public class GridsManager {
         }
     }
 
-    public void onWireAdded(Wire wire) {
+    public void addWire(Wire wire) {
         wires.computeIfAbsent(wire.chunkPos(), key -> new ObjectOpenHashSet<>()).add(wire);
         addedWires.computeIfAbsent(wire.chunkPos(), key -> new ObjectOpenHashSet<>()).add(wire);
     }
 
-    public void onWireRemoved(Wire wire) {
+    public void removeWire(Wire wire) {
         wires.computeIfAbsent(wire.chunkPos(), key -> new ObjectOpenHashSet<>()).remove(wire);
         removedWires.computeIfAbsent(wire.chunkPos(), key -> new ObjectOpenHashSet<>()).add(wire);
     }
 
-    public void onWiresRequested(List<ChunkPos> requestedChunks) {
+    public void queueRequestedChunks(List<ChunkPos> requestedChunks) {
         this.requestedChunks.addAll(requestedChunks);
     }
 
-    public void sendWires() {
+    public void syncWires() {
         if (!requestedChunks.isEmpty()) {
-            if (sendWires(wires, requestedChunks::contains, WiresS2CPayload.Added::new)) {
+            if (syncWires(wires, requestedChunks::contains, WiresS2CPayload.Added::new)) {
                 requestedChunks.clear();
             }
         }
 
         if (!addedWires.isEmpty()) {
-            if (sendWires(addedWires, Predicates.alwaysTrue(), WiresS2CPayload.Added::new)) {
+            if (syncWires(addedWires, Predicates.alwaysTrue(), WiresS2CPayload.Added::new)) {
                 addedWires.clear();
             }
         }
 
         if (!removedWires.isEmpty()) {
-            if (sendWires(removedWires, Predicates.alwaysTrue(), WiresS2CPayload.Removed::new)) {
+            if (syncWires(removedWires, Predicates.alwaysTrue(), WiresS2CPayload.Removed::new)) {
                 removedWires.clear();
             }
         }
     }
 
-    public boolean sendWires(Map<ChunkPos, Set<Wire>> source, Predicate<ChunkPos> filter, Function<Set<Wire>, CustomPayload> payloadFactory) {
+    public boolean syncWires(Map<ChunkPos, Set<Wire>> source, Predicate<ChunkPos> filter, Function<Set<Wire>, CustomPayload> payloadFactory) {
         if (source.isEmpty()) {
             return false;
         }
@@ -110,8 +113,26 @@ public class GridsManager {
         return gridLookup;
     }
 
-    public Set<Grid> getGrids() {
-        return grids;
+    public List<GridSnapshot> createSnapshots() {
+        grids.removeIf(Grid::isEmpty);
+        var list = new ImmutableList.Builder<GridSnapshot>();
+        for (var grid : grids) {
+            list.add(grid.createSnapshot());
+        }
+        return list.build();
+    }
+
+    public boolean add(Grid grid) {
+        return grids.add(grid);
+    }
+
+    public boolean remove(Grid grid) {
+        return grids.remove(grid);
+    }
+
+    public int count() {
+        grids.removeIf(Grid::isEmpty);
+        return grids.size();
     }
 
     public Grid findOrCreate(BlockPos u, BlockPos v, WireType wireType) {
@@ -135,14 +156,5 @@ public class GridsManager {
         var grid = new Grid(this, world, wireType);
         grids.add(grid);
         return grid;
-    }
-
-    public void close() {
-        grids.clear();
-        gridLookup.clear();
-        wires.clear();
-        addedWires.clear();
-        removedWires.clear();
-        requestedChunks.clear();
     }
 }

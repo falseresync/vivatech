@@ -4,7 +4,11 @@ import falseresync.vivatech.common.block.VivatechBlocks;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
@@ -21,6 +25,25 @@ public class PowerSystem {
     public static final BlockApiLookup<GridVertex, Void> GRID_VERTEX = BlockApiLookup.get(vtId("grid_vertex"), GridVertex.class, Void.class);
     public static final WorldSavePath SAVE_PATH = new WorldSavePath("power_systems");
     public static final int DATA_VERSION = 100;
+    private final MinecraftServer server;
+    private final ServerGridsLoader serverGridsLoader;
+
+    public PowerSystem(MinecraftServer server) {
+        this.server = server;
+        serverGridsLoader = new ServerGridsLoader(server);
+
+        ServerWorldEvents.LOAD.register((_server, world) -> {
+            serverGridsLoader.load(world);
+        });
+
+        ServerWorldEvents.UNLOAD.register((_server, world) -> {
+            serverGridsLoader.save(world);
+        });
+
+        ServerTickEvents.START_WORLD_TICK.register(world -> {
+            serverGridsLoader.tick(world);
+        });
+    }
 
     public static <T> Map<ChunkPos, Set<T>> createChunkPosKeyedMap() {
         return new Object2ObjectRBTreeMap<>(Comparator.comparingLong(ChunkPos::toLong));
@@ -48,5 +71,13 @@ public class PowerSystem {
 
     public static String createFileName(World world) {
         return world.getDimensionEntry().getIdAsString().replace(':', '_').replace('/', '_');
+    }
+
+    public ServerGridsLoader getServerGridsLoader() {
+        return serverGridsLoader;
+    }
+
+    public WorldPowerSystem in(RegistryKey<World> world) {
+        return serverGridsLoader.getWorldGrids(world);
     }
 }

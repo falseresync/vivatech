@@ -1,4 +1,4 @@
-package falseresync.vivatech.common.power;
+package falseresync.vivatech.common.power.wire;
 
 import falseresync.lib.registry.RegistryObject;
 import falseresync.vivatech.common.item.VivatechItems;

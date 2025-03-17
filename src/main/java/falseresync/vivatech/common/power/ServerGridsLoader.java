@@ -9,7 +9,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.PathUtil;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 import java.io.DataInputStream;
@@ -22,7 +21,7 @@ import java.util.Map;
 import static falseresync.vivatech.common.Vivatech.LOGGER;
 
 public class ServerGridsLoader {
-    private final Map<RegistryKey<World>, GridsManager> gridsManagers = new Object2ObjectArrayMap<>();
+    private final Map<RegistryKey<World>, WorldPowerSystem> worldGridsForWorld = new Object2ObjectArrayMap<>();
     private final MinecraftServer server;
 
     public ServerGridsLoader(MinecraftServer server) {
@@ -31,31 +30,24 @@ public class ServerGridsLoader {
 
     public void tick(World world) {
         if (world.getTickManager().shouldTick()) {
-            getGridsManager(world).tick();
+            var worldGrids = getWorldGrids(world.getRegistryKey());
+            worldGrids.tick();
+            worldGrids.syncWires();
         }
-        sendWires();
     }
 
-    public GridsManager getGridsManager(World world) {
-        return gridsManagers.get(world.getRegistryKey());
-    }
-
-    public void onWiresRequested(RegistryKey<World> key, List<ChunkPos> requestedChunks) {
-        gridsManagers.get(key).onWiresRequested(requestedChunks);
-    }
-
-    public void sendWires() {
-        for (var gridsManager : gridsManagers.values()) {
-            gridsManager.sendWires();
-        }
+    public WorldPowerSystem getWorldGrids(RegistryKey<World> world) {
+        return worldGridsForWorld.get(world);
     }
 
     public void load(ServerWorld world) {
-        var gridsManager = new GridsManager(world);
+        var worldGrids = new WorldPowerSystem(world);
         for (var snapshot : loadSnapshots(world)) {
-            gridsManager.getGrids().add(snapshot.reconstruct(gridsManager, world));
+            worldGrids.add(snapshot.reconstruct(worldGrids, world));
         }
-        gridsManagers.put(world.getRegistryKey(), gridsManager);
+        worldGridsForWorld.put(world.getRegistryKey(), worldGrids);
+
+        LOGGER.info("Loaded %s grids in %s".formatted(worldGrids.count(), world.getRegistryKey().getValue()));
     }
 
     private List<GridSnapshot> loadSnapshots(World world) {
@@ -64,7 +56,7 @@ public class ServerGridsLoader {
             try (var fileInputStream = Files.newInputStream(filePath)) {
                 try (var dataInputStream = new DataInputStream(fileInputStream)) {
                     var nbt = NbtIo.readCompound(dataInputStream, NbtSizeTracker.ofUnlimitedBytes());
-                    return GridsManager.CODEC.parse(NbtOps.INSTANCE, nbt.get("grids")).getOrThrow();
+                    return WorldPowerSystem.CODEC.parse(NbtOps.INSTANCE, nbt.get("grids")).getOrThrow();
                 } catch (Throwable eOuter) {
                     try {
                         fileInputStream.close();
@@ -87,10 +79,7 @@ public class ServerGridsLoader {
     }
 
     public void save(ServerWorld world) {
-        var snapshots = gridsManagers.get(world.getRegistryKey()).getGrids().stream()
-                .filter(grid -> !grid.isEmpty())
-                .map(Grid::createSnapshot)
-                .toList();
+        var snapshots = getWorldGrids(world.getRegistryKey()).createSnapshots();
         var filePath = server.getSavePath(PowerSystem.SAVE_PATH).resolve(PowerSystem.createFileName(world) + ".nbt");
         try {
             PathUtil.createDirectories(filePath.getParent());
@@ -99,7 +88,7 @@ public class ServerGridsLoader {
             try (var dataOutput = new DataOutputStream(fileOutputStream)) {
                 var nbt = new NbtCompound();
                 nbt.putInt("data_version", PowerSystem.DATA_VERSION);
-                nbt.put("grids", GridsManager.CODEC.encodeStart(NbtOps.INSTANCE, snapshots).getOrThrow());
+                nbt.put("grids", WorldPowerSystem.CODEC.encodeStart(NbtOps.INSTANCE, snapshots).getOrThrow());
                 NbtIo.writeCompound(nbt, dataOutput);
             } catch (Throwable eOuter) {
                 try {
@@ -119,6 +108,7 @@ public class ServerGridsLoader {
             LOGGER.error("Couldn't serialize power systems for %s".formatted(filePath));
             LOGGER.error(e);
         }
-    }
 
+        LOGGER.info("Saved %s grids in %s".formatted(snapshots.size(), world.getRegistryKey().getValue()));
+    }
 }

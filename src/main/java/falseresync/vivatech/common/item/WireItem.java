@@ -4,7 +4,7 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.data.ItemBarComponent;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.power.GridVertex;
-import falseresync.vivatech.common.power.WireType;
+import falseresync.vivatech.common.power.wire.WireType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -32,7 +32,7 @@ public class WireItem extends WireManagementItem {
                 return ActionResult.FAIL;
             }
 
-            var grid = Vivatech.getServerGridsLoader().getGridsManager(context.getWorld())
+            var grid = Vivatech.getPowerSystem().in(context.getWorld().getRegistryKey())
                     .findOrCreate(vertexU.pos(), vertexV.pos(), WireType.V_230);
             if (grid.getWireType() != WireType.V_230) {
                 return ActionResult.FAIL;
