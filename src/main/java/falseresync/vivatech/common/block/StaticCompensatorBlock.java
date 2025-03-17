@@ -1,27 +1,26 @@
 package falseresync.vivatech.common.block;
 
-import com.mojang.serialization.MapCodec;
+import falseresync.vivatech.common.blockentity.StaticCompensatorBlockEntity;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public class StaticCompensatorBlock extends BlockWithEntity {
-    public static final MapCodec<StaticCompensatorBlock> CODEC = createCodec(StaticCompensatorBlock::new);
-
+public class StaticCompensatorBlock extends BaseBlockWithEntity.WithTicker implements RestrictsWirePostPlacement.AllowVertical {
     protected StaticCompensatorBlock(Settings settings) {
         super(settings);
-    }
-
-    @Override
-    protected MapCodec<StaticCompensatorBlock> getCodec() {
-        return CODEC;
     }
 
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
+        return new StaticCompensatorBlockEntity(pos, state);
+    }
+
+    @Override
+    protected BlockEntityType<StaticCompensatorBlockEntity> getBlockEntityType() {
+        return VivatechBlockEntities.STATIC_COMPENSATOR;
     }
 }

@@ -10,7 +10,7 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.Direction;
 
-public class GearboxBlock extends Block {
+public class GearboxBlock extends Block implements RestrictsWirePostPlacement.Disallow {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public GearboxBlock(Settings settings) {

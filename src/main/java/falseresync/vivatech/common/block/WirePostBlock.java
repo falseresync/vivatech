@@ -62,7 +62,14 @@ public class WirePostBlock extends Block implements GridVertexProvider {
     protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         var facing = state.get(FACING);
         var otherPos = pos.offset(facing);
-        return world.getBlockState(otherPos).isSideSolid(world, otherPos, facing.getOpposite(), SideShapeType.CENTER);
+        var otherState = world.getBlockState(otherPos);
+        if (otherState.isSideSolid(world, otherPos, facing.getOpposite(), SideShapeType.CENTER)) {
+            if (otherState.getBlock() instanceof RestrictsWirePostPlacement otherBlock) {
+                return otherBlock.allowsWirePostsAt(world, otherPos, facing.getOpposite());
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

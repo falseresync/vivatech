@@ -1,30 +1,17 @@
 package falseresync.vivatech.common.block;
 
-import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.blockentity.HeaterBlockEntity;
-import falseresync.vivatech.common.blockentity.Ticking;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
-public class HeaterBlock extends BlockWithEntity {
-    public static final MapCodec<HeaterBlock> CODEC = createCodec(HeaterBlock::new);
-
+public class HeaterBlock extends BaseBlockWithEntity.WithTicker implements RestrictsWirePostPlacement.AllowVertical {
     protected HeaterBlock(Settings settings) {
         super(settings);
-    }
-
-    @Override
-    protected MapCodec<HeaterBlock> getCodec() {
-        return CODEC;
     }
 
     @Override
@@ -42,14 +29,8 @@ public class HeaterBlock extends BlockWithEntity {
         return new HeaterBlockEntity(pos, state);
     }
 
-    @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VivatechBlockEntities.HEATER, Ticking.getDefaultTicker());
-    }
-
-    @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    protected BlockEntityType<HeaterBlockEntity> getBlockEntityType() {
+        return VivatechBlockEntities.HEATER;
     }
 }

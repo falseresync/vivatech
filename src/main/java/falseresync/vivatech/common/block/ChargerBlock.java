@@ -1,14 +1,9 @@
 package falseresync.vivatech.common.block;
 
-import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.blockentity.ChargerBlockEntity;
-import falseresync.vivatech.common.blockentity.Ticking;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
-import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -20,33 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class ChargerBlock extends BlockWithEntity {
-    public static final MapCodec<ChargerBlock> CODEC = createCodec(ChargerBlock::new);
-
+public class ChargerBlock extends BaseBlockWithEntity.WithTicker implements RestrictsWirePostPlacement.AllowHorizontal {
     protected ChargerBlock(Settings settings) {
         super(settings);
-    }
-
-    @Override
-    protected MapCodec<ChargerBlock> getCodec() {
-        return CODEC;
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new ChargerBlockEntity(pos, state);
-    }
-
-    @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, VivatechBlockEntities.CHARGER, Ticking.getDefaultTicker());
     }
 
     @Override
@@ -69,5 +40,16 @@ public class ChargerBlock extends BlockWithEntity {
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new ChargerBlockEntity(pos, state);
+    }
+
+    @Override
+    protected BlockEntityType<ChargerBlockEntity> getBlockEntityType() {
+        return VivatechBlockEntities.CHARGER;
     }
 }

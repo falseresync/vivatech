@@ -19,9 +19,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class ContactorBlock extends Block {
+public class ContactorBlock extends Block implements RestrictsWirePostPlacement {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty POWERED = Properties.POWERED;
     public static final BooleanProperty NORMALLY_OPEN = BooleanProperty.of("normally_open");
@@ -127,5 +128,11 @@ public class ContactorBlock extends Block {
         if (state.get(POWERED) && !world.isReceivingRedstonePower(pos)) {
             world.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
         }
+    }
+
+    @Override
+    public boolean allowsWirePostsAt(BlockView world, BlockPos pos, Direction direction) {
+        var facing = world.getBlockState(pos).get(FACING);
+        return facing.rotateYClockwise() == direction || facing.rotateYCounterclockwise() == direction;
     }
 }
