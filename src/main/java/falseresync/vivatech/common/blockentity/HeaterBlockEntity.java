@@ -1,7 +1,6 @@
 package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.VivatechUtil;
-import falseresync.vivatech.common.power.grid.Appliance;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceArrayMap;
@@ -17,7 +16,7 @@ import net.minecraft.util.math.Direction;
 import java.util.Comparator;
 import java.util.Map;
 
-public class HeaterBlockEntity extends BaseAppliance implements Ticking, Appliance {
+public class HeaterBlockEntity extends BaseAppliance implements Ticking {
     private static final int ENOUGH_TO_FUNCTION_TICKS = 100;
     private static final int MAX_HEATING_LEVEL_TICKS = 500;
     private final Map<Direction, AbstractFurnaceBlockEntity> cachedFurnaces = new Reference2ReferenceArrayMap<>();

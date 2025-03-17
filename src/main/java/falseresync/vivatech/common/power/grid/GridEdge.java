@@ -3,6 +3,7 @@ package falseresync.vivatech.common.power.grid;
 import com.google.common.collect.ImmutableSortedSet;
 import com.mojang.serialization.Codec;
 import falseresync.vivatech.common.power.wire.Wire;
+import falseresync.vivatech.common.power.wire.WireType;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public record GridEdge(ImmutableSortedSet<BlockPos> positions, BlockPos u, Block
         this(ImmutableSortedSet.of(u, v), u, v);
     }
 
-    public Wire toServerWire() {
-        return Wire.createServerWire(u, v);
+    public Wire toServerWire(WireType wireType) {
+        return Wire.createServerWire(wireType, u, v);
     }
 
     @Override

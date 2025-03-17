@@ -23,6 +23,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.Objects;
 
@@ -110,5 +112,17 @@ public class RenderingUtil {
         buffer.vertex(positionMatrix, x1, y2, z).texture(u1, v2).color(tint).overlay(overlay).light(light).normal(0, 1, 0);
         buffer.vertex(positionMatrix, x2, y2, z).texture(u2, v2).color(tint).overlay(overlay).light(light).normal(0, 1, 0);
         buffer.vertex(positionMatrix, x2, y1, z).texture(u2, v1).color(tint).overlay(overlay).light(light).normal(0, 1, 0);
+    }
+
+    public static void drawQuad(VertexConsumer buffer, Matrix4f positionMatrix, Vector3f vUpLeft, Vector3f vDownLeft, Vector3f vDownRight, Vector3f vUpRight, float u1, float u2, float v1, float v2, int tint, int light, int overlay, Vector3f normal) {
+        // Counter-clockwise https://stackoverflow.com/a/8142461
+        setupVertex(vUpLeft, buffer, positionMatrix, u1, v1, tint, light, overlay, normal);
+        setupVertex(vDownLeft, buffer, positionMatrix, u2, v1, tint, light, overlay, normal);
+        setupVertex(vDownRight, buffer, positionMatrix, u2, v2, tint, light, overlay, normal);
+        setupVertex(vUpRight, buffer, positionMatrix, u1, v2, tint, light, overlay, normal);
+    }
+
+    public static void setupVertex(Vector3f vertex, VertexConsumer buffer, Matrix4f positionMatrix, float u, float v, int tint, int light, int overlay, Vector3f normal) {
+        buffer.vertex(positionMatrix, vertex.x, vertex.y, vertex.z).texture(u, v).color(tint).light(light).overlay(overlay).normal(normal.x, normal.y, normal.z);
     }
 }

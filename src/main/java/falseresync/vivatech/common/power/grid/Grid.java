@@ -89,7 +89,7 @@ public class Grid {
             var edge = edgeSupplier.get();
             var wasModified = graph.addEdge(vertexU, vertexV, edge);
             if (wasModified && !noWire) {
-                worldPowerSystem.addWire(edge.toServerWire());
+                worldPowerSystem.addWire(edge.toServerWire(wireType));
             }
             return wasModified;
         }
@@ -245,7 +245,7 @@ public class Grid {
     }
 
     private void removeWire(GridEdge edge, Wire.DropRule dropRule) {
-        var serverWire = edge.toServerWire();
+        var serverWire = edge.toServerWire(wireType);
         worldPowerSystem.removeWire(serverWire);
         serverWire.drop(world, wireType, dropRule);
     }

@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
@@ -12,6 +14,7 @@ import org.joml.Vector3f;
 import java.util.Objects;
 
 public record Wire(
+        WireType type,
         ImmutableSet<BlockPos> positions,
         BlockPos u,
         BlockPos v,
@@ -27,21 +30,22 @@ public record Wire(
     }
 
     public static final PacketCodec<RegistryByteBuf, Wire> PACKET_CODEC = PacketCodec.tuple(
+            WireType.PACKET_CODEC.xmap(RegistryEntry::value, WireType.REGISTRY::getEntry), Wire::type,
             BlockPos.PACKET_CODEC, Wire::u,
             BlockPos.PACKET_CODEC, Wire::v,
             Wire::createClientWire
     );
 
-    public static Wire createServerWire(BlockPos u, BlockPos v) {
+    public static Wire createServerWire(WireType type, BlockPos u, BlockPos v) {
         var middle = toCenterPos(u.add(v)).mul(0.5f);
         var chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z));
-        return new Wire(ImmutableSet.of(u, v), u, v, null, null, middle, chunkPos);
+        return new Wire(type, ImmutableSet.of(u, v), u, v, null, null, middle, chunkPos);
     }
 
-    public static Wire createClientWire(BlockPos u, BlockPos v) {
+    public static Wire createClientWire(WireType type, BlockPos u, BlockPos v) {
         var middle = toCenterPos(u.add(v)).mul(0.5f);
         var chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z));
-        return new Wire(ImmutableSet.of(u, v), u, v, toCenterPos(u), toCenterPos(v), middle, chunkPos);
+        return new Wire(type, ImmutableSet.of(u, v), u, v, toCenterPos(u), toCenterPos(v), middle, chunkPos);
     }
 
     private static Vector3f toCenterPos(BlockPos pos) {

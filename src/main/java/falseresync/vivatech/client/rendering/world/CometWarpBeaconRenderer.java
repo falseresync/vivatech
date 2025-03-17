@@ -29,7 +29,9 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
     private static final int TINT_BASE = Color.ofHsv(0f, 0f, 1, 0.5f).argb();
     private static final int TINT_CROWN = Color.WHITE.argb();
 
-    private static void drawBase(WorldRenderContext context, MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
+    private static void drawBase(WorldRenderContext context, MatrixStack matrices, int light, int overlay) {
+        var buffer = context.consumers().getBuffer(BASE_LAYER);
+
         matrices.push();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
 
@@ -55,6 +57,25 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
 
         matrices.multiplyPositionMatrix(perPanelAdjustment);
         RenderingUtil.drawTexture(matrices, buffer, TINT_BASE, light, overlay, 0, 1, 0, 1, initialOffset, 0, 0.5f, 0, 0.5f);
+
+        matrices.pop();
+    }
+
+    private static void drawCrown(WorldRenderContext context, MatrixStack matrices, int light, int overlay) {
+        matrices.push();
+        var adjustment = new Matrix4f()
+                .rotateAround(RotationAxis.POSITIVE_X.rotationDegrees(180), 0, 0.5f, 0)
+                .translate(0, 0.25f, -1)
+                .scaleAround(0.5f, 0.5f, 0.5f, 0.5f);
+        matrices.multiplyPositionMatrix(adjustment);
+
+        var perPanelAdjustment = new Matrix4f().rotateAround(RotationAxis.POSITIVE_Y.rotationDegrees(60), 0.5f, 0, 0.5f);
+        var sprite = CROWN_TEX.getSprite();
+        var buffer = CROWN_TEX.getVertexConsumer(context.consumers(), RenderLayer::getEntityTranslucentEmissive);
+        for (int i = 0; i < 6; i++) {
+            matrices.multiplyPositionMatrix(perPanelAdjustment);
+            RenderingUtil.drawSprite(matrices, buffer, sprite, TINT_BASE, light, overlay, 0, 1, 0, 1, -0.365f);
+        }
 
         matrices.pop();
     }
@@ -90,26 +111,8 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
         var translation = context.camera().getPos().relativize(Vec3d.of(anchor.pos()));
         matrices.translate(translation.x, translation.y, translation.z);
 
-        var buffer = context.consumers().getBuffer(BASE_LAYER);
-        drawBase(context, matrices, buffer, light, overlay);
-
-        matrices.push();
-        var adjustment = new Matrix4f()
-                .rotateAround(RotationAxis.POSITIVE_X.rotationDegrees(180), 0, 0.5f, 0)
-                .translate(0, 0.25f, -1)
-                .scaleAround(0.5f, 0.5f, 0.5f, 0.5f);
-        matrices.multiplyPositionMatrix(adjustment);
-
-        var perPanelAdjustment = new Matrix4f()
-                .rotateAround(RotationAxis.POSITIVE_Y.rotationDegrees(60), 0.5f, 0, 0.5f);
-        var sprite = CROWN_TEX.getSprite();
-        var crownBuffer = CROWN_TEX.getVertexConsumer(context.consumers(), RenderLayer::getEntityTranslucentEmissive);
-        for (int i = 0; i < 6; i++) {
-            matrices.multiplyPositionMatrix(perPanelAdjustment);
-            RenderingUtil.drawSprite(matrices, crownBuffer, sprite, TINT_BASE, light, overlay, 0, 1, 0, 1, -0.365f);
-        }
-
-        matrices.pop();
+        drawBase(context, matrices, light, overlay);
+        drawCrown(context, matrices, light, overlay);
 
         matrices.pop();
     }

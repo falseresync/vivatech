@@ -1,4 +1,4 @@
-package falseresync.vivatech.client;
+package falseresync.vivatech.client.wire;
 
 import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.network.c2s.RequestWiresC2SPayload;
@@ -37,11 +37,11 @@ public class ClientWireManager {
         });
     }
 
-    public void onWiresAdded(RegistryKey<World> world, Set<Wire> wires) {
+    public void addWires(RegistryKey<World> world, Set<Wire> wires) {
         trackers.get(world).wires.addAll(wires);
     }
 
-    public void onWiresRemoved(RegistryKey<World> world, Set<Wire> wires) {
+    public void removeWires(RegistryKey<World> world, Set<Wire> wires) {
         trackers.get(world).wires.removeAll(wires);
     }
 

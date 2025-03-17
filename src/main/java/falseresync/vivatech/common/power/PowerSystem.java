@@ -48,7 +48,7 @@ public class PowerSystem {
         });
     }
 
-    public static <T> Map<ChunkPos, Set<T>> createChunkPosKeyedMap() {
+    public static <T> Map<ChunkPos, T> createChunkPosKeyedMap() {
         return new Object2ObjectRBTreeMap<>(Comparator.comparingLong(ChunkPos::toLong));
     }
 
