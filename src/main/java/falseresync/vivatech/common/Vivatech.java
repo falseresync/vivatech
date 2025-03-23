@@ -13,17 +13,13 @@ import falseresync.vivatech.common.item.VivatechItemTags;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
-import falseresync.vivatech.common.power.ServerGridsLoader;
 import falseresync.vivatech.common.power.wire.WireType;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VivatechServerReceivers;
-import falseresync.vivatech.network.report.Reports;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.slf4j.LoggerFactory;
@@ -67,7 +63,6 @@ public class Vivatech implements ModInitializer {
                 .link(Registries.DATA_COMPONENT_TYPE, VivatechComponents.class)
                 .link(Registries.ENTITY_TYPE, VivatechEntities.class)
                 .link(Registries.PARTICLE_TYPE, VivatechParticleTypes.class)
-                .link(Reports.REGISTRY, Reports.class)
                 .link(WireType.REGISTRY, WireType.class);
         VivatechAttachments.init();
         VivatechSounds.init();

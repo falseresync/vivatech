@@ -44,5 +44,25 @@
         "pitch": 0.95
       }
     ]
+  },
+  "item.gadget.insufficient_charge": {
+    "subtitle": "sound.vivatech.item.gadget.insufficient_charge",
+    "sounds": [
+      {
+        "name": "random/click",
+        "volume": 0.8,
+        "pitch": 0.90
+      },
+      {
+        "name": "random/click",
+        "volume": 0.7,
+        "pitch": 1.00
+      },
+      {
+        "name": "random/click",
+        "volume": 0.6,
+        "pitch": 1.10
+      }
+    ]
   }
 }

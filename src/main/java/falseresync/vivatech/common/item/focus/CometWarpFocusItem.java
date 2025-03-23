@@ -1,14 +1,17 @@
 package falseresync.vivatech.common.item.focus;
 
 import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.VivatechSounds;
 import falseresync.vivatech.common.data.VivatechComponents;
-import falseresync.vivatech.network.report.Reports;
+import falseresync.vivatech.common.Reports;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -48,11 +51,11 @@ public class CometWarpFocusItem extends FocusItem {
         if (user instanceof ServerPlayerEntity player) {
             if (user.isSneaking()) {
                 if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, DEFAULT_PLACEMENT_COST, user)) {
-                    Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+                    Reports.insufficientCharge(player);
                     return TypedActionResult.fail(gadgetStack);
                 }
 
-                Reports.COMET_WARP_ANCHOR_PLACED.sendTo(player);
+                player.playSoundToPlayer(VivatechSounds.COMET_WARP_ANCHOR_PLACED, SoundCategory.PLAYERS, 1f, 1f);
                 var globalPos = GlobalPos.create(world.getRegistryKey(), user.getBlockPos());
                 gadgetStack.set(VivatechComponents.WARP_FOCUS_ANCHOR, globalPos);
                 if (world.random.nextFloat() < 0.1f) {
@@ -61,7 +64,8 @@ public class CometWarpFocusItem extends FocusItem {
             } else {
                 var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
                 if (anchor == null) {
-                    Reports.COMET_WARP_NO_ANCHOR.sendTo(player);
+                    player.playSoundToPlayer(SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.PLAYERS, 1f, 1f);
+                    player.sendMessage(Text.translatable("hud.vivatech.focus.comet_warp.no_anchor"), false);
                     return TypedActionResult.fail(gadgetStack);
                 }
 
@@ -74,11 +78,11 @@ public class CometWarpFocusItem extends FocusItem {
                         ? DEFAULT_INTERDIMENSIONAL_COST
                         : DEFAULT_WARPING_COST;
                 if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, warpingCost, user)) {
-                    Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+                    Reports.insufficientCharge(player);
                     return TypedActionResult.fail(gadgetStack);
                 }
 
-                Reports.COMET_WARP_TELEPORTED.sendTo(player);
+                player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_TELEPORT, SoundCategory.PLAYERS, 1f, 1f);
                 user.teleportTo(new TeleportTarget(destination, anchor.pos().toCenterPos(), Vec3d.ZERO, user.getYaw(), user.getPitch(), TeleportTarget.NO_OP));
                 gadgetStack.remove(VivatechComponents.WARP_FOCUS_ANCHOR);
                 focusStack.damage(1, player, EquipmentSlot.MAINHAND);

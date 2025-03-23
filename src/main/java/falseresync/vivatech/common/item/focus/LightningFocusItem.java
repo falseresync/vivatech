@@ -3,7 +3,7 @@ package falseresync.vivatech.common.item.focus;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.VivatechUtil;
 import falseresync.vivatech.common.data.VivatechAttachments;
-import falseresync.vivatech.network.report.Reports;
+import falseresync.vivatech.common.Reports;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,7 +43,7 @@ public class LightningFocusItem extends FocusItem {
                 return TypedActionResult.success(gadgetStack);
             }
 
-            Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+            Reports.insufficientCharge(player);
             return TypedActionResult.fail(gadgetStack);
         }
 

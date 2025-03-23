@@ -8,7 +8,7 @@ import falseresync.vivatech.common.data.VivatechAttachments;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.entity.EnergyVeilEntity;
 import falseresync.vivatech.common.world.VivatechWorld;
-import falseresync.vivatech.network.report.Reports;
+import falseresync.vivatech.common.Reports;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -63,7 +63,7 @@ public class EnergyVeilFocusItem extends FocusItem {
                 return TypedActionResult.success(gadgetStack);
             }
 
-            Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+            Reports.insufficientCharge(player);
             return TypedActionResult.fail(gadgetStack);
         }
         return TypedActionResult.pass(gadgetStack);

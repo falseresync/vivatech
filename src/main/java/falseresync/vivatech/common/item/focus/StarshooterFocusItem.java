@@ -2,7 +2,7 @@ package falseresync.vivatech.common.item.focus;
 
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.entity.StarProjectileEntity;
-import falseresync.vivatech.network.report.Reports;
+import falseresync.vivatech.common.Reports;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -25,7 +25,7 @@ public class StarshooterFocusItem extends FocusItem {
                 return TypedActionResult.success(gadgetStack);
             }
 
-            Reports.GADGET_INSUFFICIENT_CHARGE.sendTo(player);
+            Reports.insufficientCharge(player);
             return TypedActionResult.fail(gadgetStack);
         }
 

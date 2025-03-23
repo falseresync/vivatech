@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public record RequestWiresC2SPayload(List<ChunkPos> chunks) implements CustomPayload {
-    public static final CustomPayload.Id<RequestWiresC2SPayload> ID = new Id<>(vtId("request_wires"));
-    public static final PacketCodec<RegistryByteBuf, RequestWiresC2SPayload> PACKET_CODEC =
+public record RequestWiresChunksC2SPayload(List<ChunkPos> chunks) implements CustomPayload {
+    public static final CustomPayload.Id<RequestWiresChunksC2SPayload> ID = new Id<>(vtId("request_wires_chunks"));
+    public static final PacketCodec<RegistryByteBuf, RequestWiresChunksC2SPayload> PACKET_CODEC =
             PacketCodecs.collection(n -> (LongList) new LongArrayList(n), PacketCodecs.VAR_LONG)
                     .xmap(
-                            it -> new RequestWiresC2SPayload(it.longStream().mapToObj(ChunkPos::new).toList()),
+                            it -> new RequestWiresChunksC2SPayload(it.longStream().mapToObj(ChunkPos::new).toList()),
                             it -> it.chunks.stream().map(ChunkPos::toLong).collect(Collectors.toCollection(LongArrayList::new)))
                     .cast();
 
     @Override
-    public Id<RequestWiresC2SPayload> getId() {
+    public Id<RequestWiresChunksC2SPayload> getId() {
         return ID;
     }
 }

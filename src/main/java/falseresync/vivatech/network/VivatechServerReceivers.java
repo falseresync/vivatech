@@ -4,17 +4,17 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.item.VivatechItemTags;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.network.c2s.ChangeFocusC2SPayload;
-import falseresync.vivatech.network.c2s.RequestWiresC2SPayload;
+import falseresync.vivatech.network.c2s.RequestWiresChunksC2SPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
 
 public class VivatechServerReceivers {
     public static void registerAll() {
-        ServerPlayNetworking.registerGlobalReceiver(RequestWiresC2SPayload.ID, VivatechServerReceivers::onRequestWires);
+        ServerPlayNetworking.registerGlobalReceiver(RequestWiresChunksC2SPayload.ID, VivatechServerReceivers::requestWiresChunks);
         ServerPlayNetworking.registerGlobalReceiver(ChangeFocusC2SPayload.ID, VivatechServerReceivers::changeGadgetFocus);
     }
 
-    private static void onRequestWires(RequestWiresC2SPayload payload, ServerPlayNetworking.Context context) {
+    private static void requestWiresChunks(RequestWiresChunksC2SPayload payload, ServerPlayNetworking.Context context) {
         Vivatech.getPowerSystem().in(context.player().getWorld().getRegistryKey()).queueRequestedChunks(payload.chunks());
     }
     
