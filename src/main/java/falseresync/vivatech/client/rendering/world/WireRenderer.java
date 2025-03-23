@@ -2,8 +2,9 @@ package falseresync.vivatech.client.rendering.world;
 
 import falseresync.vivatech.client.VivatechClient;
 import falseresync.vivatech.client.rendering.RenderingUtil;
-import falseresync.vivatech.client.wire.VivatechWireParameters;
 import falseresync.vivatech.client.wire.WireParameters;
+import falseresync.vivatech.client.wire.WireRenderingRegistry;
+import falseresync.vivatech.client.wire.WireModel;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.render.*;
@@ -30,8 +31,9 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
         var cameraPos = context.camera().getPos();
 
         for (var wire : wires) {
-            var parameters = VivatechWireParameters.get(wire);
-            var buffer = parameters.getSprite().getTextureSpecificVertexConsumer(context.consumers().getBuffer(RenderLayer.getCutout()));
+            var parameters = WireRenderingRegistry.getAndBuild(wire);
+            var model = parameters.getModel();
+            var buffer = model.getSprite().getTextureSpecificVertexConsumer(context.consumers().getBuffer(RenderLayer.getCutout()));
 
             var wireEnd = wire.end().sub(wire.start(), new Vector3f());
             var light = WorldRenderer.getLightmapCoordinates(context.world(), BlockPos.ofFloored(wire.middle().x, wire.middle().y, wire.middle().z));
@@ -43,21 +45,19 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
 
             var positionMatrix = matrices.peek().getPositionMatrix();
             var direction = wireEnd.normalize(new Vector3f());
-
-            float length = wireEnd.length();
-            int segmentCount = (int) (length / parameters.getSegmentSize());
+            int segmentCount = (int) (wire.length() / model.getSegmentSize());
 
             if (direction.x == 0 && direction.z == 0) {
-                drawVerticalWire(parameters, wireEnd, segmentCount, buffer, positionMatrix, light);
+                drawVerticalWire(model, wireEnd, segmentCount, buffer, positionMatrix, light);
             } else {
-                drawHorizontalWire(parameters, direction, wireEnd, segmentCount, length, buffer, positionMatrix, light);
+                drawHorizontalWire(parameters, model, direction, wireEnd, segmentCount, wire.length(), buffer, positionMatrix, light);
             }
 
             matrices.pop();
         }
     }
 
-    private void drawVerticalWire(WireParameters parameters, Vector3f wireEnd, int segmentCount, VertexConsumer buffer, Matrix4f positionMatrix, int light) {
+    private void drawVerticalWire(WireModel parameters, Vector3f wireEnd, int segmentCount, VertexConsumer buffer, Matrix4f positionMatrix, int light) {
         var tangent = new Vector3f(VERTICAL_SEGMENT_NORMAL);
         var tangentialHalfSize = tangent.mul(parameters.getSegmentSize() / 2f, new Vector3f());
         var stepY = new Vector3f(0, wireEnd.y / segmentCount, 0);
@@ -79,24 +79,24 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
         }
     }
 
-    private void drawHorizontalWire(WireParameters parameters, Vector3f direction, Vector3f wireEnd, int segmentCount, float length, VertexConsumer buffer, Matrix4f positionMatrix, int light) {
+    private void drawHorizontalWire(WireParameters renderableWire, WireModel model, Vector3f direction, Vector3f wireEnd, int segmentCount, float length, VertexConsumer buffer, Matrix4f positionMatrix, int light) {
         var tangent = new Vector3f(direction.x, 0, direction.z).normalize(new Vector3f()).cross(HORIZONTAL_SEGMENT_NORMAL);
-        var tangentialHalfSize = tangent.mul(parameters.getSegmentSize() / 2f, new Vector3f());
+        var tangentialHalfSize = tangent.mul(model.getSegmentSize() / 2f, new Vector3f());
 
-        var stepXZ = direction.mul(parameters.getSegmentSize(), new Vector3f());
+        var stepXZ = direction.mul(model.getSegmentSize(), new Vector3f());
         float stepY = wireEnd.y / segmentCount;
 
-        var segmentAVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, parameters.getSegmentSize() / 2, 0), stepXZ);
-        var segmentBVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, -parameters.getSegmentSize() / 2, 0), stepXZ);
+        var segmentAVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, model.getSegmentSize() / 2, 0), stepXZ);
+        var segmentBVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, -model.getSegmentSize() / 2, 0), stepXZ);
 
-        var startY = parameters.getSaggedY(0, stepY, length);
+        var startY = renderableWire.getSaggedY(0, stepY);
         for (int segmentNo = 0; segmentNo < segmentCount; segmentNo++) {
-            var endY = parameters.getSaggedY(segmentNo + 1, stepY, length);
-            advanceSegmentVertices(segmentAVertices, stepXZ, startY, endY, parameters.getSegmentSize() / 2);
-            advanceSegmentVertices(segmentBVertices, stepXZ, startY, endY, -parameters.getSegmentSize() / 2);
+            var endY = renderableWire.getSaggedY(segmentNo + 1, stepY);
+            advanceSegmentVertices(segmentAVertices, stepXZ, startY, endY, model.getSegmentSize() / 2);
+            advanceSegmentVertices(segmentBVertices, stepXZ, startY, endY, -model.getSegmentSize() / 2);
             startY = endY;
 
-            var uv = parameters.getUv(segmentNo);
+            var uv = model.getUv(segmentNo);
             drawSegment(buffer, positionMatrix, segmentAVertices, uv, TINT, light, OVERLAY, HORIZONTAL_SEGMENT_NORMAL);
             drawSegment(buffer, positionMatrix, segmentBVertices, uv, TINT, light, OVERLAY, HORIZONTAL_SEGMENT_NORMAL);
         }

@@ -6,7 +6,7 @@ import falseresync.vivatech.client.hud.VivatechHud;
 import falseresync.vivatech.client.particle.VivatechParticleFactories;
 import falseresync.vivatech.client.rendering.VivatechRendering;
 import falseresync.vivatech.client.wire.ClientWireManager;
-import falseresync.vivatech.client.wire.VivatechWireParameters;
+import falseresync.vivatech.client.wire.WireRenderingRegistry;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.config.TranslatableEnum;
 import falseresync.vivatech.common.config.TranslatableEnumGuiProvider;
@@ -35,7 +35,7 @@ public class VivatechClient implements ClientModInitializer {
         VivatechParticleFactories.init();
         VivatechGui.init();
         VivatechKeybindings.init();
-        VivatechWireParameters.registerAll();
+        WireRenderingRegistry.registerAll();
         VivatechClientReceivers.registerAll();
         ClientPlayerInventoryEvents.init();
 

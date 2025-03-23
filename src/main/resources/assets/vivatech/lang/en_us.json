@@ -43,6 +43,8 @@
   "hud.vivatech.gadget.insufficient_charge": "Not enough charge",
   "hud.vivatech.gadget.no_anchor": "Setup an anchor first",
   "hud.vivatech.gadget.full_inventory": "Cannot pick a focus with a full inventory",
+  "hud.vivatech.probe": "Voltage: %d - Current: %.2f",
+  "hud.vivatech.wire": "Not enough wire!",
 
   "sound.vivatech.entity.star_projectile.explode": "Star projectile explodes",
   "sound.vivatech.focus.comet_warp.anchor_placed": "Placed a Comet warp anchor",

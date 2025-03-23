@@ -27,6 +27,10 @@ public abstract class WireManagementItem extends Item {
         var world = context.getWorld();
 
         var currentPos = context.getBlockPos();
+        if (context.getPlayer() == null || !context.getPlayer().canModifyAt(context.getWorld(), currentPos)) {
+            return ActionResult.FAIL;
+        }
+
         var currentVertex = PowerSystem.GRID_VERTEX.find(world, currentPos, null);
         if (currentVertex == null) {
             return ActionResult.FAIL;

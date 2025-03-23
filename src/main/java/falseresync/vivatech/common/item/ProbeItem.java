@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -27,8 +26,7 @@ public class ProbeItem extends Item {
         if (context.getPlayer() instanceof ServerPlayerEntity player) {
             var grid = Vivatech.getPowerSystem().in(context.getWorld().getRegistryKey()).getGridLookup().get(context.getBlockPos());
             if (grid != null) {
-                var message = Text.literal("Voltage: %d - Current: %.2f".formatted(Math.round(grid.getLastVoltage()), grid.getLastCurrent()));
-                player.networkHandler.sendPacket(new OverlayMessageS2CPacket(message));
+                player.sendMessage(Text.translatable("hud.vivatech.probe", Math.round(grid.getLastVoltage()), grid.getLastCurrent()), true);
             }
         }
         return super.useOnBlock(context);

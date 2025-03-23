@@ -7,8 +7,9 @@ import net.minecraft.util.Util;
 import java.util.Random;
 import java.util.function.Function;
 
-public abstract class RandomizedUvWireParameters implements WireParameters {
+public class RandomizedUvWireModel implements WireModel {
     private static final Random RANDOM = new Random();
+    protected final float segmentSize;
     private final SpriteIdentifier spriteId;
     private int uvChunkAmount;
     private Sprite sprite;
@@ -26,9 +27,10 @@ public abstract class RandomizedUvWireParameters implements WireParameters {
         };
     });
 
-    protected RandomizedUvWireParameters(SpriteIdentifier spriteId, float uvChunkSize) {
+    protected RandomizedUvWireModel(SpriteIdentifier spriteId, float uvChunkSize, float segmentSize) {
         this.spriteId = spriteId;
         this.uvChunkAmount = (int) (16 / uvChunkSize);
+        this.segmentSize = segmentSize;
     }
 
     @Override
@@ -54,5 +56,10 @@ public abstract class RandomizedUvWireParameters implements WireParameters {
             segmentHeightOnAtlas = (defaultUv[3] - defaultUv[2]) / uvChunkAmount;
         }
         return randomizedUv.apply(segmentNo);
+    }
+
+    @Override
+    public float getSegmentSize() {
+        return segmentSize;
     }
 }

@@ -17,8 +17,8 @@ public record GridEdge(ImmutableSortedSet<BlockPos> positions, BlockPos u, Block
         this(ImmutableSortedSet.of(u, v), u, v);
     }
 
-    public Wire toServerWire(WireType wireType) {
-        return Wire.createServerWire(wireType, u, v);
+    public Wire asWire(WireType wireType, float loadCoefficient) {
+        return Wire.create(wireType, u, v, loadCoefficient);
     }
 
     @Override
