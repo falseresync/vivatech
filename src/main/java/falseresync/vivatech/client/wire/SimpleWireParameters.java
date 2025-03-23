@@ -2,11 +2,11 @@ package falseresync.vivatech.client.wire;
 
 import falseresync.vivatech.common.power.wire.Wire;
 
-public abstract class DefaultRenderableWire implements WireParameters {
+public abstract class SimpleWireParameters implements WireParameters {
     private final Wire wire;
     private final WireModel parameters;
 
-    protected DefaultRenderableWire(Wire wire, WireModel parameters) {
+    public SimpleWireParameters(Wire wire, WireModel parameters) {
         this.wire = wire;
         this.parameters = parameters;
     }

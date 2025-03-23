@@ -33,7 +33,7 @@ public class WireRenderingRegistry {
     public static void registerAll() {
         registerModel(WireType.V_230, new RandomizedUvWireModel(COPPER_SPRITE_ID, 2f, 1/32f));
 
-        registerParametersFactory(WireType.V_230, (wire, parameters) -> new DefaultRenderableWire(wire, parameters) {
+        registerParametersFactory(WireType.V_230, (wire, parameters) -> new SimpleWireParameters(wire, parameters) {
             @Override
             public float getSaggingCoefficient() {
                 return wire.length() < 5 ? 0.3f : 0.4f;
