@@ -50,7 +50,7 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
             if (direction.x == 0 && direction.z == 0) {
                 drawVerticalWire(model, wireEnd, segmentCount, buffer, positionMatrix, light);
             } else {
-                drawHorizontalWire(parameters, model, direction, wireEnd, segmentCount, wire.length(), buffer, positionMatrix, light);
+                drawHorizontalWire(parameters, model, direction, wireEnd, segmentCount, buffer, positionMatrix, light);
             }
 
             matrices.pop();
@@ -79,19 +79,19 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
         }
     }
 
-    private void drawHorizontalWire(WireParameters renderableWire, WireModel model, Vector3f direction, Vector3f wireEnd, int segmentCount, float length, VertexConsumer buffer, Matrix4f positionMatrix, int light) {
+    private void drawHorizontalWire(WireParameters renderableWire, WireModel model, Vector3f direction, Vector3f wireEnd, int segmentCount, VertexConsumer buffer, Matrix4f positionMatrix, int light) {
         var tangent = new Vector3f(direction.x, 0, direction.z).normalize(new Vector3f()).cross(HORIZONTAL_SEGMENT_NORMAL);
         var tangentialHalfSize = tangent.mul(model.getSegmentSize() / 2f, new Vector3f());
 
         var stepXZ = direction.mul(model.getSegmentSize(), new Vector3f());
-        float stepY = wireEnd.y / segmentCount;
+        float yPerSegment = wireEnd.y / segmentCount;
 
         var segmentAVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, model.getSegmentSize() / 2, 0), stepXZ);
         var segmentBVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, -model.getSegmentSize() / 2, 0), stepXZ);
 
-        var startY = renderableWire.getSaggedY(0, stepY);
+        var startY = renderableWire.getSaggedYForSegment(0, 0);
         for (int segmentNo = 0; segmentNo < segmentCount; segmentNo++) {
-            var endY = renderableWire.getSaggedY(segmentNo + 1, stepY);
+            var endY = renderableWire.getSaggedYForSegment(yPerSegment * segmentNo, segmentNo + 1);
             advanceSegmentVertices(segmentAVertices, stepXZ, startY, endY, model.getSegmentSize() / 2);
             advanceSegmentVertices(segmentBVertices, stepXZ, startY, endY, -model.getSegmentSize() / 2);
             startY = endY;
@@ -102,14 +102,14 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
         }
     }
 
-    private void advanceSegmentVertices(Vector3f[] segmentAVertices, Vector3f stepXZ, float startY, float endY, float segmentShift) {
-        for (var segmentVertex : segmentAVertices) {
+    private void advanceSegmentVertices(Vector3f[] vertices, Vector3f stepXZ, float startY, float endY, float segmentShift) {
+        for (var segmentVertex : vertices) {
             segmentVertex.add(stepXZ);
         }
-        segmentAVertices[0].y = startY + segmentShift;
-        segmentAVertices[1].y = startY - segmentShift;
-        segmentAVertices[2].y = endY - segmentShift;
-        segmentAVertices[3].y = endY + segmentShift;
+        vertices[0].y = startY + segmentShift;
+        vertices[1].y = startY - segmentShift;
+        vertices[2].y = endY - segmentShift;
+        vertices[3].y = endY + segmentShift;
     }
 
     private Vector3f[] buildInitialSegmentVertices(Vector3f tangentialHalfSize, Vector3f segmentShift, Vector3f step) {

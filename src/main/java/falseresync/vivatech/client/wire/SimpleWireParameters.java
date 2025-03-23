@@ -5,10 +5,14 @@ import falseresync.vivatech.common.power.wire.Wire;
 public abstract class SimpleWireParameters implements WireParameters {
     private final Wire wire;
     private final WireModel parameters;
+    private final float k1;
+    private final float k2;
 
     public SimpleWireParameters(Wire wire, WireModel parameters) {
         this.wire = wire;
         this.parameters = parameters;
+        k1 = (float) (getSaggingCoefficient() * 4f * Math.pow(parameters.getSegmentSize() / wire.length(), 2));
+        k2 = getSaggingCoefficient() * 4f * parameters.getSegmentSize() / wire.length();
     }
 
     @Override
@@ -17,8 +21,8 @@ public abstract class SimpleWireParameters implements WireParameters {
     }
 
     @Override
-    public float getSaggedY(int segmentNo, float yStep) {
-        return (float) (yStep * segmentNo + getSaggingCoefficient() * (Math.pow(2 * (parameters.getSegmentSize() * segmentNo) - wire.length(), 2) / Math.pow(wire.length(), 2) - 1));
+    public float getSaggedYForSegment(float unsaggedY, float segmentNo) {
+        return unsaggedY + k1 * segmentNo * segmentNo - k2 * segmentNo;
     }
 
     public abstract float getSaggingCoefficient();

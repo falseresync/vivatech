@@ -5,7 +5,11 @@ import falseresync.vivatech.common.power.wire.Wire;
 public interface WireParameters {
     WireModel getModel();
 
-    float getSaggedY(int segmentNo, float yStep);
+    float getSaggedYForSegment(float unsaggedY, float segmentNo);
+
+    default float getSaggedYForX(float unsaggedY, float x) {
+        return getSaggedYForSegment(unsaggedY, x / getModel().getSegmentSize());
+    }
 
     @FunctionalInterface
     interface Factory {
