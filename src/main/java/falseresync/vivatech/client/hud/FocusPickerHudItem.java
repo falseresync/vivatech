@@ -37,7 +37,7 @@ public class FocusPickerHudItem implements HudItem {
     private static final Comparator<ItemStack> FOCUS_ORDERING = Comparator
             .<ItemStack>comparingInt(stack -> ((FocusItem) stack.getItem()).getRawId())
             .thenComparingInt(stack -> stack.getOrDefault(VivatechComponents.FOCUS_PLATING, -1))
-            .thenComparing(stack -> stack.getOrDefault(VivatechComponents.UUID, UUID.randomUUID()));
+            .thenComparingLong(stack -> stack.getOrDefault(VivatechComponents.UUID, UUID.randomUUID()).getMostSignificantBits());
     private final MinecraftClient client;
     private final TextRenderer textRenderer;
     private final LinkedList<ItemStack> focuses = new LinkedList<>();

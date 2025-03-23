@@ -22,6 +22,7 @@ import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Set;
 
 public class CometWarpFocusItem extends FocusItem {
     public static final int DEFAULT_PLACEMENT_COST = 5;
@@ -65,7 +66,7 @@ public class CometWarpFocusItem extends FocusItem {
                 var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
                 if (anchor == null) {
                     player.playSoundToPlayer(SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.PLAYERS, 1f, 1f);
-                    player.sendMessage(Text.translatable("hud.vivatech.focus.comet_warp.no_anchor"), false);
+                    player.sendMessage(Text.translatable("hud.vivatech.focus.comet_warp.no_anchor"), true);
                     return TypedActionResult.fail(gadgetStack);
                 }
 
@@ -99,6 +100,11 @@ public class CometWarpFocusItem extends FocusItem {
     }
 
     @Override
+    public boolean focusHasGlintSelf(ItemStack stack) {
+        return stack.contains(VivatechComponents.WARP_FOCUS_ANCHOR);
+    }
+
+    @Override
     public void focusAppendTooltip(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor == null) {
@@ -114,12 +120,7 @@ public class CometWarpFocusItem extends FocusItem {
     }
 
     @Override
-    public boolean hasGlint(ItemStack stack) {
-        return stack.contains(VivatechComponents.WARP_FOCUS_ANCHOR);
-    }
-
-    @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void focusAppendTooltipSelf(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var anchor = stack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor != null) {
             tooltip.add(Text.translatable(

@@ -14,12 +14,14 @@ import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.wire.WireType;
+import falseresync.vivatech.compat.anshar.AnsharCompat;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VivatechServerReceivers;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.slf4j.LoggerFactory;
@@ -77,6 +79,10 @@ public class Vivatech implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             powerSystem = new PowerSystem(server);
         });
+
+        if (FabricLoader.getInstance().isModLoaded("anshar")) {
+            VivatechItems.COMET_WARP_FOCUS.registerBehaviorExtension(new AnsharCompat());
+        }
 
         LOGGER.info("Initialized");
     }

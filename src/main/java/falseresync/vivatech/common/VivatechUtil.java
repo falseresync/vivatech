@@ -39,7 +39,7 @@ public class VivatechUtil {
         }
     });
 
-    public static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[]{ Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
+    public static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[]{Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
     private static final Function<World, Integer> memo$findViewDistance = Util.memoize((World world) -> world.isClient()
             ? MinecraftClient.getInstance().options.getClampedViewDistance()
