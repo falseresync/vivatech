@@ -11,11 +11,13 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.config.TranslatableEnum;
 import falseresync.vivatech.common.config.TranslatableEnumGuiProvider;
 import falseresync.vivatech.common.config.VivatechConfig;
+import falseresync.vivatech.compat.anshar.AnsharCompatClient;
 import falseresync.vivatech.network.VivatechClientReceivers;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.LoggerFactory;
 
 public class VivatechClient implements ClientModInitializer {
@@ -43,6 +45,10 @@ public class VivatechClient implements ClientModInitializer {
             clientWireManager = new ClientWireManager(client);
             hud = new VivatechHud(client);
             toolManager = new ToolManager();
+
+            if (FabricLoader.getInstance().isModLoaded("anshar")) {
+                AnsharCompatClient.init(client);
+            }
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

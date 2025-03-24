@@ -38,7 +38,8 @@
   "tooltip.vivatech.gadget.change_focus": "Press [%s] to change focus",
   "tooltip.vivatech.gadget.setup_anchor": "Use while sneaking to setup an anchor",
   "tooltip.vivatech.gadget.has_anchor": "Anchored in %s at %s",
-  "tooltip.vivatech.gadget.anshar_compat": "Bound to Anshar",
+  "tooltip.vivatech.gadget.anshar_compat.bound": "Permanently bound to the embedded state",
+  "tooltip.vivatech.gadget.anshar_compat.enter": "Enter the embedded state",
 
   "hud.vivatech.gadget.no_focuses": "No other focus to pick",
   "hud.vivatech.gadget.insufficient_charge": "Not enough charge",

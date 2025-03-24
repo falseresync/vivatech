@@ -8,7 +8,7 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.dynamic.Codecs;
 
 public record ItemBarComponent(int step, int color) {
-    public static final ItemBarComponent DEFAULT = new ItemBarComponent(0, 0);
+    public static final ItemBarComponent DEFAULT = new ItemBarComponent(0, -1);
     public static final Codec<ItemBarComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.intRange(0, 13).fieldOf("step").forGetter(ItemBarComponent::step),
             Codecs.ARGB.fieldOf("color").forGetter(ItemBarComponent::color)

@@ -85,7 +85,7 @@ public class ToolManager {
     }
 
     @Nullable
-    private ItemStack scanInventoryForGadgets(PlayerInventory inventory) {
+    public static ItemStack scanInventoryForGadgets(PlayerInventory inventory) {
         var gadgetStack = inventory.getMainHandStack();
         return gadgetStack.isIn(VivatechItemTags.GADGETS) ? gadgetStack : null;
     }

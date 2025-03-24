@@ -274,9 +274,9 @@ public class GadgetItem extends Item {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var step = behaviorExtension.focusGetItemBarStep(stack, focusStack);
-                if (step > 0) {
-                    return step;
+                var color = behaviorExtension.focusGetItemBarStep(stack, focusStack);
+                if (color >= 0) {
+                    return color;
                 }
             }
             return focusItem.focusGetItemBarColor(stack, focusStack);

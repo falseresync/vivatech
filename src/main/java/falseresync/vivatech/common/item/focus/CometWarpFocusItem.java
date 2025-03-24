@@ -106,6 +106,9 @@ public class CometWarpFocusItem extends FocusItem {
 
     @Override
     public void focusAppendTooltip(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        if (focusStack.contains(VivatechComponents.TOOLTIP_OVERRIDDEN)) {
+            return;
+        }
         var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor == null) {
             tooltip.add(Text.translatable("tooltip.vivatech.gadget.setup_anchor")

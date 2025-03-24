@@ -73,6 +73,14 @@ public class ChargeManager {
         return isGadgetFullyCharged(stack);// && areShellsFull(player);
     }
 
+    public boolean hasEnoughCharge(ItemStack stack, int cost, @Nullable PlayerEntity user) {
+        if (user != null && (user.isCreative() && Vivatech.getConfig().infiniteCharge.isCreativeOnly() || Vivatech.getConfig().infiniteCharge.isAlways())) {
+            return true;
+        }
+        return stack.getOrDefault(VivatechComponents.CHARGE, 0) >= cost;
+    }
+
+    // This should not use hasEnoughCharge, as that doesn't bypass creative and makes a whoopsie
     public boolean tryExpendGadgetCharge(ItemStack stack, int cost, @Nullable PlayerEntity user) {
         if (user != null && (user.isCreative() && Vivatech.getConfig().infiniteCharge.isCreativeOnly() || Vivatech.getConfig().infiniteCharge.isAlways())) {
             return true;
