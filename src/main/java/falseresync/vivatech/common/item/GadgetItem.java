@@ -2,7 +2,6 @@ package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.client.VivatechKeybindings;
 import falseresync.vivatech.common.data.VivatechComponents;
-import falseresync.vivatech.common.item.focus.Focus;
 import falseresync.vivatech.common.item.focus.FocusItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -71,12 +70,6 @@ public class GadgetItem extends Item {
         var gadgetStack = user.getStackInHand(hand);
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var result = behaviorExtension.focusUse(gadgetStack, focusStack, world, user, hand);
-                if (result.getResult() != ActionResult.PASS) {
-                    return result;
-                }
-            }
             return focusItem.focusUse(gadgetStack, focusStack, world, user, hand);
         }
 
@@ -92,12 +85,6 @@ public class GadgetItem extends Item {
         var gadgetStack = context.getStack();
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var result = behaviorExtension.focusUseOnBlock(gadgetStack, focusStack, context);
-                if (result != ActionResult.PASS) {
-                    return result;
-                }
-            }
             return focusItem.focusUseOnBlock(gadgetStack, focusStack, context);
         }
 
@@ -109,12 +96,6 @@ public class GadgetItem extends Item {
         var gadgetStack = user.getStackInHand(hand);
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var result = behaviorExtension.focusUseOnEntity(gadgetStack, focusStack, user, entity, hand);
-                if (result != ActionResult.PASS) {
-                    return result;
-                }
-            }
             return focusItem.focusUseOnEntity(gadgetStack, focusStack, user, entity, hand);
         }
 
@@ -125,9 +106,6 @@ public class GadgetItem extends Item {
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                behaviorExtension.focusUsageTick(world, user, stack, focusStack, remainingUseTicks);
-            }
             focusItem.focusUsageTick(world, user, stack, focusStack, remainingUseTicks);
             return;
         }
@@ -140,12 +118,6 @@ public class GadgetItem extends Item {
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var newStack = behaviorExtension.focusFinishUsing(stack, focusStack, world, user);
-                if (!ItemStack.areEqual(newStack, stack)) {
-                    return newStack;
-                }
-            }
             return focusItem.focusFinishUsing(stack, focusStack, world, user);
         }
 
@@ -157,9 +129,6 @@ public class GadgetItem extends Item {
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                behaviorExtension.focusOnStoppedUsing(stack, focusStack, world, user, remainingUseTicks);
-            }
             focusItem.focusOnStoppedUsing(stack, focusStack, world, user, remainingUseTicks);
         }
     }
@@ -168,9 +137,6 @@ public class GadgetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                behaviorExtension.focusInventoryTick(stack, focusStack, world, entity, slot, selected);
-            }
             focusItem.focusInventoryTick(stack, focusStack, world, entity, slot, selected);
         }
 //        if (entity instanceof ServerPlayerEntity player) {
@@ -185,11 +151,6 @@ public class GadgetItem extends Item {
     public boolean isUsedOnRelease(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                if (behaviorExtension.focusIsUsedOnRelease(stack, focusStack)) {
-                    return true;
-                }
-            }
             return focusItem.focusIsUsedOnRelease(stack, focusStack);
         }
 
@@ -205,12 +166,6 @@ public class GadgetItem extends Item {
     public int getMaxUseTime(ItemStack stack, LivingEntity user) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var maxUseTime = behaviorExtension.focusGetMaxUseTime(stack, focusStack, user);
-                if (maxUseTime > 0) {
-                    return maxUseTime;
-                }
-            }
             return focusItem.focusGetMaxUseTime(stack, focusStack, user);
         }
 
@@ -223,12 +178,6 @@ public class GadgetItem extends Item {
         if (weaponStack != null && weaponStack.getItem() instanceof GadgetItem) {
             var focusStack = getEquipped(weaponStack);
             if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-                for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                    var bonusAttackDamage = behaviorExtension.focusGetBonusAttackDamage(weaponStack, focusStack, target, baseAttackDamage, damageSource);
-                    if (bonusAttackDamage > 0) {
-                        return bonusAttackDamage;
-                    }
-                }
                 return focusItem.focusGetBonusAttackDamage(weaponStack, focusStack, target, baseAttackDamage, damageSource);
             }
         }
@@ -242,11 +191,6 @@ public class GadgetItem extends Item {
     public boolean isItemBarVisible(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                if (behaviorExtension.focusIsItemBarVisible(stack, focusStack)) {
-                    return true;
-                }
-            }
             return focusItem.focusIsItemBarVisible(stack, focusStack);
         }
 
@@ -257,12 +201,6 @@ public class GadgetItem extends Item {
     public int getItemBarStep(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var step = behaviorExtension.focusGetItemBarStep(stack, focusStack);
-                if (step > 0) {
-                    return step;
-                }
-            }
             return focusItem.focusGetItemBarStep(stack, focusStack);
         }
 
@@ -273,12 +211,6 @@ public class GadgetItem extends Item {
     public int getItemBarColor(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                var color = behaviorExtension.focusGetItemBarStep(stack, focusStack);
-                if (color >= 0) {
-                    return color;
-                }
-            }
             return focusItem.focusGetItemBarColor(stack, focusStack);
         }
 
@@ -289,11 +221,6 @@ public class GadgetItem extends Item {
     public boolean hasGlint(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                if (behaviorExtension.focusHasGlint(stack, focusStack)) {
-                    return true;
-                }
-            }
             return focusItem.focusHasGlint(stack, focusStack);
         }
 
@@ -309,9 +236,6 @@ public class GadgetItem extends Item {
                     .translatable("tooltip.vivatech.gadget.active_focus", focusStack.getName())
                     .styled(style -> style.withColor(Formatting.GRAY)));
             focusItem.focusAppendTooltip(stack, focusStack, context, tooltip, type);
-            for (Focus behaviorExtension : focusItem.getBehaviorExtensions()) {
-                behaviorExtension.focusAppendTooltip(stack, focusStack, context, tooltip, type);
-            }
         }
         tooltip.add(Text
                 .translatable("tooltip.vivatech.gadget.change_focus", KeyBindingHelper.getBoundKeyOf(VivatechKeybindings.TOOL_CONTROL).getLocalizedText())
@@ -336,17 +260,11 @@ public class GadgetItem extends Item {
         if (oldFocusStack.getItem() instanceof FocusItem oldFocusItem) {
             removeOld = true;
             oldFocusItem.focusOnUnequipped(gadgetStack, oldFocusStack, user);
-            for (Focus behaviorExtension : oldFocusItem.getBehaviorExtensions()) {
-                behaviorExtension.focusOnUnequipped(gadgetStack, oldFocusStack, user);
-            }
         }
 
         if (newFocusStack.getItem() instanceof FocusItem newFocusItem) {
             insertNew = true;
             newFocusItem.focusOnEquipped(gadgetStack, newFocusStack, user);
-            for (Focus behaviorExtension : newFocusItem.getBehaviorExtensions()) {
-                behaviorExtension.focusOnEquipped(gadgetStack, newFocusStack, user);
-            }
         }
 
         // newFocus != empty, oldFocus == empty -> success oldFocus

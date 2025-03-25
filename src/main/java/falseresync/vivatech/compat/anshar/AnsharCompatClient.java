@@ -5,7 +5,6 @@ import falseresync.lib.client.BetterDrawContext;
 import falseresync.vivatech.client.ToolManager;
 import falseresync.vivatech.client.hud.HudItem;
 import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.item.VivatechItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -109,7 +108,7 @@ public class AnsharCompatClient implements HudItem {
             return;
         }
 
-        hidden = !(gadgetStack.contains(AnsharCompat.NETWORK_UUID) && Vivatech.getChargeManager().hasEnoughCharge(gadgetStack, AnsharCompat.DEFAULT_COST, client.player));
+        hidden = !(gadgetStack.contains(AnsharCompatImpl.NETWORK_UUID) && Vivatech.getChargeManager().hasEnoughCharge(gadgetStack, AnsharCompatImpl.DEFAULT_COST, client.player));
 
         if (!hidden) {
             if (overlayMessageCooldown == 0) {

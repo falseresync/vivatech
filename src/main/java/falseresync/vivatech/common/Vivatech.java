@@ -11,10 +11,11 @@ import falseresync.vivatech.common.entity.VivatechEntities;
 import falseresync.vivatech.common.item.VivatechItemGroups;
 import falseresync.vivatech.common.item.VivatechItemTags;
 import falseresync.vivatech.common.item.VivatechItems;
+import falseresync.vivatech.common.item.focus.CometWarpFocusItem;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.wire.WireType;
-import falseresync.vivatech.compat.anshar.AnsharCompat;
+import falseresync.vivatech.compat.anshar.AnsharCompatImpl;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VivatechServerReceivers;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -81,7 +82,7 @@ public class Vivatech implements ModInitializer {
         });
 
         if (FabricLoader.getInstance().isModLoaded("anshar")) {
-            VivatechItems.COMET_WARP_FOCUS.registerBehaviorExtension(new AnsharCompat());
+            CometWarpFocusItem.ansharCompat = new AnsharCompatImpl();
         }
 
         LOGGER.info("Initialized");
