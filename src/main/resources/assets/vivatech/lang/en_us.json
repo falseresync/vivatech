@@ -38,6 +38,7 @@
   "tooltip.vivatech.gadget.change_focus": "Press [%s] to change focus",
   "tooltip.vivatech.gadget.setup_anchor": "Use while sneaking to setup an anchor",
   "tooltip.vivatech.gadget.has_anchor": "Anchored in %s at %s",
+  "tooltip.vivatech.gadget.has_permanent_anchor": "Permanently anchored in %s at %s",
   "tooltip.vivatech.gadget.anshar_compat.bound": "Permanently bound to the embedded state",
   "tooltip.vivatech.gadget.anshar_compat.enter": "Enter the embedded state",
 
@@ -45,6 +46,8 @@
   "hud.vivatech.gadget.insufficient_charge": "Not enough charge",
   "hud.vivatech.gadget.full_inventory": "Cannot pick a focus with a full inventory",
   "hud.vivatech.focus.comet_warp.no_anchor": "Setup an anchor first",
+  "hud.vivatech.focus.comet_warp.permanently_anchored": "Permanently anchored in %s at %s",
+  "hud.vivatech.focus.comet_warp.cannot_anchor_here": "Cannot anchor here",
   "hud.vivatech.probe": "Voltage: %d - Current: %.2f",
   "hud.vivatech.wire": "Not enough wire",
 

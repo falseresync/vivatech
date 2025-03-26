@@ -45,12 +45,18 @@ public class VivatechComponents {
             ComponentType.<Integer>builder().codec(Codecs.POSITIVE_INT).packetCodec(PacketCodecs.INTEGER).build();
     public static final @RegistryObject ComponentType<Integer> CHARGE_DEFICIT =
             ComponentType.<Integer>builder().codec(Codecs.POSITIVE_INT).packetCodec(PacketCodecs.INTEGER).build();
+    public static final @RegistryObject ComponentType<Boolean> INFINITE_CHARGE =
+            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
 
     // Focuses
     public static final @RegistryObject ComponentType<Integer> FOCUS_PLATING =
             ComponentType.<Integer>builder().codec(Codecs.rangedInt(0, FocusPlating.values().length - 1)).packetCodec(PacketCodecs.INTEGER).build();
     public static final @RegistryObject ComponentType<GlobalPos> WARP_FOCUS_ANCHOR =
             ComponentType.<GlobalPos>builder().codec(GlobalPos.CODEC).packetCodec(GlobalPos.PACKET_CODEC).build();
+    public static final @RegistryObject ComponentType<GlobalPos> WARP_FOCUS_PERSISTENT_ANCHOR =
+            ComponentType.<GlobalPos>builder().codec(GlobalPos.CODEC).packetCodec(GlobalPos.PACKET_CODEC).build();
+    public static final @RegistryObject ComponentType<Boolean> WARP_FOCUS_BLOCK_ONLY_MODE =
+            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
     public static final @RegistryObject ComponentType<UUID> ENERGY_VEIL_UUID =
             ComponentType.<UUID>builder().codec(Uuids.INT_STREAM_CODEC).packetCodec(Uuids.PACKET_CODEC).build();
 }

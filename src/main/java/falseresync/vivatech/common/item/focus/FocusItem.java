@@ -2,6 +2,7 @@ package falseresync.vivatech.common.item.focus;
 
 import falseresync.vivatech.common.data.ItemBarComponent;
 import falseresync.vivatech.common.data.VivatechComponents;
+import net.minecraft.component.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -38,6 +39,10 @@ public abstract class FocusItem extends Item {
         if (!stack.contains(VivatechComponents.UUID)) {
             stack.set(VivatechComponents.UUID, UUID.randomUUID());
         }
+    }
+
+    protected final <T> void transferComponent(ItemStack sourceStack, ItemStack targetStack, ComponentType<T> componentType) {
+        targetStack.set(componentType, sourceStack.remove(componentType));
     }
 
     public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {

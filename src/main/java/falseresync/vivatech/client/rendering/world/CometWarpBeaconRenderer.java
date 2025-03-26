@@ -94,9 +94,12 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
         }
 
         var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
+        if (anchor == null) {
+            anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_PERSISTENT_ANCHOR);
+        }
         if (anchor == null
                 || anchor.dimension() != context.world().getRegistryKey()
-                || !anchor.pos().isWithinDistance(player.getPos(), Vivatech.getConfig().inspectorGogglesDisplayRange)
+                || !anchor.pos().isWithinDistance(player.getPos(), Vivatech.getConfig().inspectorGogglesDisplayRange * 4)
                 || !context.frustum().isVisible(Box.from(anchor.pos().toCenterPos()))) {
             return;
         }
