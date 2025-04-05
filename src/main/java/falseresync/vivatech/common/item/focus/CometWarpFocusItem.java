@@ -7,7 +7,6 @@ import falseresync.vivatech.common.Reports;
 import falseresync.vivatech.compat.anshar.AnsharCompat;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.CachedBlockPosition;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -64,19 +63,24 @@ public class CometWarpFocusItem extends FocusItem {
 
     @Override
     public ActionResult focusUseOnBlock(ItemStack gadgetStack, ItemStack focusStack, ItemUsageContext context) {
+        var world = context.getWorld();
+        var player = context.getPlayer();
+        if (player == null) {
+            return ActionResult.PASS;
+        }
+
         // Do not override lodestones
         var persistentAnchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_PERSISTENT_ANCHOR);
         if (persistentAnchor != null && !focusStack.contains(VivatechComponents.WARP_FOCUS_BLOCK_ONLY_MODE)) {
-            if (context.getPlayer() instanceof ClientPlayerEntity player && player.isSneaking()) {
+            if (world.isClient && player.isSneaking()) {
                 reportPermanentlyBound(player, persistentAnchor);
             }
             return ActionResult.PASS;
         }
 
-        var world = context.getWorld();
         var pos = context.getBlockPos();
         if (focusStack.canPlaceOn(new CachedBlockPosition(world, pos, false))) {
-            if (context.getPlayer() instanceof ServerPlayerEntity player && player.isSneaking()) {
+            if (!world.isClient && player.isSneaking()) {
                 if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, DEFAULT_PLACEMENT_COST * PERSISTENT_ANCHOR_COST_COEFFICIENT, player)) {
                     Reports.insufficientCharge(player);
                     return ActionResult.FAIL;
@@ -91,7 +95,7 @@ public class CometWarpFocusItem extends FocusItem {
 
             return ActionResult.CONSUME;
         } else if (focusStack.contains(VivatechComponents.WARP_FOCUS_BLOCK_ONLY_MODE)) {
-            if (context.getPlayer() instanceof ClientPlayerEntity player) {
+            if (world.isClient) {
                 player.sendMessage(Text.translatable("hud.vivatech.focus.comet_warp.cannot_anchor_here"), true);
             }
             return ActionResult.FAIL;
