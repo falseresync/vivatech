@@ -4,25 +4,26 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import falseresync.lib.client.BetterDrawContext;
 import falseresync.lib.math.Easing;
 import falseresync.vivatech.client.VivatechClient;
+import falseresync.vivatech.client.hud.HudItem;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.focus.FocusItem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
 
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.UUID;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class FocusPickerHudItem implements HudItem {
-    protected static final Identifier SELECTION_TEX = vtId("textures/hud/focus_picker.png");
+    protected static final ResourceLocation SELECTION_TEX = vtId("textures/hud/focus_picker.png");
     private static final int MARGIN = 2;
     private static final int WIDGET_W = 22;
     private static final int WIDGET_H = 22;
@@ -38,8 +39,8 @@ public class FocusPickerHudItem implements HudItem {
             .<ItemStack>comparingInt(stack -> ((FocusItem) stack.getItem()).getRawId())
             .thenComparingInt(stack -> stack.getOrDefault(VivatechComponents.FOCUS_PLATING, -1))
             .thenComparingLong(stack -> stack.getOrDefault(VivatechComponents.UUID, UUID.randomUUID()).getMostSignificantBits());
-    private final MinecraftClient client;
-    private final TextRenderer textRenderer;
+    private final Minecraft client;
+    private final Font textRenderer;
     private final LinkedList<ItemStack> focuses = new LinkedList<>();
     private ItemStack gadget;
     private float baseOpacity = 1;
@@ -50,13 +51,13 @@ public class FocusPickerHudItem implements HudItem {
     private boolean animatingItems = false;
     private int remainingItemsAnimationTicks = 0;
 
-    public FocusPickerHudItem(MinecraftClient client, TextRenderer textRenderer) {
+    public FocusPickerHudItem(Minecraft client, Font textRenderer) {
         this.client = client;
         this.textRenderer = textRenderer;
     }
 
     @Override
-    public void render(BetterDrawContext context, RenderTickCounter tickCounter) {
+    public void render(BetterDrawContext context, DeltaTracker tickCounter) {
         if (isVisible() || animatingParent) {
             baseOpacity = getAnimatedBaseOpacity();
             var yOffsetPerItem = ITEM_H + MARGIN;
@@ -65,10 +66,10 @@ public class FocusPickerHudItem implements HudItem {
 
             var chargeDisplay = VivatechClient.getHud().getChargeDisplay();
             var x = 4 + (chargeDisplay.isVisible() ? chargeDisplay.getWidth() : 0);
-            var y = context.getScaledWindowHeight() / 2 - widgetH / 2;
+            var y = context.guiHeight() / 2 - widgetH / 2;
 
             RenderSystem.enableBlend();
-            context.setShaderColor(1, 1, 1, baseOpacity);
+            context.setColor(1, 1, 1, baseOpacity);
 
             context.drawSquare(SELECTION_TEX, x, y + yOffset, 22, TEX_SIZE);
 
@@ -126,29 +127,29 @@ public class FocusPickerHudItem implements HudItem {
 
     protected ItemStack addGlintIfNecessary(ItemStack stack) {
         ItemStack stackWithGlint = null;
-        if (gadget.hasGlint() && stack != null) {
+        if (gadget.hasFoil() && stack != null) {
             stackWithGlint = stack.copy();
-            stackWithGlint.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+            stackWithGlint.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
         return stackWithGlint == null ? stack : stackWithGlint;
     }
 
     protected void paintItem(BetterDrawContext context, ItemStack stack, int x, int y, float scale, float translation, float opacity, boolean shouldTint) {
-        var matrices = context.getMatrices();
-        matrices.push();
-        matrices.multiplyPositionMatrix(new Matrix4f().scaleAround(scale, scale, 1f, x + ITEM_W / 2f, y + ITEM_H / 2f, 0));
+        var matrices = context.pose();
+        matrices.pushPose();
+        matrices.mulPose(new Matrix4f().scaleAround(scale, scale, 1f, x + ITEM_W / 2f, y + ITEM_H / 2f, 0));
         matrices.translate(0, translation, 0);
         if (shouldTint) {
-            context.setShaderColor(161 / 255f, 158 / 255f, 170 / 255f, opacity);
+            context.setColor(161 / 255f, 158 / 255f, 170 / 255f, opacity);
         } else {
-            context.setShaderColor(1, 1, 1, opacity);
+            context.setColor(1, 1, 1, opacity);
         }
 
-        context.drawItemWithoutEntity(stack, x, y);
-        context.drawItemInSlot(textRenderer, stack, x, y);
+        context.renderFakeItem(stack, x, y);
+        context.renderItemDecorations(textRenderer, stack, x, y);
 
-        context.setShaderColor(1, 1, 1, baseOpacity);
-        matrices.pop();
+        context.setColor(1, 1, 1, baseOpacity);
+        matrices.popPose();
     }
 
     private float getAnimatedBaseOpacity() {

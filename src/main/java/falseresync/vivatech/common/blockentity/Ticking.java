@@ -1,7 +1,7 @@
 package falseresync.vivatech.common.blockentity;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 
 public interface Ticking {
     void tick();

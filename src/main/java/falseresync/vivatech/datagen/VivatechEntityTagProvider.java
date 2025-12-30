@@ -4,18 +4,17 @@ import falseresync.vivatech.common.entity.VivatechEntityTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEntityTypeTags;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.RegistryWrapper;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.EntityType;
 import java.util.concurrent.CompletableFuture;
 
 public class VivatechEntityTagProvider extends FabricTagProvider.EntityTypeTagProvider {
-    public VivatechEntityTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
+    public VivatechEntityTagProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
         super(output, completableFuture);
     }
 
     @Override
-    protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
+    protected void addTags(HolderLookup.Provider wrapperLookup) {
         getOrCreateTagBuilder(VivatechEntityTags.PASSES_THROUGH_ENERGY_VEIL)
                 .add(EntityType.ITEM)
                 .add(EntityType.AREA_EFFECT_CLOUD)

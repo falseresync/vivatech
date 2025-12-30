@@ -2,50 +2,50 @@ package falseresync.vivatech.common.block;
 
 import com.mojang.serialization.MapCodec;
 import falseresync.vivatech.common.blockentity.Ticking;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.OverrideOnly
-public class BaseBlockWithEntity extends BlockWithEntity {
-    public static final MapCodec<BaseBlockWithEntity> CODEC = createCodec(BaseBlockWithEntity::new);
+public class BaseBlockWithEntity extends BaseEntityBlock {
+    public static final MapCodec<BaseBlockWithEntity> CODEC = simpleCodec(BaseBlockWithEntity::new);
 
-    protected BaseBlockWithEntity(Settings settings) {
+    protected BaseBlockWithEntity(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected MapCodec<BaseBlockWithEntity> getCodec() {
+    protected MapCodec<BaseBlockWithEntity> codec() {
         return CODEC;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     public static abstract class WithTicker extends BaseBlockWithEntity {
-        protected WithTicker(Settings settings) {
+        protected WithTicker(Properties settings) {
             super(settings);
         }
 
         @Nullable
         @Override
-        public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-            return validateTicker(type, getBlockEntityType(), Ticking.getDefaultTicker());
+        public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+            return createTickerHelper(type, getBlockEntityType(), Ticking.getDefaultTicker());
         }
 
         protected abstract BlockEntityType<?> getBlockEntityType();

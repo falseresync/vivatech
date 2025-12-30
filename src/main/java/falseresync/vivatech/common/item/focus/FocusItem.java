@@ -2,31 +2,30 @@ package falseresync.vivatech.common.item.focus;
 
 import falseresync.vivatech.common.data.ItemBarComponent;
 import falseresync.vivatech.common.data.VivatechComponents;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import net.minecraft.Util;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public abstract class FocusItem extends Item {
-    private final Function<Item, Integer> rawIdGetter = Util.memoize(Registries.ITEM::getRawIdOrThrow);
+    private final Function<Item, Integer> rawIdGetter = Util.memoize(BuiltInRegistries.ITEM::getIdOrThrow);
 
-    public FocusItem(Settings settings) {
+    public FocusItem(Properties settings) {
         super(settings);
     }
 
@@ -35,45 +34,45 @@ public abstract class FocusItem extends Item {
     }
 
     @Override
-    public void postProcessComponents(ItemStack stack) {
-        if (!stack.contains(VivatechComponents.UUID)) {
+    public void verifyComponentsAfterLoad(ItemStack stack) {
+        if (!stack.has(VivatechComponents.UUID)) {
             stack.set(VivatechComponents.UUID, UUID.randomUUID());
         }
     }
 
-    protected final <T> void transferComponent(ItemStack sourceStack, ItemStack targetStack, ComponentType<T> componentType) {
+    protected final <T> void transferComponent(ItemStack sourceStack, ItemStack targetStack, DataComponentType<T> componentType) {
         targetStack.set(componentType, sourceStack.remove(componentType));
     }
 
-    public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
+    public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, Player user) {
     }
 
-    public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
+    public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, Player user) {
     }
 
-    public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
-        return TypedActionResult.pass(gadgetStack);
+    public InteractionResultHolder<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, Level world, Player user, InteractionHand hand) {
+        return InteractionResultHolder.pass(gadgetStack);
     }
 
-    public ActionResult focusUseOnBlock(ItemStack gadgetStack, ItemStack focusStack, ItemUsageContext context) {
-        return ActionResult.PASS;
+    public InteractionResult focusUseOnBlock(ItemStack gadgetStack, ItemStack focusStack, UseOnContext context) {
+        return InteractionResult.PASS;
     }
 
-    public ActionResult focusUseOnEntity(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        return ActionResult.PASS;
+    public InteractionResult focusUseOnEntity(ItemStack gadgetStack, ItemStack focusStack, Player user, LivingEntity entity, InteractionHand hand) {
+        return InteractionResult.PASS;
     }
 
-    public void focusUsageTick(World world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
+    public void focusUsageTick(Level world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
     }
 
-    public ItemStack focusFinishUsing(ItemStack gadgetStack, ItemStack focusStack, World world, LivingEntity user) {
+    public ItemStack focusFinishUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user) {
         return gadgetStack;
     }
 
-    public void focusOnStoppedUsing(ItemStack gadgetStack, ItemStack focusStack, World world, LivingEntity user, int remainingUseTicks) {
+    public void focusOnStoppedUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user, int remainingUseTicks) {
     }
 
-    public void focusInventoryTick(ItemStack gadgetStack, ItemStack focusStack, World world, Entity entity, int slot, boolean selected) {
+    public void focusInventoryTick(ItemStack gadgetStack, ItemStack focusStack, Level world, Entity entity, int slot, boolean selected) {
     }
 
     public boolean focusIsUsedOnRelease(ItemStack gadgetStack, ItemStack focusStack) {
@@ -89,7 +88,7 @@ public abstract class FocusItem extends Item {
     }
 
     public boolean focusIsItemBarVisible(ItemStack gadgetStack, ItemStack focusStack) {
-        return gadgetStack.contains(VivatechComponents.ITEM_BAR);
+        return gadgetStack.has(VivatechComponents.ITEM_BAR);
     }
 
     public int focusGetItemBarStep(ItemStack gadgetStack, ItemStack focusStack) {
@@ -104,6 +103,6 @@ public abstract class FocusItem extends Item {
         return false;
     }
 
-    public void focusAppendTooltip(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void focusAppendTooltip(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
     }
 }

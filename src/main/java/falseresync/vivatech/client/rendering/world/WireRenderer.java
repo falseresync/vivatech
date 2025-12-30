@@ -1,6 +1,6 @@
 package falseresync.vivatech.client.rendering.world;
 
-import falseresync.lib.math.VectorMath;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import falseresync.vivatech.client.VivatechClient;
 import falseresync.vivatech.client.rendering.RenderingUtil;
 import falseresync.vivatech.client.wire.WireParameters;
@@ -8,45 +8,45 @@ import falseresync.vivatech.client.wire.WireRenderingRegistry;
 import falseresync.vivatech.client.wire.WireModel;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Colors;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.CommonColors;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class WireRenderer implements WorldRenderEvents.AfterEntities {
-    private static final Vector3f VERTICAL_SEGMENT_NORMAL = Direction.NORTH.getUnitVector();//
-    private static final Vector3f HORIZONTAL_SEGMENT_NORMAL = Direction.UP.getUnitVector();
-    private static final int TINT = Colors.WHITE;
-    private static final int OVERLAY = OverlayTexture.DEFAULT_UV;
+    private static final Vector3f VERTICAL_SEGMENT_NORMAL = Direction.NORTH.step();//
+    private static final Vector3f HORIZONTAL_SEGMENT_NORMAL = Direction.UP.step();
+    private static final int TINT = CommonColors.WHITE;
+    private static final int OVERLAY = OverlayTexture.NO_OVERLAY;
 
     @Override
     public void afterEntities(WorldRenderContext context) {
-        var wires = VivatechClient.getClientWireManager().getWires(context.world().getRegistryKey());
+        var wires = VivatechClient.getClientWireManager().getWires(context.world().dimension());
         if (wires.isEmpty()) {
             return;
         }
 
         var matrices = context.matrixStack();
-        var cameraPos = context.camera().getPos();
+        var cameraPos = context.camera().getPosition();
 
         for (var wire : wires) {
             var parameters = WireRenderingRegistry.getAndBuild(wire);
             var model = parameters.getModel();
-            var buffer = model.getSprite().getTextureSpecificVertexConsumer(context.consumers().getBuffer(RenderLayer.getCutout()));
+            var buffer = model.getSprite().wrap(context.consumers().getBuffer(RenderType.cutout()));
 
             var wireEnd = wire.end().sub(wire.start(), new Vector3f());
-            var light = WorldRenderer.getLightmapCoordinates(context.world(), BlockPos.ofFloored(wire.middle().x, wire.middle().y, wire.middle().z));
+            var light = LevelRenderer.getLightColor(context.world(), BlockPos.containing(wire.middle().x, wire.middle().y, wire.middle().z));
 
-            matrices.push();
+            matrices.pushPose();
 
             var cameraAdjustment = wire.start().sub(cameraPos.toVector3f(), new Vector3f());
             matrices.translate(cameraAdjustment.x, cameraAdjustment.y, cameraAdjustment.z);
 
-            var positionMatrix = matrices.peek().getPositionMatrix();
+            var positionMatrix = matrices.last().pose();
             var direction = wireEnd.normalize(new Vector3f());
             int segmentCount = (int) (wire.length() / model.getSegmentLength());
 
@@ -56,7 +56,7 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
                 drawHorizontalWire(parameters, model, direction, wireEnd, segmentCount, buffer, positionMatrix, light);
             }
 
-            matrices.pop();
+            matrices.popPose();
         }
     }
 

@@ -6,25 +6,28 @@ import falseresync.vivatech.common.item.focus.FocusItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 public class GadgetItem extends Item {
-    public GadgetItem(Settings settings) {
+    public GadgetItem(Properties settings) {
         super(settings
                 .component(VivatechComponents.CHARGE, 0)
                 .component(VivatechComponents.MAX_CHARGE, 100));
@@ -33,24 +36,24 @@ public class GadgetItem extends Item {
     // Gadget as an item
 
     @Override
-    public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+    public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player miner) {
         return false;
     }
 
     @Override
-    public boolean onStackClicked(ItemStack gadgetStack, Slot slot, ClickType clickType, PlayerEntity player) {
-        if (clickType == ClickType.RIGHT) {
-            var exchange = exchangeFocuses(gadgetStack, slot.getStack().copy(), player);
-            if (exchange.getResult().isAccepted()) {
-                slot.setStack(exchange.getValue());
+    public boolean overrideStackedOnOther(ItemStack gadgetStack, Slot slot, ClickAction clickType, Player player) {
+        if (clickType == ClickAction.SECONDARY) {
+            var exchange = exchangeFocuses(gadgetStack, slot.getItem().copy(), player);
+            if (exchange.getResult().consumesAction()) {
+                slot.setByPlayer(exchange.getObject());
                 return true;
             }
         }
-        return super.onStackClicked(gadgetStack, slot, clickType, player);
+        return super.overrideStackedOnOther(gadgetStack, slot, clickType, player);
     }
 
     @Override
-    public void postProcessComponents(ItemStack stack) {
+    public void verifyComponentsAfterLoad(ItemStack stack) {
         var charge = stack.getOrDefault(VivatechComponents.CHARGE, 0);
         var maxCharge = stack.getOrDefault(VivatechComponents.MAX_CHARGE, 0);
         if (charge > maxCharge) {
@@ -59,15 +62,15 @@ public class GadgetItem extends Item {
     }
 
     @Override
-    public boolean allowComponentsUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         return false;
     }
 
     // Focus actions processing
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        var gadgetStack = user.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        var gadgetStack = user.getItemInHand(hand);
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusUse(gadgetStack, focusStack, world, user, hand);
@@ -78,55 +81,55 @@ public class GadgetItem extends Item {
 
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
+    public InteractionResult useOn(UseOnContext context) {
 //        var activationResult = activateBlock(GADGET_BEHAVIORS, context);
 //        if (activationResult.isAccepted()) return activationResult;
 
-        var gadgetStack = context.getStack();
+        var gadgetStack = context.getItemInHand();
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusUseOnBlock(gadgetStack, focusStack, context);
         }
 
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 
     @Override
-    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        var gadgetStack = user.getStackInHand(hand);
+    public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand) {
+        var gadgetStack = user.getItemInHand(hand);
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusUseOnEntity(gadgetStack, focusStack, user, entity, hand);
         }
 
-        return super.useOnEntity(stack, user, entity, hand);
+        return super.interactLivingEntity(stack, user, entity, hand);
     }
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             focusItem.focusUsageTick(world, user, stack, focusStack, remainingUseTicks);
             return;
         }
 
-        super.usageTick(world, user, stack, remainingUseTicks);
+        super.onUseTick(world, user, stack, remainingUseTicks);
     }
 
 
     @Override
-    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusFinishUsing(stack, focusStack, world, user);
         }
 
-        return super.finishUsing(stack, world, user);
+        return super.finishUsingItem(stack, world, user);
     }
 
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             focusItem.focusOnStoppedUsing(stack, focusStack, world, user, remainingUseTicks);
@@ -134,7 +137,7 @@ public class GadgetItem extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             focusItem.focusInventoryTick(stack, focusStack, world, entity, slot, selected);
@@ -148,13 +151,13 @@ public class GadgetItem extends Item {
     // Focus properties processing
 
     @Override
-    public boolean isUsedOnRelease(ItemStack stack) {
+    public boolean useOnRelease(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusIsUsedOnRelease(stack, focusStack);
         }
 
-        return super.isUsedOnRelease(stack);
+        return super.useOnRelease(stack);
     }
 
 //    @Override
@@ -163,18 +166,18 @@ public class GadgetItem extends Item {
 //    }
 
     @Override
-    public int getMaxUseTime(ItemStack stack, LivingEntity user) {
+    public int getUseDuration(ItemStack stack, LivingEntity user) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusGetMaxUseTime(stack, focusStack, user);
         }
 
-        return super.getMaxUseTime(stack, user);
+        return super.getUseDuration(stack, user);
     }
 
     @Override
-    public float getBonusAttackDamage(Entity target, float baseAttackDamage, DamageSource damageSource) {
-        var weaponStack = damageSource.getWeaponStack();
+    public float getAttackDamageBonus(Entity target, float baseAttackDamage, DamageSource damageSource) {
+        var weaponStack = damageSource.getWeaponItem();
         if (weaponStack != null && weaponStack.getItem() instanceof GadgetItem) {
             var focusStack = getEquipped(weaponStack);
             if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
@@ -182,71 +185,71 @@ public class GadgetItem extends Item {
             }
         }
 
-        return super.getBonusAttackDamage(target, baseAttackDamage, damageSource);
+        return super.getAttackDamageBonus(target, baseAttackDamage, damageSource);
     }
 
     // Focus appearance processing
 
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusIsItemBarVisible(stack, focusStack);
         }
 
-        return super.isItemBarVisible(stack);
+        return super.isBarVisible(stack);
     }
 
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusGetItemBarStep(stack, focusStack);
         }
 
-        return super.getItemBarStep(stack);
+        return super.getBarWidth(stack);
     }
 
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusGetItemBarColor(stack, focusStack);
         }
 
-        return super.getItemBarColor(stack);
+        return super.getBarColor(stack);
     }
 
     @Override
-    public boolean hasGlint(ItemStack stack) {
+    public boolean isFoil(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
             return focusItem.focusHasGlint(stack, focusStack);
         }
 
-        return super.hasGlint(stack);
+        return super.isFoil(stack);
     }
 
     @Environment(EnvType.CLIENT)
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            tooltip.add(Text
-                    .translatable("tooltip.vivatech.gadget.active_focus", focusStack.getName())
-                    .styled(style -> style.withColor(Formatting.GRAY)));
+            tooltip.add(Component
+                    .translatable("tooltip.vivatech.gadget.active_focus", focusStack.getHoverName())
+                    .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
             focusItem.focusAppendTooltip(stack, focusStack, context, tooltip, type);
         }
-        tooltip.add(Text
-                .translatable("tooltip.vivatech.gadget.change_focus", KeyBindingHelper.getBoundKeyOf(VivatechKeybindings.TOOL_CONTROL).getLocalizedText())
-                .styled(style -> style.withColor(Formatting.GRAY).withItalic(true)));
-        super.appendTooltip(stack, context, tooltip, type);
+        tooltip.add(Component
+                .translatable("tooltip.vivatech.gadget.change_focus", KeyBindingHelper.getBoundKeyOf(VivatechKeybindings.TOOL_CONTROL).getDisplayName())
+                .withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)));
+        super.appendHoverText(stack, context, tooltip, type);
     }
 
 
     // Custom gadget methods
 
-    public TypedActionResult<ItemStack> exchangeFocuses(ItemStack gadgetStack, ItemStack newFocusStack, PlayerEntity user) {
+    public InteractionResultHolder<ItemStack> exchangeFocuses(ItemStack gadgetStack, ItemStack newFocusStack, Player user) {
         var oldFocusStack = getEquipped(gadgetStack);
 
         var removeOld = false;
@@ -254,7 +257,7 @@ public class GadgetItem extends Item {
 
         // newFocus = empty, oldFocus = empty -> pass newFocus
         if (newFocusStack.isEmpty() && oldFocusStack.isEmpty()) {
-            return TypedActionResult.pass(newFocusStack);
+            return InteractionResultHolder.pass(newFocusStack);
         }
 
         if (oldFocusStack.getItem() instanceof FocusItem oldFocusItem) {
@@ -271,17 +274,17 @@ public class GadgetItem extends Item {
         // newFocus != empty, oldFocus != empty -> success oldFocus
         if (insertNew) {
             gadgetStack.set(VivatechComponents.EQUIPPED_FOCUS_ITEM, newFocusStack);
-            return TypedActionResult.success(oldFocusStack);
+            return InteractionResultHolder.success(oldFocusStack);
         }
 
         // newFocus = empty, oldFocus != empty -> success oldFocus
         if (removeOld) {
             gadgetStack.remove(VivatechComponents.EQUIPPED_FOCUS_ITEM);
-            return TypedActionResult.success(oldFocusStack);
+            return InteractionResultHolder.success(oldFocusStack);
         }
 
         // newFocus is not empty, but not a focus item -> fail newFocus
-        return TypedActionResult.fail(newFocusStack);
+        return InteractionResultHolder.fail(newFocusStack);
     }
 
     public ItemStack getEquipped(ItemStack gadgetStack) {

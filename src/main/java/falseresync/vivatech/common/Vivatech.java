@@ -11,7 +11,6 @@ import falseresync.vivatech.common.entity.VivatechEntities;
 import falseresync.vivatech.common.item.VivatechItemGroups;
 import falseresync.vivatech.common.item.VivatechItemTags;
 import falseresync.vivatech.common.item.VivatechItems;
-import falseresync.vivatech.common.item.focus.CometWarpFocusItem;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.wire.WireType;
@@ -21,15 +20,14 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.LoggerFactory;
 
 public class Vivatech implements ModInitializer {
     public static final String MOD_ID = "vivatech";
     public static final BetterLogger LOGGER = new BetterLogger(LoggerFactory.getLogger(MOD_ID), "Vivatech");
-    private static ChargeManager chargeManager;
+    private static falseresync.vivatech.common.ChargeManager chargeManager;
     private static VivatechConfig config;
     private static PowerSystem powerSystem;
 
@@ -37,7 +35,7 @@ public class Vivatech implements ModInitializer {
         return powerSystem;
     }
 
-    public static ChargeManager getChargeManager() {
+    public static falseresync.vivatech.common.ChargeManager getChargeManager() {
         return chargeManager;
     }
 
@@ -45,8 +43,8 @@ public class Vivatech implements ModInitializer {
         return config;
     }
 
-    public static Identifier vtId(String path) {
-        return Identifier.of(MOD_ID, path);
+    public static ResourceLocation vtId(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     @Override
@@ -60,11 +58,11 @@ public class Vivatech implements ModInitializer {
         VivatechItems.registerAll();
         VivatechItemTags.init();
         new AutoRegistry(MOD_ID, LOGGER.getDelegate())
-                .link(Registries.BLOCK_ENTITY_TYPE, VivatechBlockEntities.class)
-                .link(Registries.ITEM_GROUP, VivatechItemGroups.class)
-                .link(Registries.DATA_COMPONENT_TYPE, VivatechComponents.class)
-                .link(Registries.ENTITY_TYPE, VivatechEntities.class)
-                .link(Registries.PARTICLE_TYPE, VivatechParticleTypes.class)
+                .link(BuiltInRegistries.BLOCK_ENTITY_TYPE, VivatechBlockEntities.class)
+                .link(BuiltInRegistries.CREATIVE_MODE_TAB, VivatechItemGroups.class)
+                .link(BuiltInRegistries.DATA_COMPONENT_TYPE, VivatechComponents.class)
+                .link(BuiltInRegistries.ENTITY_TYPE, VivatechEntities.class)
+                .link(BuiltInRegistries.PARTICLE_TYPE, VivatechParticleTypes.class)
                 .link(WireType.REGISTRY, WireType.class);
         VivatechAttachments.init();
         VivatechSounds.init();

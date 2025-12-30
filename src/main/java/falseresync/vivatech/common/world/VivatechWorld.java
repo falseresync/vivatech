@@ -1,16 +1,17 @@
 package falseresync.vivatech.common.world;
 
-import net.minecraft.block.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.*;
-import net.minecraft.world.explosion.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class VivatechWorld {
-    public static class DischargeExplosionBehavior extends ExplosionBehavior {
+    public static class DischargeExplosionBehavior extends ExplosionDamageCalculator {
         public static final DischargeExplosionBehavior INSTANCE = new DischargeExplosionBehavior();
 
         @Override
-        public boolean canDestroyBlock(Explosion explosion, BlockView world, BlockPos pos, BlockState state, float power) {
+        public boolean shouldBlockExplode(Explosion explosion, BlockGetter world, BlockPos pos, BlockState state, float power) {
             return false;
         }
     }

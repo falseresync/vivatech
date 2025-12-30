@@ -1,11 +1,11 @@
 package falseresync.lib.registry;
 
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Modifier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * <h2>USAGE EXAMPLE</h2>
@@ -60,7 +60,7 @@ public class AutoRegistry {
                     }
 
                     //noinspection unchecked
-                    Registry.register(registry, Identifier.of(modId, field.getName().toLowerCase()), (T) registryObject);
+                    Registry.register(registry, ResourceLocation.fromNamespaceAndPath(modId, field.getName().toLowerCase()), (T) registryObject);
                 } catch (IllegalAccessException e) {
                     throw new InaccessibleObjectException("[AutoRegistry / %s] Couldn't read a @RegistryObject field: %s at %s".formatted(modId, field.getName(), holderClass.getCanonicalName()));
                 } catch (ClassCastException e) {

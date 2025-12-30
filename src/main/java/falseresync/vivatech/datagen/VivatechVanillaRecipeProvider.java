@@ -3,28 +3,28 @@ package falseresync.vivatech.datagen;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.FocusPlating;
+import falseresync.vivatech.datagen.VivatechItemTagProvider;
 import falseresync.vivatech.datagen.recipe.CustomSmithingTransformRecipeJsonBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.advancement.criterion.TickCriterion;
-import net.minecraft.block.Block;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.advancements.critereon.PlayerTrigger;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import java.util.concurrent.CompletableFuture;
 
 public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
-    public VivatechVanillaRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+    public VivatechVanillaRecipeProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
 
@@ -34,21 +34,21 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    public void generate(RecipeExporter exporter) {
+    public void buildRecipes(RecipeOutput exporter) {
         generateCrafting(exporter);
         generateFocusPlating(exporter);
     }
 
-    private void generateCrafting(RecipeExporter exporter) {
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.MORTAR_AND_PESTLE)
-                .input('i', ConventionalItemTags.IRON_NUGGETS)
-                .input('f', Items.FLINT)
-                .input('s', Items.SMOOTH_STONE_SLAB)
+    private void generateCrafting(RecipeOutput exporter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, VivatechItems.MORTAR_AND_PESTLE)
+                .define('i', ConventionalItemTags.IRON_NUGGETS)
+                .define('f', Items.FLINT)
+                .define('s', Items.SMOOTH_STONE_SLAB)
                 .pattern("i")
                 .pattern("f")
                 .pattern("s")
-                .criterion("unlock_right_away", TickCriterion.Conditions.createTick())
-                .offerTo(exporter, item(VivatechItems.MORTAR_AND_PESTLE));
+                .unlockedBy("unlock_right_away", PlayerTrigger.TriggerInstance.tick())
+                .save(exporter, item(VivatechItems.MORTAR_AND_PESTLE));
 
 //        ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.GADGET)
 //                .input('w', VivatechItems.GADGET_CORE)
@@ -60,25 +60,25 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
 //                .criterion("has_diamond", conditionsFromTag(ConventionalItemTags.DIAMOND_GEMS))
 //                .criterion("has_amethyst", conditionsFromTag(ConventionalItemTags.AMETHYST_GEMS))
 //                .offerTo(exporter, item(VivatechItems.GADGET));
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.INSPECTOR_GOGGLES)
-                .input('g', ConventionalItemTags.GOLD_NUGGETS)
-                .input('h', Items.CHAINMAIL_HELMET)
-                .input('p', Items.PHANTOM_MEMBRANE)
-                .input('c', ConventionalItemTags.PRISMARINE_GEMS)
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, VivatechItems.INSPECTOR_GOGGLES)
+                .define('g', ConventionalItemTags.GOLD_NUGGETS)
+                .define('h', Items.CHAINMAIL_HELMET)
+                .define('p', Items.PHANTOM_MEMBRANE)
+                .define('c', ConventionalItemTags.PRISMARINE_GEMS)
                 .pattern("g g")
                 .pattern("php")
                 .pattern("c c")
-                .criterion("has_phantom_membrane", conditionsFromItem(Items.PHANTOM_MEMBRANE))
-                .criterion("has_prismarine", conditionsFromTag(ConventionalItemTags.PRISMARINE_GEMS))
-                .offerTo(exporter, item(VivatechItems.INSPECTOR_GOGGLES));
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, VivatechItems.FOCUSES_POUCH)
-                .input('l', ConventionalItemTags.LEATHERS)
-                .input('t', Items.TURTLE_HELMET)
+                .unlockedBy("has_phantom_membrane", has(Items.PHANTOM_MEMBRANE))
+                .unlockedBy("has_prismarine", has(ConventionalItemTags.PRISMARINE_GEMS))
+                .save(exporter, item(VivatechItems.INSPECTOR_GOGGLES));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, VivatechItems.FOCUSES_POUCH)
+                .define('l', ConventionalItemTags.LEATHERS)
+                .define('t', Items.TURTLE_HELMET)
                 .pattern("ltl")
                 .pattern("l l")
                 .pattern("lll")
-                .criterion("has_turtle_shell", conditionsFromItem(Items.TURTLE_HELMET))
-                .offerTo(exporter, item(VivatechItems.FOCUSES_POUCH));
+                .unlockedBy("has_turtle_shell", has(Items.TURTLE_HELMET))
+                .save(exporter, item(VivatechItems.FOCUSES_POUCH));
 
 //        ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, VivatechItems.WORKTABLE)
 //                .input('g', ConventionalItemTags.GOLD_INGOTS)
@@ -92,28 +92,28 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
 //                .offerTo(exporter, block(VivatechBlocks.DUMMY_WORKTABLE));
     }
 
-    private void generateFocusPlating(RecipeExporter exporter) {
-        generateFocusPlating(exporter, FocusPlating.IRON, Ingredient.fromTag(ConventionalItemTags.IRON_INGOTS));
-        generateFocusPlating(exporter, FocusPlating.GOLD, Ingredient.fromTag(ConventionalItemTags.GOLD_INGOTS));
-        generateFocusPlating(exporter, FocusPlating.COPPER, Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS));
+    private void generateFocusPlating(RecipeOutput exporter) {
+        generateFocusPlating(exporter, FocusPlating.IRON, Ingredient.of(ConventionalItemTags.IRON_INGOTS));
+        generateFocusPlating(exporter, FocusPlating.GOLD, Ingredient.of(ConventionalItemTags.GOLD_INGOTS));
+        generateFocusPlating(exporter, FocusPlating.COPPER, Ingredient.of(ConventionalItemTags.COPPER_INGOTS));
     }
 
-    private void generateFocusPlating(RecipeExporter exporter, FocusPlating plating, Ingredient ingredient) {
-        var platingComponents = ComponentChanges.builder().add(VivatechComponents.FOCUS_PLATING, plating.index).build();
+    private void generateFocusPlating(RecipeOutput exporter, FocusPlating plating, Ingredient ingredient) {
+        var platingComponents = DataComponentPatch.builder().set(VivatechComponents.FOCUS_PLATING, plating.index).build();
         for (var item : VivatechItemTagProvider.FOCUSES) {
             var stack = new ItemStack(item);
-            stack.applyChanges(platingComponents);
+            stack.applyComponentsAndValidate(platingComponents);
             stack.remove(VivatechComponents.UUID);
-            new CustomSmithingTransformRecipeJsonBuilder(Ingredient.EMPTY, Ingredient.ofItems(item), ingredient, stack)
+            new CustomSmithingTransformRecipeJsonBuilder(Ingredient.EMPTY, Ingredient.of(item), ingredient, stack)
                     .offerTo(exporter, plating);
         }
     }
 
-    private Identifier block(Block block) {
-        return Registries.BLOCK.getId(block);
+    private ResourceLocation block(Block block) {
+        return BuiltInRegistries.BLOCK.getKey(block);
     }
 
-    private Identifier item(Item item) {
-        return Registries.ITEM.getId(item);
+    private ResourceLocation item(Item item) {
+        return BuiltInRegistries.ITEM.getKey(item);
     }
 }

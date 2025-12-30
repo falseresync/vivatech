@@ -4,23 +4,23 @@ import falseresync.lib.registry.RegistryObject;
 import falseresync.vivatech.common.item.VivatechItems;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
-import net.minecraft.item.Item;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public record WireType(Item item, int voltage, int maxCurrent, int overcurrentToleranceTime) {
     public static final Registry<WireType> REGISTRY =
-            FabricRegistryBuilder.<WireType>createSimple(RegistryKey.ofRegistry(vtId("wire_types")))
+            FabricRegistryBuilder.<WireType>createSimple(ResourceKey.createRegistryKey(vtId("wire_types")))
                     .attribute(RegistryAttribute.MODDED)
                     .attribute(RegistryAttribute.SYNCED)
                     .buildAndRegister();
-    public static final PacketCodec<RegistryByteBuf, RegistryEntry<WireType>> PACKET_CODEC = PacketCodecs.registryEntry(REGISTRY.getKey());
+    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<WireType>> PACKET_CODEC = ByteBufCodecs.holderRegistry(REGISTRY.key());
 
     public static final @RegistryObject WireType V_230 = new WireType(VivatechItems.WIRE, 230, 32, 100);
 }

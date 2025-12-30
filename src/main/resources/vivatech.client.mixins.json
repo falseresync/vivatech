@@ -6,9 +6,9 @@
     "defaultRequire": 1
   },
   "client": [
-    "ClientPlayerInteractionManagerMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "HeldItemRendererMixin",
-    "PlayerEntityRendererMixin"
+    "MultiPlayerGameModeMixin",
+    "ClientPacketListenerMixin",
+    "ItemInHandRendererMixin",
+    "PlayerRendererMixin"
   ]
 }

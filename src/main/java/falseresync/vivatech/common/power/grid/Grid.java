@@ -3,18 +3,16 @@ package falseresync.vivatech.common.power.grid;
 import falseresync.vivatech.common.VivatechUtil;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.WorldPowerSystem;
+import falseresync.vivatech.common.power.grid.Appliance;
+import falseresync.vivatech.common.power.grid.GridAwareAppliance;
+import falseresync.vivatech.common.power.grid.GridEdge;
+import falseresync.vivatech.common.power.grid.GridSnapshot;
+import falseresync.vivatech.common.power.grid.GridVertex;
 import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.common.power.wire.WireType;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceObjectPair;
-import net.minecraft.block.AbstractFireBlock;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -26,34 +24,41 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.BaseFireBlock;
 
 public class Grid {
-    private final SimpleGraph<GridVertex, GridEdge> graph;
-    private final Map<BlockPos, Appliance> appliances;
+    private final SimpleGraph<falseresync.vivatech.common.power.grid.GridVertex, falseresync.vivatech.common.power.grid.GridEdge> graph;
+    private final Map<BlockPos, falseresync.vivatech.common.power.grid.Appliance> appliances;
     private final Map<ChunkPos, Set<BlockPos>> trackedChunks;
     private final WorldPowerSystem worldPowerSystem;
-    private final ServerWorld world;
+    private final ServerLevel world;
     private final WireType wireType;
     private int overcurrentTicks = 0;
     private float lastVoltage = 0;
     private float lastCurrent = 0;
     private boolean frozen = false;
 
-    public Grid(WorldPowerSystem worldPowerSystem, ServerWorld world, WireType wireType) {
+    public Grid(WorldPowerSystem worldPowerSystem, ServerLevel world, WireType wireType) {
         this.worldPowerSystem = worldPowerSystem;
         this.world = world;
         this.wireType = wireType;
-        graph = new SimpleGraph<>(GridEdge.class);
+        graph = new SimpleGraph<>(falseresync.vivatech.common.power.grid.GridEdge.class);
         appliances = new Object2ReferenceRBTreeMap<>();
         trackedChunks = PowerSystem.createChunkPosKeyedMap();
     }
 
-    public Grid(WorldPowerSystem worldPowerSystem, ServerWorld world, WireType wireType, Set<GridEdge> edges) {
+    public Grid(WorldPowerSystem worldPowerSystem, ServerLevel world, WireType wireType, Set<falseresync.vivatech.common.power.grid.GridEdge> edges) {
         this(worldPowerSystem, world, wireType);
         edges.forEach(this::connect);
     }
 
-    public GridSnapshot createSnapshot() {
+    public falseresync.vivatech.common.power.grid.GridSnapshot createSnapshot() {
         return new GridSnapshot(wireType, Set.copyOf(graph.edgeSet()));
     }
 
@@ -65,21 +70,21 @@ public class Grid {
         return graph.vertexSet().isEmpty();
     }
 
-    public boolean connect(GridEdge edge) {
+    public boolean connect(falseresync.vivatech.common.power.grid.GridEdge edge) {
         return connect(edge, false);
     }
 
-    public boolean connect(GridEdge edge, boolean noWire) {
+    public boolean connect(falseresync.vivatech.common.power.grid.GridEdge edge, boolean noWire) {
         var vertexU = PowerSystem.GRID_VERTEX.find(world, edge.u(), null);
         var vertexV = PowerSystem.GRID_VERTEX.find(world, edge.v(), null);
         return connect(vertexU, vertexV, () -> edge, noWire);
     }
 
-    public boolean connect(GridVertex vertexU, GridVertex vertexV) {
-        return connect(vertexU, vertexV, () -> new GridEdge(vertexU.pos(), vertexV.pos()), false);
+    public boolean connect(falseresync.vivatech.common.power.grid.GridVertex vertexU, falseresync.vivatech.common.power.grid.GridVertex vertexV) {
+        return connect(vertexU, vertexV, () -> new falseresync.vivatech.common.power.grid.GridEdge(vertexU.pos(), vertexV.pos()), false);
     }
 
-    public boolean connect(GridVertex vertexU, GridVertex vertexV, Supplier<GridEdge> edgeSupplier, boolean noWire) {
+    public boolean connect(falseresync.vivatech.common.power.grid.GridVertex vertexU, falseresync.vivatech.common.power.grid.GridVertex vertexV, Supplier<falseresync.vivatech.common.power.grid.GridEdge> edgeSupplier, boolean noWire) {
         if (frozen) {
             return false;
         }
@@ -96,7 +101,7 @@ public class Grid {
         return false;
     }
 
-    private void initOrMerge(GridVertex vertex) {
+    private void initOrMerge(falseresync.vivatech.common.power.grid.GridVertex vertex) {
         var otherGrid = worldPowerSystem.getGridLookup().get(vertex.pos());
         if (otherGrid == null) {
             graph.addVertex(vertex);
@@ -107,7 +112,7 @@ public class Grid {
         }
     }
 
-    private void merge(Graph<GridVertex, GridEdge> otherGraph) {
+    private void merge(Graph<falseresync.vivatech.common.power.grid.GridVertex, falseresync.vivatech.common.power.grid.GridEdge> otherGraph) {
         Graphs.addGraph(this.graph, otherGraph);
         for (var vertex : otherGraph.vertexSet()) {
             onVertexAdded(vertex, false);
@@ -125,7 +130,7 @@ public class Grid {
         if (!graph.removeVertex(vertex)) {
             return false;
         }
-        for (GridEdge edge : edges) {
+        for (falseresync.vivatech.common.power.grid.GridEdge edge : edges) {
             removeWire(edge, Wire.DropRule.FULL);
         }
 
@@ -135,8 +140,8 @@ public class Grid {
     }
 
     @Nullable
-    private GridVertex findVertex(BlockPos pos) {
-        for (GridVertex vertex : graph.vertexSet()) {
+    private falseresync.vivatech.common.power.grid.GridVertex findVertex(BlockPos pos) {
+        for (falseresync.vivatech.common.power.grid.GridVertex vertex : graph.vertexSet()) {
             if (vertex.pos().equals(pos)) {
                 return vertex;
             }
@@ -144,11 +149,11 @@ public class Grid {
         return null;
     }
 
-    public boolean disconnect(GridVertex vertexU, GridVertex vertexV) {
-        return disconnect(new GridEdge(vertexU.pos(), vertexV.pos()), Wire.DropRule.FULL);
+    public boolean disconnect(falseresync.vivatech.common.power.grid.GridVertex vertexU, falseresync.vivatech.common.power.grid.GridVertex vertexV) {
+        return disconnect(new falseresync.vivatech.common.power.grid.GridEdge(vertexU.pos(), vertexV.pos()), Wire.DropRule.FULL);
     }
 
-    public boolean disconnect(GridEdge edge, Wire.DropRule dropRule) {
+    public boolean disconnect(falseresync.vivatech.common.power.grid.GridEdge edge, Wire.DropRule dropRule) {
         if (!graph.removeEdge(edge)) {
             return false;
         }
@@ -176,7 +181,7 @@ public class Grid {
         worldPowerSystem.remove(this);
     }
 
-    private void onVertexAdded(GridVertex vertex, boolean shouldInitialize) {
+    private void onVertexAdded(falseresync.vivatech.common.power.grid.GridVertex vertex, boolean shouldInitialize) {
         worldPowerSystem.getGridLookup().put(vertex.pos(), this);
         if (vertex.appliance() != null) {
             if (!appliances.containsValue(vertex.appliance())) {
@@ -185,7 +190,7 @@ public class Grid {
         }
     }
 
-    private void addAppliance(Appliance appliance, boolean shouldInitialize) {
+    private void addAppliance(falseresync.vivatech.common.power.grid.Appliance appliance, boolean shouldInitialize) {
         var pos = appliance.getAppliancePos();
         if (appliances.get(pos) == appliance) {
             throw new IllegalStateException("Cannot cache the same appliance twice");
@@ -198,7 +203,7 @@ public class Grid {
         }
     }
 
-    private void onVertexRemoved(GridVertex vertex, boolean removeGridIfEmpty) {
+    private void onVertexRemoved(falseresync.vivatech.common.power.grid.GridVertex vertex, boolean removeGridIfEmpty) {
         onVertexRemoved(vertex.pos(), vertex.appliance() != null ? vertex.appliance().getAppliancePos() : null, removeGridIfEmpty);
     }
 
@@ -209,7 +214,7 @@ public class Grid {
             removeAppliance(appliancePos);
         } else {
             for (var direction : Direction.values()) {
-                if (removeAppliance(pos.offset(direction))) {
+                if (removeAppliance(pos.relative(direction))) {
                     break;
                 }
             }
@@ -244,7 +249,7 @@ public class Grid {
         return false;
     }
 
-    private void removeWire(GridEdge edge, Wire.DropRule dropRule) {
+    private void removeWire(falseresync.vivatech.common.power.grid.GridEdge edge, Wire.DropRule dropRule) {
         var serverWire = edge.asWire(wireType, 0);
         worldPowerSystem.removeWire(serverWire);
         serverWire.drop(world, wireType, dropRule);
@@ -253,7 +258,7 @@ public class Grid {
     private void pollChunks() {
         var becameFrozen = false;
         for (ChunkPos chunkPos : trackedChunks.keySet()) {
-            if (!world.shouldTickBlocksInChunk(chunkPos.toLong())) {
+            if (!world.shouldTickBlocksAt(chunkPos.toLong())) {
                 becameFrozen = true;
                 break;
             }
@@ -261,7 +266,7 @@ public class Grid {
 
         if (becameFrozen) {
             if (!frozen) {
-                for (Appliance appliance : appliances.values()) {
+                for (falseresync.vivatech.common.power.grid.Appliance appliance : appliances.values()) {
                     appliance.onGridFrozen();
                 }
             }
@@ -272,7 +277,7 @@ public class Grid {
         if (frozen) {
             frozen = false;
             refreshApplianceReferences();
-            for (Appliance appliance : appliances.values()) {
+            for (falseresync.vivatech.common.power.grid.Appliance appliance : appliances.values()) {
                 appliance.onGridUnfrozen();
             }
         }
@@ -280,8 +285,8 @@ public class Grid {
 
     private void refreshApplianceReferences() {
         // Because CME
-        var appliancesToUpdate = new ObjectOpenHashSet<ReferenceObjectPair<Appliance, GridVertex>>();
-        for (GridVertex oldVertex : graph.vertexSet()) {
+        var appliancesToUpdate = new ObjectOpenHashSet<ReferenceObjectPair<Appliance, falseresync.vivatech.common.power.grid.GridVertex>>();
+        for (falseresync.vivatech.common.power.grid.GridVertex oldVertex : graph.vertexSet()) {
             if (oldVertex.appliance() != null) {
                 var appliance = PowerSystem.APPLIANCE.find(world, oldVertex.appliance().getAppliancePos(), oldVertex.direction());
                 if (oldVertex.appliance() != appliance) {
@@ -319,7 +324,7 @@ public class Grid {
             var balance = generation / consumption;
             voltage = wireType.voltage();
             if (balance < 1) {
-                voltage *= MathHelper.sqrt(balance);
+                voltage *= Mth.sqrt(balance);
             } else {
                 voltage *= 0.5f + balance / 2f;
             }
@@ -368,7 +373,7 @@ public class Grid {
 
     private void burn(GridEdge edge) {
         disconnect(edge, Wire.DropRule.PARTIAL);
-        if (world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
+        if (world.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
             spreadFire(edge.u());
             spreadFire(edge.v());
         }
@@ -376,16 +381,16 @@ public class Grid {
 
     private void spreadFire(BlockPos pos) {
         int ignitedBlocks = 0;
-        int blocksToIgnite = world.getRandom().nextBetween(1, 4);
+        int blocksToIgnite = world.getRandom().nextIntBetweenInclusive(1, 4);
         for (int j = 0; j < 10 && ignitedBlocks < blocksToIgnite; j++) {
-            var nearbyPos = pos.add(world.getRandom().nextBetween(-2, 2), world.getRandom().nextBetween(-2, 2), world.getRandom().nextBetween(-2, 2));
-            if (!world.canSetBlock(nearbyPos)) {
+            var nearbyPos = pos.offset(world.getRandom().nextIntBetweenInclusive(-2, 2), world.getRandom().nextIntBetweenInclusive(-2, 2), world.getRandom().nextIntBetweenInclusive(-2, 2));
+            if (!world.isLoaded(nearbyPos)) {
                 continue;
             }
 
-            if (world.isAir(nearbyPos)) {
+            if (world.isEmptyBlock(nearbyPos)) {
                 ignitedBlocks += 1;
-                world.setBlockState(nearbyPos, AbstractFireBlock.getState(world, nearbyPos));
+                world.setBlockAndUpdate(nearbyPos, BaseFireBlock.getState(world, nearbyPos));
             }
         }
     }

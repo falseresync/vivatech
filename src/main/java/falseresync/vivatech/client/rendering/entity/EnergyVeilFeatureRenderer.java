@@ -4,95 +4,96 @@ import falseresync.lib.math.VectorMath;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.data.VivatechAttachments;
 import falseresync.vivatech.common.entity.EnergyVeilEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public class EnergyVeilFeatureRenderer<T extends PlayerEntity> extends FeatureRenderer<T, PlayerEntityModel<T>> {
-    public static final Identifier TEXTURE = vtId("textures/entity/energy_veil.png");
-    public static final EntityModelLayer LAYER = new EntityModelLayer(vtId("energy_veil"), "main");
-    private final EnergyVeilModel model;
-    private final RenderLayer renderLayer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
-    public EnergyVeilFeatureRenderer(FeatureRendererContext<T, PlayerEntityModel<T>> context, EntityModelLoader loader) {
+public class EnergyVeilFeatureRenderer<T extends Player> extends RenderLayer<T, PlayerModel<T>> {
+    public static final ResourceLocation TEXTURE = vtId("textures/entity/energy_veil.png");
+    public static final ModelLayerLocation LAYER = new ModelLayerLocation(vtId("energy_veil"), "main");
+    private final falseresync.vivatech.client.rendering.entity.EnergyVeilModel model;
+    private final RenderType renderLayer;
+
+    public EnergyVeilFeatureRenderer(RenderLayerParent<T, PlayerModel<T>> context, EntityModelSet loader) {
         super(context);
-        model = new EnergyVeilModel(loader.getModelPart(LAYER));
-        renderLayer = RenderLayer.getEntityTranslucentEmissive(TEXTURE);
+        model = new EnergyVeilModel(loader.bakeLayer(LAYER));
+        renderLayer = RenderType.entityTranslucentEmissive(TEXTURE);
     }
 
     @Override
-    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+    public void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, T entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         var veil = findVeil(entity);
         if (veil == null) return;
 
-        matrices.push();
+        matrices.pushPose();
         var buffer = vertexConsumers.getBuffer(renderLayer);
-        model.animateModel(veil, limbAngle, limbDistance, tickDelta);
+        model.prepareMobModel(veil, limbAngle, limbDistance, tickDelta);
 
         for (int i = 0; i < 4; i++) {
-            matrices.push();
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(i * 45));
+            matrices.pushPose();
+            matrices.mulPose(Axis.YP.rotationDegrees(i * 45));
             matrices.translate(-veil.getVisibleRadius(), -1, 0);
-            model.render(matrices, buffer, light, OverlayTexture.DEFAULT_UV);
+            model.renderToBuffer(matrices, buffer, light, OverlayTexture.NO_OVERLAY);
             matrices.translate(veil.getVisibleRadius() * 2, 0, 0);
-            model.render(matrices, buffer, light, OverlayTexture.DEFAULT_UV);
-            matrices.pop();
+            model.renderToBuffer(matrices, buffer, light, OverlayTexture.NO_OVERLAY);
+            matrices.popPose();
         }
-        matrices.pop();
+        matrices.popPose();
     }
 
-    public void renderInFirstPerson(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float tickDelta, float animationProgress) {
+    public void renderInFirstPerson(PoseStack matrices, MultiBufferSource vertexConsumers, int light, T entity, float tickDelta, float animationProgress) {
         var veil = findVeil(entity);
         if (veil == null) return;
 
-        matrices.push();
-        matrices.loadIdentity();
+        matrices.pushPose();
+        matrices.setIdentity();
 
         var buffer = vertexConsumers.getBuffer(renderLayer);
-        model.animateModel(veil, 0, 0, tickDelta);
+        model.prepareMobModel(veil, 0, 0, tickDelta);
 
-        var rotation = MinecraftClient.getInstance().gameRenderer.getCamera().getRotation();
-        var direction = Direction.UP.getUnitVector();
+        var rotation = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
+        var direction = Direction.UP.step();
         var swingAndTwist = VectorMath.swingTwistDecomposition(rotation, direction);
-        matrices.multiply(swingAndTwist.getRight());
+        matrices.mulPose(swingAndTwist.getRight());
 
         for (int i = 0; i < 3; i++) {
-            matrices.push();
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45 + i * 45));
+            matrices.pushPose();
+            matrices.mulPose(Axis.YP.rotationDegrees(45 + i * 45));
             matrices.translate(veil.getVisibleRadius(), -1, 0);
-            model.render(matrices, buffer, light, OverlayTexture.DEFAULT_UV, ((int) (0x44 / Vivatech.getConfig().fullscreenEffectsTransparency.modifier)) << 24 | 0x00_FF_FF_FF);
-            matrices.pop();
+            model.renderToBuffer(matrices, buffer, light, OverlayTexture.NO_OVERLAY, ((int) (0x44 / Vivatech.getConfig().fullscreenEffectsTransparency.modifier)) << 24 | 0x00_FF_FF_FF);
+            matrices.popPose();
         }
 
-        matrices.pop();
+        matrices.popPose();
     }
 
     @Nullable
     private EnergyVeilEntity findVeil(T entity) {
         return Optional.ofNullable(entity.getAttached(VivatechAttachments.ENERGY_VEIL_NETWORK_ID))
-                .map(id -> entity.getEntityWorld().getEntityById(id))
+                .map(id -> entity.getCommandSenderWorld().getEntity(id))
                 .flatMap(foundEntity -> foundEntity instanceof EnergyVeilEntity veil ? Optional.of(veil) : Optional.empty())
                 .orElse(null);
     }
 
     public interface Accessor {
-        EnergyVeilFeatureRenderer<AbstractClientPlayerEntity> vivatech$getEnergyVeilRenderer();
+        EnergyVeilFeatureRenderer<AbstractClientPlayer> vivatech$getEnergyVeilRenderer();
     }
 }

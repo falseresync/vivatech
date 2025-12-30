@@ -1,10 +1,10 @@
 package falseresync.vivatech.common.power.grid;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 public record GridVertex(BlockPos pos, Direction direction, @Nullable Appliance appliance) implements Comparable<GridVertex> {
     @Override

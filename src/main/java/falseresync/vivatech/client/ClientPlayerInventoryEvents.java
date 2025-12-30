@@ -1,7 +1,8 @@
 package falseresync.vivatech.client;
 
-import net.fabricmc.fabric.api.event.*;
-import net.minecraft.entity.player.*;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ClientPlayerInventoryEvents {
     public static final Event<ContentsChanged> CONTENTS_CHANGED = EventFactory.createArrayBacked(
@@ -25,11 +26,11 @@ public class ClientPlayerInventoryEvents {
 
     @FunctionalInterface
     public interface ContentsChanged {
-        void onChanged(PlayerInventory inventory);
+        void onChanged(Inventory inventory);
     }
 
     @FunctionalInterface
     public interface SelectedSlotChanged {
-        void onChanged(PlayerInventory inventory, int lastSelectedSlot);
+        void onChanged(Inventory inventory, int lastSelectedSlot);
     }
 }

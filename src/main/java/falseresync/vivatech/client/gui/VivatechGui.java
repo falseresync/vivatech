@@ -1,5 +1,6 @@
 package falseresync.vivatech.client.gui;
 
+import falseresync.vivatech.client.gui.InventoryComponentTooltip;
 import falseresync.vivatech.common.data.InventoryComponent;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 

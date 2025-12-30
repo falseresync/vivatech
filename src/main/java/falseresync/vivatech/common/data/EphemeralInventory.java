@@ -1,19 +1,21 @@
 package falseresync.vivatech.common.data;
 
-import net.minecraft.inventory.InventoryChangedListener;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
+import falseresync.vivatech.common.data.InventoryComponent;
+import falseresync.vivatech.common.data.VivatechComponents;
+import net.minecraft.world.ContainerListener;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
 
-public class EphemeralInventory extends SimpleInventory {
-    private final InventoryComponent backingComponent;
+public class EphemeralInventory extends SimpleContainer {
+    private final falseresync.vivatech.common.data.InventoryComponent backingComponent;
 
-    public EphemeralInventory(InventoryComponent backingComponent) {
+    public EphemeralInventory(falseresync.vivatech.common.data.InventoryComponent backingComponent) {
         super(backingComponent.stacks().toArray(new ItemStack[backingComponent.size()]));
         this.backingComponent = backingComponent;
     }
 
-    public InventoryComponent toImmutable() {
-        return new InventoryComponent(heldStacks, backingComponent.size());
+    public falseresync.vivatech.common.data.InventoryComponent toImmutable() {
+        return new InventoryComponent(items, backingComponent.size());
     }
 
     public void flush(ItemStack stack) {
@@ -21,7 +23,7 @@ public class EphemeralInventory extends SimpleInventory {
     }
 
     @Override
-    public void addListener(InventoryChangedListener listener) {
+    public void addListener(ContainerListener listener) {
         throw new UnsupportedOperationException();
     }
 }

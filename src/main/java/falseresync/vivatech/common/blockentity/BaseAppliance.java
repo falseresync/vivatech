@@ -2,10 +2,10 @@ package falseresync.vivatech.common.blockentity;
 
 import com.google.common.base.Preconditions;
 import falseresync.vivatech.common.power.grid.Appliance;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class BaseAppliance extends BlockEntity implements Appliance {
     private float minAcceptableVoltage = 210;
@@ -20,7 +20,7 @@ public abstract class BaseAppliance extends BlockEntity implements Appliance {
 
     @Override
     public BlockPos getAppliancePos() {
-        return getPos();
+        return getBlockPos();
     }
 
     @Override

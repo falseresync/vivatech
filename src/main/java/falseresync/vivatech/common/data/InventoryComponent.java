@@ -3,24 +3,24 @@ package falseresync.vivatech.common.data;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipData;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.util.collection.DefaultedList;
-
 import java.util.List;
 
-public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) implements TooltipData {
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.ItemStack;
+
+public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) implements TooltipComponent {
     public static final Codec<InventoryComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Slot.CODEC.listOf().xmap(InventoryComponent::fromSlots, InventoryComponent::toSlots)
                     .fieldOf("slots").forGetter(InventoryComponent::stacks),
             Codec.INT.fieldOf("size").forGetter(InventoryComponent::size)
     ).apply(instance, InventoryComponent::createRespectingSize));
-    public static final PacketCodec<RegistryByteBuf, InventoryComponent> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.OPTIONAL_LIST_PACKET_CODEC, InventoryComponent::stacks,
-            PacketCodecs.INTEGER, InventoryComponent::size,
+    public static final StreamCodec<RegistryFriendlyByteBuf, InventoryComponent> PACKET_CODEC = StreamCodec.composite(
+            ItemStack.OPTIONAL_LIST_STREAM_CODEC, InventoryComponent::stacks,
+            ByteBufCodecs.INT, InventoryComponent::size,
             InventoryComponent::new
     );
 
@@ -43,11 +43,11 @@ public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) impl
     }
 
     public static InventoryComponent createDefault(int size) {
-        return new InventoryComponent(DefaultedList.ofSize(size, ItemStack.EMPTY), size);
+        return new InventoryComponent(NonNullList.withSize(size, ItemStack.EMPTY), size);
     }
 
     public static List<ItemStack> fromSlots(List<Slot> slots) {
-        var stacks = DefaultedList.ofSize(slots.stream().mapToInt(Slot::index).max().orElseThrow() + 1, ItemStack.EMPTY);
+        var stacks = NonNullList.withSize(slots.stream().mapToInt(Slot::index).max().orElseThrow() + 1, ItemStack.EMPTY);
         for (Slot slot : slots) {
             stacks.set(slot.index, slot.stack);
         }
@@ -67,7 +67,7 @@ public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) impl
 
     public int getSlotWithStack(ItemStack stack) {
         for (int i = 0; i < size(); i++) {
-            if (!stacks.get(i).isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, stacks.get(i))) {
+            if (!stacks.get(i).isEmpty() && ItemStack.isSameItemSameComponents(stack, stacks.get(i))) {
                 return i;
             }
         }
@@ -75,7 +75,7 @@ public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) impl
         return -1;
     }
 
-    public EphemeralInventory toModifiable() {
+    public falseresync.vivatech.common.data.EphemeralInventory toModifiable() {
         return new EphemeralInventory(this);
     }
 
@@ -88,7 +88,7 @@ public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) impl
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj instanceof InventoryComponent that) {
-            return this.stacks.size() == that.stacks.size() && ItemStack.stacksEqual(this.stacks, that.stacks);
+            return this.stacks.size() == that.stacks.size() && ItemStack.listMatches(this.stacks, that.stacks);
         } else {
             return false;
         }
@@ -96,7 +96,7 @@ public record InventoryComponent(ImmutableList<ItemStack> stacks, int size) impl
 
     @Override
     public int hashCode() {
-        return ItemStack.listHashCode(stacks);
+        return ItemStack.hashStackList(stacks);
     }
 
     public record Slot(int index, ItemStack stack) {

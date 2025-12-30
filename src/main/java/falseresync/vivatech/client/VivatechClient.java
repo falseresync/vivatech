@@ -1,6 +1,9 @@
 package falseresync.vivatech.client;
 
 import falseresync.lib.logging.BetterLogger;
+import falseresync.vivatech.client.ClientPlayerInventoryEvents;
+import falseresync.vivatech.client.ToolManager;
+import falseresync.vivatech.client.VivatechKeybindings;
 import falseresync.vivatech.client.gui.VivatechGui;
 import falseresync.vivatech.client.hud.VivatechHud;
 import falseresync.vivatech.client.particle.VivatechParticleFactories;
@@ -22,7 +25,7 @@ public class VivatechClient implements ClientModInitializer {
     public static final BetterLogger LOGGER = new BetterLogger(LoggerFactory.getLogger(Vivatech.MOD_ID), "Vivatech / Client");
     private static ClientWireManager clientWireManager;
     private static VivatechHud hud;
-    private static ToolManager toolManager;
+    private static falseresync.vivatech.client.ToolManager toolManager;
 
     @Override
     public void onInitializeClient() {
@@ -42,7 +45,7 @@ public class VivatechClient implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             clientWireManager = new ClientWireManager(client);
             hud = new VivatechHud(client);
-            toolManager = new ToolManager();
+            toolManager = new falseresync.vivatech.client.ToolManager();
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

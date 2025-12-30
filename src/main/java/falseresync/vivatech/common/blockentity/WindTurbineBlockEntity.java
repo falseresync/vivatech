@@ -1,9 +1,11 @@
 package falseresync.vivatech.common.blockentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import falseresync.vivatech.common.blockentity.Ticking;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WindTurbineBlockEntity extends BlockEntity implements Ticking {
     private static final float rotationSpeed = 0.5f / 360;
@@ -24,6 +26,6 @@ public class WindTurbineBlockEntity extends BlockEntity implements Ticking {
     }
 
     public float getRotationProgress(float tickDelta) {
-        return MathHelper.lerp(tickDelta, lastRotationProgress, rotationProgress);
+        return Mth.lerp(tickDelta, lastRotationProgress, rotationProgress);
     }
 }

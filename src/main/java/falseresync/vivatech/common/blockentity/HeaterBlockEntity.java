@@ -1,18 +1,20 @@
 package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.VivatechUtil;
+import falseresync.vivatech.common.blockentity.BaseAppliance;
+import falseresync.vivatech.common.blockentity.Ticking;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceArrayMap;
-import net.minecraft.block.AbstractFurnaceBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -32,22 +34,22 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking {
 
     @Override
     public void tick() {
-        if (world.isClient) {
+        if (level.isClientSide) {
             return;
         }
 
         if (scanningCooldown == 0) {
             var sizeBefore = cachedFurnaces.size();
             for (var direction : VivatechUtil.HORIZONTAL_DIRECTIONS) {
-                var posToScan = pos.offset(direction);
-                if (world.getBlockEntity(posToScan) instanceof AbstractFurnaceBlockEntity furnace) {
+                var posToScan = worldPosition.relative(direction);
+                if (level.getBlockEntity(posToScan) instanceof AbstractFurnaceBlockEntity furnace) {
                     cachedFurnaces.put(direction, furnace);
                 } else {
                     cachedFurnaces.remove(direction);
                 }
             }
             if (sizeBefore != cachedFurnaces.size()) {
-                markDirty();
+                setChanged();
             }
             scanningCooldown = 20;
         } else {
@@ -69,19 +71,19 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking {
         }
 
         for (AbstractFurnaceBlockEntity furnace : cachedFurnaces.values()) {
-            if (furnace.getStack(1).isEmpty()) {
+            if (furnace.getItem(1).isEmpty()) {
                 var changed = false;
-                if (furnace.burnTime == 0) {
-                    furnace.fuelTime = 100;
-                    world.setBlockState(furnace.getPos(), furnace.getCachedState().with(AbstractFurnaceBlock.LIT, true), Block.NOTIFY_ALL);
+                if (furnace.litTime == 0) {
+                    furnace.litDuration = 100;
+                    level.setBlock(furnace.getBlockPos(), furnace.getBlockState().setValue(AbstractFurnaceBlock.LIT, true), Block.UPDATE_ALL);
                     changed = true;
                 }
-                if (furnace.burnTime < 100) {
-                    furnace.burnTime += 2;
+                if (furnace.litTime < 100) {
+                    furnace.litTime += 2;
                     changed = true;
                 }
                 if (changed) {
-                    furnace.markDirty();
+                    furnace.setChanged();
                 }
             }
         }
@@ -97,8 +99,8 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking {
         for (var entry : cachedFurnaces.entrySet()) {
             var direction = entry.getKey();
             var furnace = entry.getValue();
-            if (furnace.getStack(1).isEmpty()) {
-                cachedBurnTimes.put(direction, furnace.burnTime);
+            if (furnace.getItem(1).isEmpty()) {
+                cachedBurnTimes.put(direction, furnace.litTime);
             }
         }
     }
@@ -109,8 +111,8 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking {
         for (var entry : cachedFurnaces.entrySet()) {
             var direction = entry.getKey();
             var furnace = entry.getValue();
-            if (furnace.getStack(1).isEmpty()) {
-                furnace.burnTime = cachedBurnTimes.removeInt(direction);
+            if (furnace.getItem(1).isEmpty()) {
+                furnace.litTime = cachedBurnTimes.removeInt(direction);
             }
         }
         cachedBurnTimes.clear();
@@ -122,31 +124,31 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
 
-        var list = new NbtList();
+        var list = new ListTag();
         cachedBurnTimes.object2IntEntrySet().stream()
-                .sorted(Comparator.comparingInt(entry -> entry.getKey().getHorizontal()))
-                .forEachOrdered(entry -> list.add(NbtInt.of(entry.getIntValue())));
+                .sorted(Comparator.comparingInt(entry -> entry.getKey().get2DDataValue()))
+                .forEachOrdered(entry -> list.add(IntTag.valueOf(entry.getIntValue())));
         nbt.put("cached_burn_times", list);
 
         nbt.putInt("heat_inertia_ticks", heatInertiaTicks);
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
 
         cachedBurnTimes.clear();
         if (nbt.contains("cached_burn_times")) {
-            var list = nbt.getList("cached_burn_times", NbtElement.INT_TYPE);
+            var list = nbt.getList("cached_burn_times", Tag.TAG_INT);
             for (int i = 0; i < list.size(); i++) {
-                cachedBurnTimes.put(Direction.fromHorizontal(i), list.getInt(i));
+                cachedBurnTimes.put(Direction.from2DDataValue(i), list.getInt(i));
             }
         }
 
-        if (nbt.contains("heat_inertia_ticks", NbtElement.INT_TYPE)) {
+        if (nbt.contains("heat_inertia_ticks", Tag.TAG_INT)) {
             heatInertiaTicks = nbt.getInt("heat_inertia_ticks");
         }
     }

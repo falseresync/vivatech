@@ -3,19 +3,18 @@ package falseresync.vivatech.common.item.focus;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.VivatechUtil;
 import falseresync.vivatech.common.entity.VivatechEntityTags;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.random.Random;
-
 import java.util.Collection;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 
 public class TransmutationFocusBehavior {
-    private static final Random OFFSETS_RANDOM = Random.createLocal();
+    private static final RandomSource OFFSETS_RANDOM = RandomSource.createNewThreadLocalInstance();
     private static final NavigableMap<Double, EntityHitBehavior> ACTIONS_ON_ENTITY_HIT = new TreeMap<>();
     private static double TOTAL_WEIGHT = 0;
 
@@ -23,32 +22,32 @@ public class TransmutationFocusBehavior {
         registerEntityHitBehavior(
                 Vivatech.getConfig().transmutation.agingWeight,
                 (world, target, random) -> {
-                    if (target.getType().isIn(VivatechEntityTags.TRANSMUTATION_AGEABLE)
-                            && target instanceof MobEntity mob) {
+                    if (target.getType().is(VivatechEntityTags.TRANSMUTATION_AGEABLE)
+                            && target instanceof Mob mob) {
                         mob.setBaby(!mob.isBaby());
-                        return ActionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
-                    return ActionResult.FAIL;
+                    return InteractionResult.FAIL;
                 }
         );
         registerEntityHitBehavior(
                 Vivatech.getConfig().transmutation.transformationWeight,
                 (world, target, random) -> {
-                    if (!target.getType().isIn(VivatechEntityTags.TRANSMUTATION_TRANSFORMABLE)) {
-                        return ActionResult.FAIL;
+                    if (!target.getType().is(VivatechEntityTags.TRANSMUTATION_TRANSFORMABLE)) {
+                        return InteractionResult.FAIL;
                     }
                     var entry = VivatechUtil.nextRandomEntry(world, VivatechEntityTags.TRANSMUTATION_RESULT, random);
                     if (entry.isEmpty()) {
-                        return ActionResult.FAIL;
+                        return InteractionResult.FAIL;
                     }
-                    entry.get().spawn(world, target.getBlockPos(), SpawnReason.CONVERSION);
+                    entry.get().spawn(world, target.blockPosition(), MobSpawnType.CONVERSION);
                     target.discard();
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
         );
         registerEntityHitBehavior(
                 Vivatech.getConfig().transmutation.doNothingWeight,
-                (world, target, random) -> ActionResult.PASS
+                (world, target, random) -> InteractionResult.PASS
         );
     }
 
@@ -62,13 +61,13 @@ public class TransmutationFocusBehavior {
         TOTAL_WEIGHT += weight + offset;
     }
 
-    public static Collection<EntityHitBehavior> viewWeightedRandomEntityHitBehaviors(Random random) {
+    public static Collection<EntityHitBehavior> viewWeightedRandomEntityHitBehaviors(RandomSource random) {
         double value = random.nextDouble() * TOTAL_WEIGHT;
         return ACTIONS_ON_ENTITY_HIT.tailMap(value, false).values();
     }
 
     @FunctionalInterface
     public interface EntityHitBehavior {
-        ActionResult onHit(ServerWorld world, LivingEntity target, Random random);
+        InteractionResult onHit(ServerLevel world, LivingEntity target, RandomSource random);
     }
 }

@@ -1,114 +1,118 @@
 package falseresync.vivatech.common.block;
 
 import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.block.RestrictsWirePostPlacement;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.power.grid.GridEdge;
 import falseresync.vivatech.common.power.wire.Wire;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ContactorBlock extends Block implements RestrictsWirePostPlacement {
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty POWERED = Properties.POWERED;
-    public static final BooleanProperty NORMALLY_OPEN = BooleanProperty.of("normally_open");
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty NORMALLY_OPEN = BooleanProperty.create("normally_open");
 
-    protected ContactorBlock(Settings settings) {
+    protected ContactorBlock(Properties settings) {
         super(settings);
-        setDefaultState(stateManager.getDefaultState()
-                .with(FACING, Direction.NORTH)
-                .with(POWERED, false)
-                .with(NORMALLY_OPEN, true));
+        registerDefaultState(stateDefinition.any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(POWERED, false)
+                .setValue(NORMALLY_OPEN, true));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, POWERED, NORMALLY_OPEN);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FACING)));
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (stack.isOf(VivatechItems.SCREWDRIVER)) {
-            if (!world.isClient) {
-                world.setBlockState(pos, state.cycle(NORMALLY_OPEN), Block.NOTIFY_LISTENERS);
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (stack.is(VivatechItems.SCREWDRIVER)) {
+            if (!world.isClientSide) {
+                world.setBlock(pos, state.cycle(NORMALLY_OPEN), Block.UPDATE_CLIENTS);
             }
 
-            return ItemActionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
 
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        if (!world.isClient) {
-            var powered = state.get(POWERED);
-            if (powered != world.isReceivingRedstonePower(pos)) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        if (!world.isClientSide) {
+            var powered = state.getValue(POWERED);
+            if (powered != world.hasNeighborSignal(pos)) {
                 if (powered) {
-                    world.scheduleBlockTick(pos, this, 4);
+                    world.scheduleTick(pos, this, 4);
                 } else {
-                    world.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+                    world.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
                 }
             }
         }
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
     }
 
     @Override
-    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.isOf(newState.getBlock())) {
+    protected void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.is(newState.getBlock())) {
             manageGridConnection(state, world, pos);
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
+        super.onRemove(state, world, pos, newState, moved);
     }
 
-    private static void manageGridConnection(BlockState state, World world, BlockPos pos) {
-        var facing = state.get(FACING);
-        var gridsLookup = Vivatech.getPowerSystem().in(world.getRegistryKey()).getGridLookup();
+    private static void manageGridConnection(BlockState state, Level world, BlockPos pos) {
+        var facing = state.getValue(FACING);
+        var gridsLookup = Vivatech.getPowerSystem().in(world.dimension()).getGridLookup();
 
-        var posU = pos.offset(facing.rotateYClockwise());
+        var posU = pos.relative(facing.getClockWise());
         var gridU = gridsLookup.get(posU);
         if (gridU == null) {
             return;
         }
 
-        var posV = pos.offset(facing.rotateYCounterclockwise());
+        var posV = pos.relative(facing.getCounterClockWise());
         var gridV = gridsLookup.get(posV);
         if (gridV == null) {
             return;
         }
 
-        var powered = state.get(POWERED);
-        if (!state.get(NORMALLY_OPEN)) { // I have no idea why this needs to be inverted... I am probably just dumb
+        var powered = state.getValue(POWERED);
+        if (!state.getValue(NORMALLY_OPEN)) { // I have no idea why this needs to be inverted... I am probably just dumb
             if (powered && gridU != gridV) {
                 gridU.connect(new GridEdge(posU, posV), true);
             } else if (!powered && gridU == gridV) {
@@ -124,15 +128,15 @@ public class ContactorBlock extends Block implements RestrictsWirePostPlacement 
     }
 
     @Override
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (state.get(POWERED) && !world.isReceivingRedstonePower(pos)) {
-            world.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+    protected void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        if (state.getValue(POWERED) && !world.hasNeighborSignal(pos)) {
+            world.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
         }
     }
 
     @Override
-    public boolean allowsWirePostsAt(BlockView world, BlockPos pos, Direction direction) {
-        var facing = world.getBlockState(pos).get(FACING);
-        return facing.rotateYClockwise() == direction || facing.rotateYCounterclockwise() == direction;
+    public boolean allowsWirePostsAt(BlockGetter world, BlockPos pos, Direction direction) {
+        var facing = world.getBlockState(pos).getValue(FACING);
+        return facing.getClockWise() == direction || facing.getCounterClockWise() == direction;
     }
 }

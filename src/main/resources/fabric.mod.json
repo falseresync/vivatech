@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "falseresync.vivatech.common.Vivatech"
+            "falseresync.vivatech.common.Vivatech"
 		],
 		"client": [
 			"falseresync.vivatech.client.VivatechClient"
@@ -28,7 +28,7 @@
 			"falseresync.vivatech.compat.modmenu.VivatechModMenuCompat"
 		]
 	},
-	"accessWidener" : "vivatech.accesswidener",
+	"accessWidener" : "vivatech.classtweaker",
 	"mixins": [
 		"vivatech.common.mixins.json",
 		"vivatech.client.mixins.json"

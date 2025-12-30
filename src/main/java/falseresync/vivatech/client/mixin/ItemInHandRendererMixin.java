@@ -1,14 +1,14 @@
 package falseresync.vivatech.client.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import falseresync.vivatech.client.rendering.entity.EnergyVeilFeatureRenderer;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,15 +16,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(HeldItemRenderer.class)
-public class HeldItemRendererMixin {
+@Mixin(ItemInHandRenderer.class)
+public class ItemInHandRendererMixin {
     private @Shadow
     @Final EntityRenderDispatcher entityRenderDispatcher;
 
-    @Inject(method = "renderFirstPersonItem", at = @At("TAIL"))
-    public void vivatech$renderFirstPersonItem$energyVeil(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        var renderer = (PlayerEntityRenderer) entityRenderDispatcher.getRenderer(player);
-        var animationProgress = renderer.getAnimationProgress(player, tickDelta);
+    @Inject(method = "renderArmWithItem", at = @At("TAIL"))
+    public void vivatech$renderArmWithItem$energyVeil(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack item, float equipProgress, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
+        var renderer = (PlayerRenderer) entityRenderDispatcher.getRenderer(player);
+        var animationProgress = renderer.getBob(player, tickDelta);
         ((EnergyVeilFeatureRenderer.Accessor) renderer)
                 .vivatech$getEnergyVeilRenderer()
                 .renderInFirstPerson(matrices, vertexConsumers, light, player, tickDelta, animationProgress);

@@ -8,82 +8,87 @@ import falseresync.vivatech.common.item.focus.FocusItem;
 import falseresync.vivatech.common.item.focus.FocusPlating;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.data.client.*;
-import net.minecraft.util.Identifier;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.data.models.ItemModelGenerators;
+import net.minecraft.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.data.models.blockstates.Variant;
+import net.minecraft.data.models.blockstates.VariantProperties;
+import net.minecraft.data.models.model.*;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 import java.util.Optional;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
-import static net.minecraft.data.client.TexturedModel.makeFactory;
+import static net.minecraft.data.models.model.TexturedModel.createDefault;
 
 public class VivatechModelProvider extends FabricModelProvider {
     public static class VivatechModels {
-        public static final Model ADEQUATE_CUBE_COLUMN_HORIZONTAL = new Model(Optional.of(vtId("block/cube_column_horizontal")), Optional.empty(), TextureKey.SIDE, TextureKey.END);
+        public static final ModelTemplate ADEQUATE_CUBE_COLUMN_HORIZONTAL = new ModelTemplate(Optional.of(vtId("block/cube_column_horizontal")), Optional.empty(), TextureSlot.SIDE, TextureSlot.END);
     }
 
     public static class VivatechTexturedModels {
-        public static final TexturedModel.Factory ADEQUATE_CUBE_COLUMN_HORIZONTAL = makeFactory(TextureMap::sideEnd, VivatechModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+        public static final TexturedModel.Provider ADEQUATE_CUBE_COLUMN_HORIZONTAL = createDefault(TextureMapping::column, VivatechModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
     }
 
-    private BlockStateModelGenerator blockStateModelGenerator;
+    private BlockModelGenerators blockStateModelGenerator;
 
     public VivatechModelProvider(FabricDataOutput output) {
         super(output);
     }
 
     @Override
-    public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
+    public void generateBlockStateModels(BlockModelGenerators blockStateModelGenerator) {
         this.blockStateModelGenerator = blockStateModelGenerator;
 
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GENERATOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.GEARBOX, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+        blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.GENERATOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+        blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.GEARBOX, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
         registerWindTurbine();
 
-        blockStateModelGenerator.registerSingleton(VivatechBlocks.HEATER, TexturedModel.CUBE_BOTTOM_TOP);
-        blockStateModelGenerator.registerSingleton(VivatechBlocks.CHARGER, TexturedModel.CUBE_BOTTOM_TOP);
+        blockStateModelGenerator.createTrivialBlock(VivatechBlocks.HEATER, TexturedModel.CUBE_TOP_BOTTOM);
+        blockStateModelGenerator.createTrivialBlock(VivatechBlocks.CHARGER, TexturedModel.CUBE_TOP_BOTTOM);
 
-        blockStateModelGenerator.registerSingleton(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_BOTTOM_TOP);
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotated(VivatechBlocks.CONTACTOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
+        blockStateModelGenerator.createTrivialBlock(VivatechBlocks.STATIC_COMPENSATOR, TexturedModel.CUBE_TOP_BOTTOM);
+        blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.CONTACTOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
 
         registerWirePost();
     }
 
     private void registerWindTurbine() {
-        var windTurbineModelId = TexturedModel.PARTICLE.upload(VivatechBlocks.WIND_TURBINE, blockStateModelGenerator.modelCollector);
-        blockStateModelGenerator.blockStateCollector.accept(
-                VariantsBlockStateSupplier
-                        .create(
+        var windTurbineModelId = TexturedModel.PARTICLE_ONLY.create(VivatechBlocks.WIND_TURBINE, blockStateModelGenerator.modelOutput);
+        blockStateModelGenerator.blockStateOutput.accept(
+                MultiVariantGenerator
+                        .multiVariant(
                                 VivatechBlocks.WIND_TURBINE,
-                                BlockStateVariant.create().put(VariantSettings.MODEL, windTurbineModelId)
-                        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+                                Variant.variant().with(VariantProperties.MODEL, windTurbineModelId)
+                        ).with(BlockModelGenerators.createHorizontalFacingDispatch())
         );
-        blockStateModelGenerator.excludeFromSimpleItemModelGeneration(VivatechBlocks.WIND_TURBINE);
+        blockStateModelGenerator.skipAutoItemBlock(VivatechBlocks.WIND_TURBINE);
     }
 
     private void registerWirePost() {
-        blockStateModelGenerator.blockStateCollector.accept(
-                VariantsBlockStateSupplier
-                        .create(
+        blockStateModelGenerator.blockStateOutput.accept(
+                MultiVariantGenerator
+                        .multiVariant(
                                 VivatechBlocks.WIRE_POST,
-                                BlockStateVariant.create().put(VariantSettings.MODEL, ModelIds.getBlockModelId(VivatechBlocks.WIRE_POST))
-                        ).coordinate(BlockStateModelGenerator.createNorthDefaultRotationStates())
+                                Variant.variant().with(VariantProperties.MODEL, ModelLocationUtils.getModelLocation(VivatechBlocks.WIRE_POST))
+                        ).with(BlockModelGenerators.createFacingDispatch())
         );
     }
 
     @Override
-    public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-        itemModelGenerator.register(VivatechItems.WIND_TURBINE, Models.GENERATED);
+    public void generateItemModels(ItemModelGenerators itemModelGenerator) {
+        itemModelGenerator.generateFlatItem(VivatechItems.WIND_TURBINE, ModelTemplates.FLAT_ITEM);
 
-        itemModelGenerator.register(VivatechItems.MORTAR_AND_PESTLE, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.WIRE, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.SCREWDRIVER, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.PLIERS, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.PROBE, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.INSPECTOR_GOGGLES, Models.GENERATED);
-        itemModelGenerator.register(VivatechItems.FOCUSES_POUCH, Models.GENERATED);
+        itemModelGenerator.generateFlatItem(VivatechItems.MORTAR_AND_PESTLE, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.WIRE, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.SCREWDRIVER, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.PLIERS, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.PROBE, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.INSPECTOR_GOGGLES, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.FOCUSES_POUCH, ModelTemplates.FLAT_ITEM);
 
-        itemModelGenerator.register(VivatechItems.GADGET, Models.HANDHELD_ROD);
+        itemModelGenerator.generateFlatItem(VivatechItems.GADGET, ModelTemplates.FLAT_HANDHELD_ROD_ITEM);
 
         registerFocus(VivatechItems.STARSHOOTER_FOCUS, itemModelGenerator);
         registerFocus(VivatechItems.LIGHTNING_FOCUS, itemModelGenerator);
@@ -91,8 +96,8 @@ public class VivatechModelProvider extends FabricModelProvider {
         registerFocus(VivatechItems.ENERGY_VEIL_FOCUS, itemModelGenerator);
     }
 
-    private JsonObject createFocusJson(Identifier id, Map<TextureKey, Identifier> textures) {
-        var model = Models.GENERATED_TWO_LAYERS.createJson(id, textures);
+    private JsonObject createFocusJson(ResourceLocation id, Map<TextureSlot, ResourceLocation> textures) {
+        var model = ModelTemplates.TWO_LAYERED_ITEM.createBaseTemplate(id, textures);
         var overrides = new JsonArray();
 
         for (var plating : FocusPlating.values()) {
@@ -100,7 +105,7 @@ public class VivatechModelProvider extends FabricModelProvider {
             var predicate = new JsonObject();
             predicate.addProperty("vivatech:focus_plating", plating.index);
             override.add("predicate", predicate);
-            override.addProperty("model", DatagenUtil.suffixPlating(id, plating).toString());
+            override.addProperty("model", falseresync.vivatech.datagen.DatagenUtil.suffixPlating(id, plating).toString());
             overrides.add(override);
         }
 
@@ -108,16 +113,16 @@ public class VivatechModelProvider extends FabricModelProvider {
         return model;
     }
 
-    private void registerFocus(FocusItem focus, ItemModelGenerator generator) {
-        Identifier modelId = ModelIds.getItemModelId(focus);
-        Identifier textureId = TextureMap.getId(focus);
-        Models.GENERATED.upload(modelId, TextureMap.layer0(textureId), generator.writer, this::createFocusJson);
+    private void registerFocus(FocusItem focus, ItemModelGenerators generator) {
+        ResourceLocation modelId = ModelLocationUtils.getModelLocation(focus);
+        ResourceLocation textureId = TextureMapping.getItemTexture(focus);
+        ModelTemplates.FLAT_ITEM.create(modelId, TextureMapping.layer0(textureId), generator.output, this::createFocusJson);
 
         for (var plating : FocusPlating.values()) {
-            Models.GENERATED_TWO_LAYERS.upload(
-                    DatagenUtil.suffixPlating(modelId, plating),
-                    TextureMap.layered(textureId, DatagenUtil.suffixPlating(vtId("item/focus"), plating)),
-                    generator.writer);
+            ModelTemplates.TWO_LAYERED_ITEM.create(
+                    falseresync.vivatech.datagen.DatagenUtil.suffixPlating(modelId, plating),
+                    TextureMapping.layered(textureId, DatagenUtil.suffixPlating(vtId("item/focus"), plating)),
+                    generator.output);
         }
     }
 }

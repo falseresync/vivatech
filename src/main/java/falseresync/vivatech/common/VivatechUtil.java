@@ -7,17 +7,17 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.Graph;
 
@@ -27,29 +27,29 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class VivatechUtil {
-    public static final Event<BiConsumer<ServerWorld, ChunkPos>> CHUNK_START_TICKING = EventFactory.createArrayBacked(BiConsumer.class, callbacks -> (serverWorld, chunk) -> {
-        for (BiConsumer<ServerWorld, ChunkPos> callback : callbacks) {
+    public static final Event<BiConsumer<ServerLevel, ChunkPos>> CHUNK_START_TICKING = EventFactory.createArrayBacked(BiConsumer.class, callbacks -> (serverWorld, chunk) -> {
+        for (BiConsumer<ServerLevel, ChunkPos> callback : callbacks) {
             callback.accept(serverWorld, chunk);
         }
     });
 
-    public static final Event<BiConsumer<ServerWorld, ChunkPos>> CHUNK_STOP_TICKING = EventFactory.createArrayBacked(BiConsumer.class, callbacks -> (serverWorld, chunk) -> {
-        for (BiConsumer<ServerWorld, ChunkPos> callback : callbacks) {
+    public static final Event<BiConsumer<ServerLevel, ChunkPos>> CHUNK_STOP_TICKING = EventFactory.createArrayBacked(BiConsumer.class, callbacks -> (serverWorld, chunk) -> {
+        for (BiConsumer<ServerLevel, ChunkPos> callback : callbacks) {
             callback.accept(serverWorld, chunk);
         }
     });
 
     public static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[]{Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
-    private static final Function<World, Integer> memo$findViewDistance = Util.memoize((World world) -> world.isClient()
-            ? MinecraftClient.getInstance().options.getClampedViewDistance()
-            : ((ServerWorld) world).getChunkManager().chunkLoadingManager.watchDistance);
+    private static final Function<Level, Integer> memo$findViewDistance = Util.memoize((Level world) -> world.isClientSide()
+            ? Minecraft.getInstance().options.getEffectiveRenderDistance()
+            : ((ServerLevel) world).getChunkSource().chunkMap.serverViewDistance);
 
-    public static <T> Optional<T> nextRandomEntry(ServerWorld world, TagKey<T> tag, Random random) {
-        return world.getRegistryManager()
-                .getOptional(tag.registry())
-                .map(registry -> registry.getOrCreateEntryList(tag))
-                .flatMap(entries -> entries.getRandom(random).map(RegistryEntry::value));
+    public static <T> Optional<T> nextRandomEntry(ServerLevel world, TagKey<T> tag, RandomSource random) {
+        return world.registryAccess()
+                .registry(tag.registry())
+                .map(registry -> registry.getOrCreateTag(tag))
+                .flatMap(entries -> entries.getRandomElement(random).map(Holder::value));
     }
 
     public static <V, E> void replaceVertexIgnoringUndirectedEdgeEquality(Graph<V, E> graph, V oldVertex, V newVertex) {
@@ -75,12 +75,12 @@ public class VivatechUtil {
     /**
      * @return memoized(!) view distance
      */
-    public static int findViewDistance(World world) {
+    public static int findViewDistance(Level world) {
         return memo$findViewDistance.apply(world);
     }
 
-    public static long exchangeStackInSlotWithHand(PlayerEntity player, Hand hand, InventoryStorage storage, int slot, int maxAmount, @Nullable TransactionContext transaction) {
-        var playerStack = player.getStackInHand(hand);
+    public static long exchangeStackInSlotWithHand(Player player, InteractionHand hand, InventoryStorage storage, int slot, int maxAmount, @Nullable TransactionContext transaction) {
+        var playerStack = player.getItemInHand(hand);
         var storedVariant = storage.getSlot(slot).getResource();
 
         if (storedVariant.isBlank() && !playerStack.isEmpty()) {

@@ -8,44 +8,43 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ClientWireManager {
-    private final MinecraftClient client;
-    private final Map<RegistryKey<World>, Tracker> trackers = new Object2ObjectArrayMap<>();
+    private final Minecraft client;
+    private final Map<ResourceKey<Level>, Tracker> trackers = new Object2ObjectArrayMap<>();
 
-    public ClientWireManager(MinecraftClient client) {
+    public ClientWireManager(Minecraft client) {
         this.client = client;
 
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((_ignored, world) -> {
-            trackers.putIfAbsent(world.getRegistryKey(), new Tracker());
+            trackers.putIfAbsent(world.dimension(), new Tracker());
         });
 
         ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            trackers.get(world.getRegistryKey()).unsyncedChunks.add(chunk.getPos());
+            trackers.get(world.dimension()).unsyncedChunks.add(chunk.getPos());
         });
 
         ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
-            trackers.get(world.getRegistryKey()).wires.removeIf(wire -> wire.chunkPos().equals(chunk.getPos()));
+            trackers.get(world.dimension()).wires.removeIf(wire -> wire.chunkPos().equals(chunk.getPos()));
         });
     }
 
-    public void addWires(RegistryKey<World> world, Set<Wire> wires) {
+    public void addWires(ResourceKey<Level> world, Set<Wire> wires) {
         trackers.get(world).wires.addAll(wires);
     }
 
-    public void removeWires(RegistryKey<World> world, Set<Wire> wires) {
+    public void removeWires(ResourceKey<Level> world, Set<Wire> wires) {
         trackers.get(world).wires.removeAll(wires);
     }
 
-    public Set<Wire> getWires(RegistryKey<World> world) {
+    public Set<Wire> getWires(ResourceKey<Level> world) {
         return trackers.get(world).wires;
     }
 

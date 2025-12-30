@@ -1,14 +1,14 @@
 package falseresync.vivatech.client.gui;
 
 import falseresync.vivatech.common.data.InventoryComponent;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
-public class InventoryComponentTooltip implements TooltipComponent {
-    private static final Identifier BACKGROUND_TEXTURE = Identifier.ofVanilla("container/bundle/background");
+public class InventoryComponentTooltip implements ClientTooltipComponent {
+    private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("container/bundle/background");
     private static final int BOTTOM_MARGIN = 4;
     private static final int WIDTH_PER_COLUMN = 18;
     private static final int HEIGHT_PER_ROW = 20;
@@ -24,7 +24,7 @@ public class InventoryComponentTooltip implements TooltipComponent {
     }
 
     @Override
-    public int getWidth(TextRenderer textRenderer) {
+    public int getWidth(Font textRenderer) {
         return getColumnsWidth();
     }
 
@@ -37,10 +37,10 @@ public class InventoryComponentTooltip implements TooltipComponent {
     }
 
     @Override
-    public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
+    public void renderImage(Font textRenderer, int x, int y, GuiGraphics context) {
         int columns = getColumns();
         int rows = getRows();
-        context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, this.getColumnsWidth(), this.getRowsHeight());
+        context.blitSprite(BACKGROUND_TEXTURE, x, y, this.getColumnsWidth(), this.getRowsHeight());
 
         int slotIndex = 0;
         for (int row = 0; row < rows; row++) {
@@ -52,19 +52,19 @@ public class InventoryComponentTooltip implements TooltipComponent {
         }
     }
 
-    private void drawSlot(int x, int y, int index, DrawContext context, TextRenderer textRenderer) {
+    private void drawSlot(int x, int y, int index, GuiGraphics context, Font textRenderer) {
         if (index >= inventoryComponent.size()) {
             drawSprite(context, x, y, SlotSprite.SLOT);
         } else {
             ItemStack itemStack = inventoryComponent.stacks().get(index);
             drawSprite(context, x, y, SlotSprite.SLOT);
-            context.drawItem(itemStack, x + 1, y + 1, index);
-            context.drawItemInSlot(textRenderer, itemStack, x + 1, y + 1);
+            context.renderItem(itemStack, x + 1, y + 1, index);
+            context.renderItemDecorations(textRenderer, itemStack, x + 1, y + 1);
         }
     }
 
-    private void drawSprite(DrawContext context, int x, int y, SlotSprite sprite) {
-        context.drawGuiTexture(sprite.texture, x, y, 0, sprite.width, sprite.height);
+    private void drawSprite(GuiGraphics context, int x, int y, SlotSprite sprite) {
+        context.blitSprite(sprite.texture, x, y, 0, sprite.width, sprite.height);
     }
 
     private int getColumns() {
@@ -76,13 +76,13 @@ public class InventoryComponentTooltip implements TooltipComponent {
     }
 
     enum SlotSprite {
-        SLOT(Identifier.ofVanilla("container/bundle/slot"), 18, 20);
+        SLOT(ResourceLocation.withDefaultNamespace("container/bundle/slot"), 18, 20);
 
-        public final Identifier texture;
+        public final ResourceLocation texture;
         public final int width;
         public final int height;
 
-        SlotSprite(final Identifier texture, final int width, final int height) {
+        SlotSprite(final ResourceLocation texture, final int width, final int height) {
             this.texture = texture;
             this.width = width;
             this.height = height;

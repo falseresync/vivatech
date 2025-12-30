@@ -4,10 +4,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.mojang.serialization.Codec;
 import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.common.power.wire.WireType;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
 
 public record GridEdge(ImmutableSortedSet<BlockPos> positions, BlockPos u, BlockPos v) {
     public static final Codec<GridEdge> CODEC =

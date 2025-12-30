@@ -18,10 +18,10 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.entity.EmptyEntityRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
@@ -31,17 +31,17 @@ public class VivatechRendering {
         EntityModelLayerRegistry.registerModelLayer(EnergyVeilFeatureRenderer.LAYER, EnergyVeilModel::getTexturedModelData);
 
         EntityRendererRegistry.register(VivatechEntities.STAR_PROJECTILE, StarProjectileRenderer::new);
-        EntityRendererRegistry.register(VivatechEntities.ENERGY_VEIL, EmptyEntityRenderer::new);
+        EntityRendererRegistry.register(VivatechEntities.ENERGY_VEIL, NoopRenderer::new);
 
-        BlockEntityRendererFactories.register(VivatechBlockEntities.WIND_TURBINE, WindTurbineBlockEntityRenderer::new);
-        BlockEntityRendererFactories.register(VivatechBlockEntities.CHARGER, ChargerBlockEntityRenderer::new);
+        BlockEntityRenderers.register(VivatechBlockEntities.WIND_TURBINE, WindTurbineBlockEntityRenderer::new);
+        BlockEntityRenderers.register(VivatechBlockEntities.CHARGER, ChargerBlockEntityRenderer::new);
 
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(),
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(),
                 VivatechBlocks.WIRE_POST,
                 VivatechBlocks.WIND_TURBINE
         );
 
-        ModelPredicateProviderRegistry.GLOBAL.put(vtId("focus_plating"), (stack, world, entity, seed) -> stack.getOrDefault(VivatechComponents.FOCUS_PLATING, -1));
+        ItemProperties.GENERIC_PROPERTIES.put(vtId("focus_plating"), (stack, world, entity, seed) -> stack.getOrDefault(VivatechComponents.FOCUS_PLATING, -1));
 
         TrinketRendererRegistry.registerRenderer(VivatechItems.INSPECTOR_GOGGLES, new InspectorGogglesRenderer());
 

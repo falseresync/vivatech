@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import falseresync.vivatech.common.data.VivatechComponents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ChargeManager {
@@ -69,38 +69,38 @@ public class ChargeManager {
         return stack.getOrDefault(VivatechComponents.CHARGE, 0) >= stack.getOrDefault(VivatechComponents.MAX_CHARGE, 0);
     }
 
-    public boolean cannotAddAnyCharge(ItemStack stack, PlayerEntity player) {
+    public boolean cannotAddAnyCharge(ItemStack stack, Player player) {
         return isGadgetFullyCharged(stack);// && areShellsFull(player);
     }
 
-    public boolean hasEnoughCharge(ItemStack stack, int cost, @Nullable PlayerEntity user) {
-        if (user != null && (user.isCreative() && Vivatech.getConfig().infiniteCharge.isCreativeOnly() || Vivatech.getConfig().infiniteCharge.isAlways())
-                || stack.contains(VivatechComponents.INFINITE_CHARGE)) {
+    public boolean hasEnoughCharge(ItemStack stack, int cost, @Nullable Player user) {
+        if (user != null && (user.isCreative() && falseresync.vivatech.common.Vivatech.getConfig().infiniteCharge.isCreativeOnly() || falseresync.vivatech.common.Vivatech.getConfig().infiniteCharge.isAlways())
+                || stack.has(VivatechComponents.INFINITE_CHARGE)) {
             return true;
         }
         return stack.getOrDefault(VivatechComponents.CHARGE, 0) >= cost;
     }
 
     // This should not use hasEnoughCharge, as that doesn't bypass creative and makes a whoopsie
-    public boolean tryExpendGadgetCharge(ItemStack stack, int cost, @Nullable PlayerEntity user) {
-        if (user != null && (user.isCreative() && Vivatech.getConfig().infiniteCharge.isCreativeOnly() || Vivatech.getConfig().infiniteCharge.isAlways())
-                || stack.contains(VivatechComponents.INFINITE_CHARGE)) {
+    public boolean tryExpendGadgetCharge(ItemStack stack, int cost, @Nullable Player user) {
+        if (user != null && (user.isCreative() && falseresync.vivatech.common.Vivatech.getConfig().infiniteCharge.isCreativeOnly() || Vivatech.getConfig().infiniteCharge.isAlways())
+                || stack.has(VivatechComponents.INFINITE_CHARGE)) {
             return true;
         }
         var charge = stack.getOrDefault(VivatechComponents.CHARGE, 0);
         if (charge >= cost) {
-            stack.apply(VivatechComponents.CHARGE, charge, current -> current - cost);
+            stack.update(VivatechComponents.CHARGE, charge, current -> current - cost);
             ChargeManager.CHARGE_SPENT.invoker().onChargeSpent(stack, cost, user);
             return true;
         }
         return false;
     }
 
-    public void charge(ItemStack stack, int amount, @Nullable PlayerEntity user) {
+    public void charge(ItemStack stack, int amount, @Nullable Player user) {
         Preconditions.checkArgument(amount > 0, "Use tryExpendCharge to subtract charge");
         var current = stack.getOrDefault(VivatechComponents.CHARGE, 0);
         var max = stack.getOrDefault(VivatechComponents.MAX_CHARGE, 0);
-        stack.apply(VivatechComponents.CHARGE, 0, it -> Math.min(it + amount, max));
+        stack.update(VivatechComponents.CHARGE, 0, it -> Math.min(it + amount, max));
         if (current + amount > max) {
             ChargeManager.OVERCHARGED.invoker().onOvercharged(stack, current + amount - max, user);
         }
@@ -142,11 +142,11 @@ public class ChargeManager {
 
     @FunctionalInterface
     public interface ChargeSpent {
-        void onChargeSpent(ItemStack stack, int cost, @Nullable PlayerEntity user);
+        void onChargeSpent(ItemStack stack, int cost, @Nullable Player user);
     }
 
     @FunctionalInterface
     public interface Overcharged {
-        void onOvercharged(ItemStack stack, int excess, @Nullable PlayerEntity user);
+        void onOvercharged(ItemStack stack, int excess, @Nullable Player user);
     }
 }

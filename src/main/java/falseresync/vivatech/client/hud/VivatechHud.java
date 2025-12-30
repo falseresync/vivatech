@@ -1,22 +1,24 @@
 package falseresync.vivatech.client.hud;
 
 import falseresync.lib.client.BetterDrawContext;
+import falseresync.vivatech.client.hud.ChargeDisplayHudItem;
+import falseresync.vivatech.client.hud.FocusPickerHudItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 @Environment(EnvType.CLIENT)
 public class VivatechHud {
-    private final MinecraftClient client;
-    private final FocusPickerHudItem focusPicker;
-    private final ChargeDisplayHudItem chargeDisplay;
+    private final Minecraft client;
+    private final falseresync.vivatech.client.hud.FocusPickerHudItem focusPicker;
+    private final falseresync.vivatech.client.hud.ChargeDisplayHudItem chargeDisplay;
 
-    public VivatechHud(MinecraftClient client) {
+    public VivatechHud(Minecraft client) {
         this.client = client;
-        focusPicker = new FocusPickerHudItem(client, client.textRenderer);
-        chargeDisplay = new ChargeDisplayHudItem(client, client.textRenderer);
+        focusPicker = new falseresync.vivatech.client.hud.FocusPickerHudItem(client, client.font);
+        chargeDisplay = new falseresync.vivatech.client.hud.ChargeDisplayHudItem(client, client.font);
         initEventListeners();
     }
 

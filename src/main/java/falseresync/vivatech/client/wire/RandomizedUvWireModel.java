@@ -1,18 +1,19 @@
 package falseresync.vivatech.client.wire;
 
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.util.Util;
-
 import java.util.Random;
 import java.util.function.Function;
+
+import falseresync.vivatech.client.wire.WireModel;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
 
 public class RandomizedUvWireModel implements WireModel {
     private static final Random RANDOM = new Random();
     protected final float segmentSize;
-    private final SpriteIdentifier spriteId;
+    private final Material spriteId;
     private int uvChunkAmount;
-    private Sprite sprite;
+    private TextureAtlasSprite sprite;
     private float[] defaultUv;
     private float segmentWidthOnAtlas;
     private float segmentHeightOnAtlas;
@@ -27,21 +28,21 @@ public class RandomizedUvWireModel implements WireModel {
         };
     });
 
-    protected RandomizedUvWireModel(SpriteIdentifier spriteId, float uvChunkSize, float segmentSize) {
+    protected RandomizedUvWireModel(Material spriteId, float uvChunkSize, float segmentSize) {
         this.spriteId = spriteId;
         this.uvChunkAmount = (int) (16 / uvChunkSize);
         this.segmentSize = segmentSize;
     }
 
     @Override
-    public SpriteIdentifier getSpriteId() {
+    public Material getSpriteId() {
         return spriteId;
     }
 
     @Override
-    public Sprite getSprite() {
+    public TextureAtlasSprite getSprite() {
         if (sprite == null) {
-            sprite = getSpriteId().getSprite();
+            sprite = getSpriteId().sprite();
         }
         return sprite;
     }
@@ -50,7 +51,7 @@ public class RandomizedUvWireModel implements WireModel {
     public float[] getUv(int segmentNo) {
         if (defaultUv == null) {
             defaultUv = new float[] {
-                    getSprite().getMinU(), getSprite().getMaxU(), getSprite().getMinV(), getSprite().getMaxV()
+                    getSprite().getU0(), getSprite().getU1(), getSprite().getV0(), getSprite().getV1()
             };
             segmentWidthOnAtlas = (defaultUv[1] - defaultUv[0]) / uvChunkAmount;
             segmentHeightOnAtlas = (defaultUv[3] - defaultUv[2]) / uvChunkAmount;

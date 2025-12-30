@@ -1,22 +1,25 @@
 package falseresync.vivatech.client.wire;
 
 import com.google.common.base.Preconditions;
+import falseresync.vivatech.client.wire.RandomizedUvWireModel;
+import falseresync.vivatech.client.wire.SimpleWireParameters;
+import falseresync.vivatech.client.wire.WireModel;
+import falseresync.vivatech.client.wire.WireParameters;
 import falseresync.vivatech.common.power.wire.Wire;
 import falseresync.vivatech.common.power.wire.WireType;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-
 import java.util.Map;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class WireRenderingRegistry {
-    private static final SpriteIdentifier COPPER_SPRITE_ID = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, vtId("block/wire"));
-    private static final Map<WireType, WireModel> MODELS = new Reference2ObjectArrayMap<>();
-    private static final Map<WireType, WireParameters.Factory> FACTORIES = new Reference2ObjectArrayMap<>();
+    private static final Material COPPER_SPRITE_ID = new Material(TextureAtlas.LOCATION_BLOCKS, vtId("block/wire"));
+    private static final Map<WireType, falseresync.vivatech.client.wire.WireModel> MODELS = new Reference2ObjectArrayMap<>();
+    private static final Map<WireType, falseresync.vivatech.client.wire.WireParameters.Factory> FACTORIES = new Reference2ObjectArrayMap<>();
 
-    public static WireParameters getAndBuild(Wire wire) {
+    public static falseresync.vivatech.client.wire.WireParameters getAndBuild(Wire wire) {
         return FACTORIES.get(wire.type()).build(wire, MODELS.get(wire.type()));
     }
 

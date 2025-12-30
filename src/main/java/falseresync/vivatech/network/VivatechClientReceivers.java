@@ -11,10 +11,10 @@ public class VivatechClientReceivers {
     }
 
     private static void onWiresAdded(WiresS2CPayload.Added payload, ClientPlayNetworking.Context context) {
-        VivatechClient.getClientWireManager().addWires(context.player().getWorld().getRegistryKey(), payload.wires());
+        VivatechClient.getClientWireManager().addWires(context.player().level().dimension(), payload.wires());
     }
 
     private static void onWiresRemoved(WiresS2CPayload.Removed payload, ClientPlayNetworking.Context context) {
-        VivatechClient.getClientWireManager().removeWires(context.player().getWorld().getRegistryKey(), payload.wires());
+        VivatechClient.getClientWireManager().removeWires(context.player().level().dimension(), payload.wires());
     }
 }

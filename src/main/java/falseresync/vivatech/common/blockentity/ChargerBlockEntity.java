@@ -1,19 +1,22 @@
 package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.blockentity.BaseAppliance;
+import falseresync.vivatech.common.blockentity.Ticking;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
 import falseresync.vivatech.common.item.VivatechItemTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class ChargerBlockEntity extends BaseAppliance implements Ticking {
@@ -29,7 +32,7 @@ public class ChargerBlockEntity extends BaseAppliance implements Ticking {
 
     @Override
     public void tick() {
-        if (world.isClient) {
+        if (level.isClientSide) {
             return;
         }
 
@@ -39,7 +42,7 @@ public class ChargerBlockEntity extends BaseAppliance implements Ticking {
             if (couldChargeLastTick) {
                 if (!charging) {
                     charging = true;
-                    markDirty();
+                    setChanged();
                 }
 
                 Vivatech.getChargeManager().charge(stack, 1, null);
@@ -47,7 +50,7 @@ public class ChargerBlockEntity extends BaseAppliance implements Ticking {
         } else {
             if (charging) {
                 charging = false;
-                markDirty();
+                setChanged();
             }
         }
 
@@ -67,57 +70,57 @@ public class ChargerBlockEntity extends BaseAppliance implements Ticking {
         return charging;
     }
 
-    public void exchangeOrDrop(PlayerEntity player, Hand hand) {
-        var stackInHand = player.getStackInHand(hand);
-        if (stackInHand.isIn(VivatechItemTags.CHARGEABLE) || stackInHand.isEmpty()) {
-            player.setStackInHand(hand, stack);
+    public void exchangeOrDrop(Player player, InteractionHand hand) {
+        var stackInHand = player.getItemInHand(hand);
+        if (stackInHand.is(VivatechItemTags.CHARGEABLE) || stackInHand.isEmpty()) {
+            player.setItemInHand(hand, stack);
             stack = stackInHand;
         } else {
-            player.getInventory().offerOrDrop(stack);
+            player.getInventory().placeItemBackInInventory(stack);
         }
-        markDirty();
+        setChanged();
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
-        if (world != null) {
-            world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_ALL);
+    public void setChanged() {
+        super.setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         writeObservableStateNbt(nbt, registryLookup);
     }
 
-    private void writeObservableStateNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        nbt.put("stack", stack.encodeAllowEmpty(registryLookup));
+    private void writeObservableStateNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        nbt.put("stack", stack.saveOptional(registryLookup));
         nbt.putBoolean("charging", charging);
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
 
-        stack = ItemStack.fromNbtOrEmpty(registryLookup, nbt.getCompound("stack"));
+        stack = ItemStack.parseOptional(registryLookup, nbt.getCompound("stack"));
 
         charging = false;
-        if (nbt.contains("charging", NbtElement.BYTE_TYPE)) {
+        if (nbt.contains("charging", Tag.TAG_BYTE)) {
             charging = nbt.getBoolean("charging");
         }
     }
 
     @Nullable
     @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
-        var nbt = super.toInitialChunkDataNbt(registryLookup);
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
+        var nbt = super.getUpdateTag(registryLookup);
         writeObservableStateNbt(nbt, registryLookup);
         return nbt;
     }

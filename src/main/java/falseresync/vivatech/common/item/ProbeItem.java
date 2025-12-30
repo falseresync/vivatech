@@ -1,34 +1,34 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ProbeItem extends Item {
-    public ProbeItem(Settings settings) {
+    public ProbeItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+    public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player miner) {
         return false;
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getPlayer() instanceof ServerPlayerEntity player) {
-            var grid = Vivatech.getPowerSystem().in(context.getWorld().getRegistryKey()).getGridLookup().get(context.getBlockPos());
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() instanceof ServerPlayer player) {
+            var grid = Vivatech.getPowerSystem().in(context.getLevel().dimension()).getGridLookup().get(context.getClickedPos());
             if (grid != null) {
-                player.sendMessage(Text.translatable("hud.vivatech.probe", Math.round(grid.getLastVoltage()), grid.getLastCurrent()), true);
+                player.displayClientMessage(Component.translatable("hud.vivatech.probe", Math.round(grid.getLastVoltage()), grid.getLastCurrent()), true);
             }
         }
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 }

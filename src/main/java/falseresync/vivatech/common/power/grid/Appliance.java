@@ -1,6 +1,6 @@
 package falseresync.vivatech.common.power.grid;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public interface Appliance {
     /**

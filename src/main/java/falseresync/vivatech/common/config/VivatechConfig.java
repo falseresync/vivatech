@@ -1,6 +1,7 @@
 package falseresync.vivatech.common.config;
 
 import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.config.TranslatableEnum;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
@@ -9,7 +10,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 @Config.Gui.Background(Config.Gui.Background.TRANSPARENT)
 public final class VivatechConfig implements ConfigData {
     @ConfigEntry.Category("general")
-    @TranslatableEnum
+    @falseresync.vivatech.common.config.TranslatableEnum
     public InfiniteCharge infiniteCharge = InfiniteCharge.CREATIVE_ONLY;
 
 //    @ConfigEntry.Category("general")
@@ -32,11 +33,11 @@ public final class VivatechConfig implements ConfigData {
     public int inspectorGogglesDisplayRange = 10;
 
     @ConfigEntry.Category("performance")
-    @TranslatableEnum
+    @falseresync.vivatech.common.config.TranslatableEnum
     public ParticlesAmount animationParticlesAmount = ParticlesAmount.DEFAULT;
 
     @ConfigEntry.Category("performance")
-    @TranslatableEnum
+    @falseresync.vivatech.common.config.TranslatableEnum
     public AnimationQuality animationQuality = AnimationQuality.DEFAULT;
 
     @ConfigEntry.Category("accessibility")

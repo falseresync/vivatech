@@ -2,8 +2,11 @@ package falseresync.vivatech.common.blockentity;
 
 import falseresync.vivatech.common.block.GearboxBlock;
 import falseresync.vivatech.common.block.VivatechBlocks;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import falseresync.vivatech.common.blockentity.BaseAppliance;
+import falseresync.vivatech.common.blockentity.Ticking;
+import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class GeneratorBlockEntity extends BaseAppliance implements Ticking {
     private boolean generating = true;
@@ -14,15 +17,15 @@ public class GeneratorBlockEntity extends BaseAppliance implements Ticking {
 
     @Override
     public void tick() {
-        if (!world.isClient) {
+        if (!level.isClientSide) {
             return;
         }
 
         if (isConnected()) {
-            var facing = getCachedState().get(GearboxBlock.FACING);
-            var gearboxState = world.getBlockState(pos.offset(facing));
-            var wind_turbineState = world.getBlockState(pos.offset(facing, 2));
-            generating = gearboxState.isOf(VivatechBlocks.GEARBOX) && wind_turbineState.isOf(VivatechBlocks.WIND_TURBINE);
+            var facing = getBlockState().getValue(GearboxBlock.FACING);
+            var gearboxState = level.getBlockState(worldPosition.relative(facing));
+            var wind_turbineState = level.getBlockState(worldPosition.relative(facing, 2));
+            generating = gearboxState.is(VivatechBlocks.GEARBOX) && wind_turbineState.is(VivatechBlocks.WIND_TURBINE);
         } else if (generating) {
             generating = false;
         }

@@ -1,25 +1,30 @@
 package falseresync.vivatech.client.rendering.entity;
 
 import falseresync.vivatech.common.entity.StarProjectileEntity;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
-public class StarProjectileRenderer extends EntityRenderer<StarProjectileEntity> {
-    protected static final Identifier TEXTURE = vtId("textures/entity/star_projectile.png");
-    private final RenderLayer renderLayer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-    public StarProjectileRenderer(EntityRendererFactory.Context context) {
+public class StarProjectileRenderer extends EntityRenderer<StarProjectileEntity> {
+    protected static final ResourceLocation TEXTURE = vtId("textures/entity/star_projectile.png");
+    private final RenderType renderLayer;
+
+    public StarProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
-        renderLayer = RenderLayer.getEntityCutout(TEXTURE);
+        renderLayer = RenderType.entityCutout(TEXTURE);
     }
 
-    protected static void vertices(VertexConsumer buffer, Matrix4f pm, MatrixStack.Entry entry) {
+    protected static void vertices(VertexConsumer buffer, Matrix4f pm, PoseStack.Pose entry) {
         vertex(buffer, pm, entry, 1, 1, 0, 0, -1);
         vertex(buffer, pm, entry, 1, 0, 0, 1, -1);
         vertex(buffer, pm, entry, 0, 0, 1, 1, -1);
@@ -31,35 +36,35 @@ public class StarProjectileRenderer extends EntityRenderer<StarProjectileEntity>
         vertex(buffer, pm, entry, 1, 1, 1, 0, 1);
     }
 
-    protected static void vertex(VertexConsumer buffer, Matrix4f positionMatrix, MatrixStack.Entry entry, int x, int y, float u, float v, int normal) {
-        buffer.vertex(positionMatrix, x, y, 0)
-                .color(255, 255, 255, 255)
-                .texture(u, v)
-                .overlay(OverlayTexture.DEFAULT_UV)
-                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE)
-                .normal(entry, 0, 0, normal);
+    protected static void vertex(VertexConsumer buffer, Matrix4f positionMatrix, PoseStack.Pose entry, int x, int y, float u, float v, int normal) {
+        buffer.addVertex(positionMatrix, x, y, 0)
+                .setColor(255, 255, 255, 255)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(entry, 0, 0, normal);
     }
 
     @Override
-    public void render(StarProjectileEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        matrices.push();
+    public void render(StarProjectileEntity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+        matrices.pushPose();
 
-        var entry = matrices.peek();
-        var pm = entry.getPositionMatrix();
+        var entry = matrices.last();
+        var pm = entry.pose();
         var buffer = vertexConsumers.getBuffer(renderLayer);
 
-        matrices.multiply(dispatcher.getRotation());
+        matrices.mulPose(entityRenderDispatcher.cameraOrientation());
         matrices.translate(-0.5f, 0, 0);
         matrices.scale(0.75f, 0.75f, 0.75f);
         vertices(buffer, pm, entry);
 
-        matrices.pop();
+        matrices.popPose();
 
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
     @Override
-    public Identifier getTexture(StarProjectileEntity entity) {
+    public ResourceLocation getTextureLocation(StarProjectileEntity entity) {
         return TEXTURE;
     }
 }

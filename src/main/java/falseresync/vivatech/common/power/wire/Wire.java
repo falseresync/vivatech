@@ -1,20 +1,23 @@
 package falseresync.vivatech.common.power.wire;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.SectionPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 
 import java.util.Objects;
 
 public record Wire(
-        WireType type,
+        falseresync.vivatech.common.power.wire.WireType type,
         ImmutableSet<BlockPos> positions,
         BlockPos u,
         BlockPos v,
@@ -25,36 +28,36 @@ public record Wire(
         ChunkPos chunkPos,
         float loadCoefficient
 ) {
-    public static final PacketCodec<RegistryByteBuf, Wire> PACKET_CODEC = PacketCodec.tuple(
-            WireType.PACKET_CODEC.xmap(RegistryEntry::value, WireType.REGISTRY::getEntry), Wire::type,
-            BlockPos.PACKET_CODEC, Wire::u,
-            BlockPos.PACKET_CODEC, Wire::v,
-            PacketCodecs.FLOAT, Wire::loadCoefficient,
+    public static final StreamCodec<RegistryFriendlyByteBuf, Wire> PACKET_CODEC = StreamCodec.composite(
+            falseresync.vivatech.common.power.wire.WireType.PACKET_CODEC.map(Holder::value, falseresync.vivatech.common.power.wire.WireType.REGISTRY::wrapAsHolder), Wire::type,
+            BlockPos.STREAM_CODEC, Wire::u,
+            BlockPos.STREAM_CODEC, Wire::v,
+            ByteBufCodecs.FLOAT, Wire::loadCoefficient,
             Wire::create
     );
 
-    public static Wire create(WireType type, BlockPos u, BlockPos v, float loadCoefficient) {
-        var start = u.toCenterPos().toVector3f();
-        var end = v.toCenterPos().toVector3f();
+    public static Wire create(falseresync.vivatech.common.power.wire.WireType type, BlockPos u, BlockPos v, float loadCoefficient) {
+        var start = u.getCenter().toVector3f();
+        var end = v.getCenter().toVector3f();
         var middle = start.add(end, new Vector3f()).mul(0.5f);
         return new Wire(type, ImmutableSet.of(u, v), u, v, start, end, middle, start.distance(end),
-                new ChunkPos(ChunkSectionPos.getSectionCoordFloored(middle.x), ChunkSectionPos.getSectionCoordFloored(middle.z)),
+                new ChunkPos(SectionPos.blockToSectionCoord(middle.x), SectionPos.blockToSectionCoord(middle.z)),
                 loadCoefficient);
     }
 
-    public void drop(World world, WireType type, DropRule dropRule) {
+    public void drop(Level world, WireType type, DropRule dropRule) {
         switch (dropRule) {
             case NO_DROP -> {
             }
             case PARTIAL ->
-                    ItemScatterer.spawn(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), MathHelper.floor(length * world.random.nextFloat())));
+                    Containers.dropItemStack(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), Mth.floor(length * world.random.nextFloat())));
             case FULL ->
-                    ItemScatterer.spawn(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), MathHelper.floor(length)));
+                    Containers.dropItemStack(world, middle.x, middle.y, middle.z, new ItemStack(type.item(), Mth.floor(length)));
         }
     }
 
     public static int getItemCount(BlockPos u, BlockPos v) {
-        return MathHelper.ceil(Math.sqrt(u.getSquaredDistance(v)));
+        return Mth.ceil(Math.sqrt(u.distSqr(v)));
     }
 
     @Override

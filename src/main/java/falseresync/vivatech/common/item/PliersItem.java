@@ -1,32 +1,33 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.Vivatech;
+import falseresync.vivatech.common.item.WireManagementItem;
 import falseresync.vivatech.common.power.grid.GridVertex;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.GlobalPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
 
 public class PliersItem extends WireManagementItem {
-    public PliersItem(Settings settings) {
+    public PliersItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected ActionResult manageWire(ItemUsageContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV) {
-        if (context.getPlayer() instanceof ServerPlayerEntity) {
-            var grid = Vivatech.getPowerSystem().in(context.getWorld().getRegistryKey()).find(vertexU.pos(), vertexV.pos());
+    protected InteractionResult manageWire(UseOnContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV) {
+        if (context.getPlayer() instanceof ServerPlayer) {
+            var grid = Vivatech.getPowerSystem().in(context.getLevel().dimension()).find(vertexU.pos(), vertexV.pos());
             if (grid == null) {
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             if (grid.disconnect(vertexU, vertexV)) {
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
-        return ActionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
 }

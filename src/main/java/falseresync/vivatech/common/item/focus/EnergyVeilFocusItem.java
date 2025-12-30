@@ -9,78 +9,81 @@ import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.entity.EnergyVeilEntity;
 import falseresync.vivatech.common.world.VivatechWorld;
 import falseresync.vivatech.common.Reports;
-import net.minecraft.entity.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.FastColor;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import java.util.Optional;
 
 public class EnergyVeilFocusItem extends FocusItem {
     public static final int MAX_USE_TIME = 200;
     public static final int STARTING_COST = 10;
     public static final int CONTINUOUS_COST = 2;
-    private static final int CYAN_ARGB = ColorHelper.Argb.getArgb(0, 115, 190, 211);
+    private static final int CYAN_ARGB = FastColor.ARGB32.color(0, 115, 190, 211);
     private static final Color CYAN = Color.ofArgb(CYAN_ARGB);
     private static final Color RED = Color.ofHsv(2 / 360F, 1F, 0.8F);
 
-    public EnergyVeilFocusItem(Settings settings) {
+    public EnergyVeilFocusItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
+    public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, Player user) {
         removeOrphanedVeilReference(gadgetStack, user);
     }
 
     @Override
-    public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
+    public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, Player user) {
         resetGadget(gadgetStack);
     }
 
     @Override
-    public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
+    public InteractionResultHolder<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, Level world, Player user, InteractionHand hand) {
         removeOrphanedVeilReference(gadgetStack, user);
-        if (user instanceof ServerPlayerEntity player
-                && !gadgetStack.contains(VivatechComponents.ENERGY_VEIL_UUID)
+        if (user instanceof ServerPlayer player
+                && !gadgetStack.has(VivatechComponents.ENERGY_VEIL_UUID)
                 && !user.hasAttached(VivatechAttachments.ENERGY_VEIL_NETWORK_ID)) {
             if (Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, STARTING_COST, user)) {
                 var veil = new EnergyVeilEntity(user, gadgetStack, world);
                 veil.setRadius(2);
-                world.spawnEntity(veil);
-                gadgetStack.set(VivatechComponents.ENERGY_VEIL_UUID, veil.getUuid());
+                world.addFreshEntity(veil);
+                gadgetStack.set(VivatechComponents.ENERGY_VEIL_UUID, veil.getUUID());
                 gadgetStack.set(VivatechComponents.IN_USE, true);
-                user.setCurrentHand(user.getActiveHand());
-                return TypedActionResult.success(gadgetStack);
+                user.startUsingItem(user.getUsedItemHand());
+                return InteractionResultHolder.success(gadgetStack);
             }
 
             Reports.insufficientCharge(player);
-            return TypedActionResult.fail(gadgetStack);
+            return InteractionResultHolder.fail(gadgetStack);
         }
-        return TypedActionResult.pass(gadgetStack);
+        return InteractionResultHolder.pass(gadgetStack);
     }
 
     @Override
-    public void focusUsageTick(World world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
+    public void focusUsageTick(Level world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
         findVeil(gadgetStack, world).ifPresent(veil -> {
-            if (user instanceof ServerPlayerEntity player) {
+            if (user instanceof ServerPlayer player) {
                 if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, CONTINUOUS_COST, player)) {
-                    player.damage(world.getDamageSources().magic(), 0.1f);
-                    var previousDeficit = gadgetStack.apply(VivatechComponents.CHARGE_DEFICIT, 0, it -> it + CONTINUOUS_COST);
+                    player.hurt(world.damageSources().magic(), 0.1f);
+                    var previousDeficit = gadgetStack.update(VivatechComponents.CHARGE_DEFICIT, 0, it -> it + CONTINUOUS_COST);
                     if (previousDeficit != null && previousDeficit % (CONTINUOUS_COST * 35) == 0) {
-                        EntityType.VEX.spawn((ServerWorld) world, fuzzyPos(world.random, 1, player.getBlockPos()), SpawnReason.TRIGGERED);
+                        EntityType.VEX.spawn((ServerLevel) world, fuzzyPos(world.random, 1, player.blockPosition()), MobSpawnType.TRIGGERED);
                     }
                     if (world.random.nextFloat() < 0.1f) {
-                        focusStack.damage(1, user, EquipmentSlot.MAINHAND);
+                        focusStack.hurtAndBreak(1, user, EquipmentSlot.MAINHAND);
                     }
                 }
                 veil.incrementLifeExpectancy(2);
@@ -89,35 +92,35 @@ public class EnergyVeilFocusItem extends FocusItem {
                         new ItemBarComponent(Math.clamp(Math.round((maxUseTicks - remainingUseTicks) * 13f / maxUseTicks), 0, 13), CYAN_ARGB));
 
                 if (world.random.nextFloat() < 0.01f) {
-                    focusStack.damage(1, user, EquipmentSlot.MAINHAND);
+                    focusStack.hurtAndBreak(1, user, EquipmentSlot.MAINHAND);
                 }
             }
         });
     }
 
-    private BlockPos fuzzyPos(Random random, int radius, BlockPos pos) {
-        return pos.add(random.nextInt(radius) - radius, 0, random.nextInt(radius) - radius);
+    private BlockPos fuzzyPos(RandomSource random, int radius, BlockPos pos) {
+        return pos.offset(random.nextInt(radius) - radius, 0, random.nextInt(radius) - radius);
     }
 
     @Override
-    public void focusOnStoppedUsing(ItemStack gadgetStack, ItemStack focusStack, World world, LivingEntity user, int remainingUseTicks) {
+    public void focusOnStoppedUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user, int remainingUseTicks) {
         focusFinishUsing(gadgetStack, focusStack, world, user);
     }
 
     @Override
-    public ItemStack focusFinishUsing(ItemStack gadgetStack, ItemStack focusStack, World world, LivingEntity user) {
-        if (!world.isClient) {
+    public ItemStack focusFinishUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user) {
+        if (!world.isClientSide) {
             Optional.ofNullable(gadgetStack.get(VivatechComponents.CHARGE_DEFICIT)).ifPresent(deficit -> {
                 if (deficit > CONTINUOUS_COST * 50) {
                     // TODO: different sound
-                    world.createExplosion(
-                            user, world.getDamageSources().magic(), VivatechWorld.DischargeExplosionBehavior.INSTANCE,
-                            user.getX(), user.getY(), user.getZ(), 3f, false, World.ExplosionSourceType.TRIGGER,
-                            ParticleTypes.ELECTRIC_SPARK, ParticleTypes.EXPLOSION_EMITTER, Registries.SOUND_EVENT.getEntry(VivatechSounds.STAR_PROJECTILE_EXPLODE));
+                    world.explode(
+                            user, world.damageSources().magic(), VivatechWorld.DischargeExplosionBehavior.INSTANCE,
+                            user.getX(), user.getY(), user.getZ(), 3f, false, Level.ExplosionInteraction.TRIGGER,
+                            ParticleTypes.ELECTRIC_SPARK, ParticleTypes.EXPLOSION_EMITTER, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(VivatechSounds.STAR_PROJECTILE_EXPLODE));
                 }
             });
             resetGadget(gadgetStack);
-            focusStack.damage(1, user, EquipmentSlot.MAINHAND);
+            focusStack.hurtAndBreak(1, user, EquipmentSlot.MAINHAND);
         }
         return gadgetStack;
     }
@@ -128,11 +131,11 @@ public class EnergyVeilFocusItem extends FocusItem {
     }
 
     @Override
-    public void focusInventoryTick(ItemStack gadgetStack, ItemStack focusStack, World world, Entity entity, int slot, boolean selected) {
-        if (gadgetStack.contains(VivatechComponents.IN_USE)) return;
+    public void focusInventoryTick(ItemStack gadgetStack, ItemStack focusStack, Level world, Entity entity, int slot, boolean selected) {
+        if (gadgetStack.has(VivatechComponents.IN_USE)) return;
 
         findVeil(gadgetStack, world).ifPresent(veil -> {
-            float delta = Math.clamp(2f * (float) (veil.getLifeExpectancy() - veil.age) / veil.getLifeExpectancy(), 0, 1);
+            float delta = Math.clamp(2f * (float) (veil.getLifeExpectancy() - veil.tickCount) / veil.getLifeExpectancy(), 0, 1);
             if (delta <= 1 / 13f) {
                 gadgetStack.remove(VivatechComponents.ITEM_BAR);
             } else {
@@ -147,8 +150,8 @@ public class EnergyVeilFocusItem extends FocusItem {
         gadgetStack.remove(VivatechComponents.CHARGE_DEFICIT);
     }
 
-    private Optional<EnergyVeilEntity> findVeil(ItemStack gadgetStack, World world) {
-        if (world instanceof ServerWorld serverWorld) {
+    private Optional<EnergyVeilEntity> findVeil(ItemStack gadgetStack, Level world) {
+        if (world instanceof ServerLevel serverWorld) {
             return Optional.ofNullable(gadgetStack.get(VivatechComponents.ENERGY_VEIL_UUID)).flatMap(uuid -> {
                 if (serverWorld.getEntity(uuid) instanceof EnergyVeilEntity veil) {
                     return Optional.of(veil);
@@ -162,8 +165,8 @@ public class EnergyVeilFocusItem extends FocusItem {
     }
 
     // This has to happen on the server, and only when the component is present, and only in that order
-    private void removeOrphanedVeilReference(ItemStack gadgetStack, PlayerEntity user) {
-        if (user.getWorld() instanceof ServerWorld serverWorld) {
+    private void removeOrphanedVeilReference(ItemStack gadgetStack, Player user) {
+        if (user.level() instanceof ServerLevel serverWorld) {
             Optional.ofNullable(gadgetStack.get(VivatechComponents.ENERGY_VEIL_UUID)).ifPresent(uuid -> {
                 if (!(serverWorld.getEntity(uuid) instanceof EnergyVeilEntity)) {
                     gadgetStack.remove(VivatechComponents.ENERGY_VEIL_UUID);

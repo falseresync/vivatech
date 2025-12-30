@@ -3,17 +3,18 @@ package falseresync.vivatech.client.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import falseresync.lib.client.BetterDrawContext;
 import falseresync.lib.math.Easing;
+import falseresync.vivatech.client.hud.HudItem;
 import falseresync.vivatech.common.data.VivatechComponents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class ChargeDisplayHudItem implements HudItem {
-    protected static final Identifier TEX = vtId("textures/hud/charge_display.png");
+    protected static final ResourceLocation TEX = vtId("textures/hud/charge_display.png");
     private static final int WIDGET_W = 16;
     private static final int WIDGET_H = 64;
     private static final int TEX_W = 32;
@@ -29,8 +30,8 @@ public class ChargeDisplayHudItem implements HudItem {
     private static final int OVERLAY_W = 3;
     private static final int OVERLAY_H = 32;
     private static final int ANIMATION_DURATION = 10;
-    private final MinecraftClient client;
-    private final TextRenderer textRenderer;
+    private final Minecraft client;
+    private final Font textRenderer;
     private int currentCharge = 0;
     private int maxCharge = 0;
     private boolean isVisible = false;
@@ -38,20 +39,20 @@ public class ChargeDisplayHudItem implements HudItem {
     private boolean animating = false;
     private int remainingAnimationTicks = 0;
 
-    public ChargeDisplayHudItem(MinecraftClient client, TextRenderer textRenderer) {
+    public ChargeDisplayHudItem(Minecraft client, Font textRenderer) {
         this.client = client;
         this.textRenderer = textRenderer;
     }
 
     @Override
-    public void render(BetterDrawContext context, RenderTickCounter tickCounter) {
+    public void render(BetterDrawContext context, DeltaTracker tickCounter) {
         if (isVisible() || animating) {
             float opacity = getAnimatedOpacity();
             float x = getAnimatedX();
-            float y = context.getScaledWindowHeight() / 2f - TEX_H / 2f;
+            float y = context.guiHeight() / 2f - TEX_H / 2f;
 
             RenderSystem.enableBlend();
-            context.setShaderColor(1, 1, 1, opacity);
+            context.setColor(1, 1, 1, opacity);
 
             context.drawNonDiscreteRect(TEX, x, y, BAR_U, BAR_V, BAR_W, BAR_H, TEX_W, TEX_H);
 

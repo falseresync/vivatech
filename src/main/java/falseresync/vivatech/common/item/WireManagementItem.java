@@ -2,49 +2,49 @@ package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.power.grid.GridVertex;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import falseresync.vivatech.common.power.PowerSystem;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.GlobalPos;
-import net.minecraft.world.World;
 
 public abstract class WireManagementItem extends Item {
-    public WireManagementItem(Settings settings) {
+    public WireManagementItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+    public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player miner) {
         return false;
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        var world = context.getWorld();
+    public InteractionResult useOn(UseOnContext context) {
+        var world = context.getLevel();
 
-        var currentPos = context.getBlockPos();
-        if (context.getPlayer() == null || !context.getPlayer().canModifyAt(context.getWorld(), currentPos)) {
-            return ActionResult.FAIL;
+        var currentPos = context.getClickedPos();
+        if (context.getPlayer() == null || !context.getPlayer().mayInteract(context.getLevel(), currentPos)) {
+            return InteractionResult.FAIL;
         }
 
         var currentVertex = PowerSystem.GRID_VERTEX.find(world, currentPos, null);
         if (currentVertex == null) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
-        var stack = context.getStack();
+        var stack = context.getItemInHand();
         var connection = stack.get(VivatechComponents.CONNECTION);
         if (connection == null) {
-            stack.set(VivatechComponents.CONNECTION, new GlobalPos(world.getRegistryKey(), currentPos));
-            return ActionResult.success(context.getWorld().isClient);
+            stack.set(VivatechComponents.CONNECTION, new GlobalPos(world.dimension(), currentPos));
+            return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
         }
 
-        if (connection.dimension() != world.getRegistryKey() || connection.pos().equals(currentPos)) {
-            return ActionResult.FAIL;
+        if (connection.dimension() != world.dimension() || connection.pos().equals(currentPos)) {
+            return InteractionResult.FAIL;
         }
 
         var previousVertex = PowerSystem.GRID_VERTEX.find(world, connection.pos(), null);
@@ -53,8 +53,8 @@ public abstract class WireManagementItem extends Item {
             return manageWire(context, connection, previousVertex, currentVertex);
         }
 
-        return ActionResult.success(context.getWorld().isClient);
+        return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
     }
 
-    protected abstract ActionResult manageWire(ItemUsageContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV);
+    protected abstract InteractionResult manageWire(UseOnContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV);
 }

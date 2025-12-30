@@ -1,51 +1,53 @@
 package falseresync.vivatech.common.block;
 
+import falseresync.vivatech.common.block.BaseBlockWithEntity;
+import falseresync.vivatech.common.block.RestrictsWirePostPlacement;
 import falseresync.vivatech.common.blockentity.GeneratorBlockEntity;
 import falseresync.vivatech.common.blockentity.VivatechBlockEntities;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
-public class GeneratorBlock extends BaseBlockWithEntity.WithTicker implements RestrictsWirePostPlacement {
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+public class GeneratorBlock extends BaseBlockWithEntity.WithTicker implements falseresync.vivatech.common.block.RestrictsWirePostPlacement {
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    protected GeneratorBlock(Settings settings) {
+    protected GeneratorBlock(Properties settings) {
         super(settings);
-        setDefaultState(stateManager.getDefaultState().with(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FACING)));
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new GeneratorBlockEntity(pos, state);
     }
 
@@ -55,7 +57,7 @@ public class GeneratorBlock extends BaseBlockWithEntity.WithTicker implements Re
     }
 
     @Override
-    public boolean allowsWirePostsAt(BlockView world, BlockPos pos, Direction direction) {
-        return RestrictsWirePostPlacement.allowRotatedAboutFacing(world.getBlockState(pos).get(FACING), direction);
+    public boolean allowsWirePostsAt(BlockGetter world, BlockPos pos, Direction direction) {
+        return RestrictsWirePostPlacement.allowRotatedAboutFacing(world.getBlockState(pos).getValue(FACING), direction);
     }
 }

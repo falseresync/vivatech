@@ -4,41 +4,45 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.power.grid.GridVertex;
 import falseresync.vivatech.common.power.grid.GridVertexProvider;
 import falseresync.vivatech.common.power.PowerSystem;
-import net.minecraft.block.*;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SupportType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class WirePostBlock extends Block implements GridVertexProvider {
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-    public static final VoxelShape SHAPE_SOUTH = createCuboidShape(4, 4, 6, 12, 12, 16);
-    public static final VoxelShape SHAPE_NORTH = createCuboidShape(4, 4, 0, 12, 12, 10);
+    public static final VoxelShape SHAPE_SOUTH = box(4, 4, 6, 12, 12, 16);
+    public static final VoxelShape SHAPE_NORTH = box(4, 4, 0, 12, 12, 10);
 
-    public static final VoxelShape SHAPE_EAST = createCuboidShape(6, 4, 4, 16, 12, 12);
-    public static final VoxelShape SHAPE_WEST = createCuboidShape(0, 4, 4, 10, 12, 12);
+    public static final VoxelShape SHAPE_EAST = box(6, 4, 4, 16, 12, 12);
+    public static final VoxelShape SHAPE_WEST = box(0, 4, 4, 10, 12, 12);
 
-    public static final VoxelShape SHAPE_DOWN = createCuboidShape(4, 0, 4, 12, 10, 12);
-    public static final VoxelShape SHAPE_UP = createCuboidShape(4, 6, 4, 12, 16, 12);
+    public static final VoxelShape SHAPE_DOWN = box(4, 0, 4, 12, 10, 12);
+    public static final VoxelShape SHAPE_UP = box(4, 6, 4, 12, 16, 12);
 
-    public WirePostBlock(Settings settings) {
+    public WirePostBlock(Properties settings) {
         super(settings);
-        setDefaultState(stateManager.getDefaultState().with(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
-    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return switch (state.get(FACING)) {
+    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return switch (state.getValue(FACING)) {
             case SOUTH -> SHAPE_SOUTH;
             case NORTH -> SHAPE_NORTH;
             case EAST -> SHAPE_EAST;
@@ -49,21 +53,21 @@ public class WirePostBlock extends Block implements GridVertexProvider {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(FACING, ctx.getSide().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getClickedFace().getOpposite());
     }
 
     @Override
-    protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-        var facing = state.get(FACING);
-        var otherPos = pos.offset(facing);
+    protected boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+        var facing = state.getValue(FACING);
+        var otherPos = pos.relative(facing);
         var otherState = world.getBlockState(otherPos);
-        if (otherState.isSideSolid(world, otherPos, facing.getOpposite(), SideShapeType.CENTER)) {
+        if (otherState.isFaceSturdy(world, otherPos, facing.getOpposite(), SupportType.CENTER)) {
             if (otherState.getBlock() instanceof RestrictsWirePostPlacement otherBlock) {
                 return otherBlock.allowsWirePostsAt(world, otherPos, facing.getOpposite());
             }
@@ -73,34 +77,34 @@ public class WirePostBlock extends Block implements GridVertexProvider {
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        return canPlaceAt(state, world, pos) ? state : Blocks.AIR.getDefaultState();
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+        return canSurvive(state, world, pos) ? state : Blocks.AIR.defaultBlockState();
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FACING)));
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    public GridVertex getGridVertex(World world, BlockPos pos, BlockState state) {
-        var facing = state.get(FACING);
-        return new GridVertex(pos, facing, PowerSystem.APPLIANCE.find(world, pos.offset(facing), facing));
+    public GridVertex getGridVertex(Level world, BlockPos pos, BlockState state) {
+        var facing = state.getValue(FACING);
+        return new GridVertex(pos, facing, PowerSystem.APPLIANCE.find(world, pos.relative(facing), facing));
     }
 
     @Override
-    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!world.isClient) {
-            var grid = Vivatech.getPowerSystem().in(world.getRegistryKey()).getGridLookup().get(pos);
+    protected void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!world.isClientSide) {
+            var grid = Vivatech.getPowerSystem().in(world.dimension()).getGridLookup().get(pos);
             if (grid != null) {
                 grid.remove(pos);
             }
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
+        super.onRemove(state, world, pos, newState, moved);
     }
 }

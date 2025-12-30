@@ -3,7 +3,7 @@ package falseresync.vivatech.client.wire;
 import falseresync.vivatech.common.power.wire.Wire;
 
 public interface WireParameters {
-    WireModel getModel();
+    falseresync.vivatech.client.wire.WireModel getModel();
 
     float getSaggedYForSegment(float unsaggedY, float segmentNo);
 

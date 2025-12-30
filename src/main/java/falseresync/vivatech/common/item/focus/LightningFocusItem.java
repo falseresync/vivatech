@@ -3,57 +3,58 @@ package falseresync.vivatech.common.item.focus;
 import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.VivatechUtil;
 import falseresync.vivatech.common.data.VivatechAttachments;
+import falseresync.vivatech.common.item.focus.FocusItem;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import falseresync.vivatech.common.Reports;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.World;
 
 public class LightningFocusItem extends FocusItem {
-    public LightningFocusItem(Settings settings) {
+    public LightningFocusItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
-        if (user instanceof ServerPlayerEntity player) {
+    public InteractionResultHolder<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, Level world, Player user, InteractionHand hand) {
+        if (user instanceof ServerPlayer player) {
             if (Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, 10, user)) {
                 var lightning = EntityType.LIGHTNING_BOLT.create(world);
-                var maxDistance = MathHelper.clamp(VivatechUtil.findViewDistance(world) * 16 / 4F, 32, 128);
-                var raycastResult = user.raycast(maxDistance, 0, true);
+                var maxDistance = Mth.clamp(VivatechUtil.findViewDistance(world) * 16 / 4F, 32, 128);
+                var raycastResult = user.pick(maxDistance, 0, true);
                 var pos = raycastResult.getType() == HitResult.Type.MISS
-                        ? findGroundPos((ServerWorld) world, raycastResult.getPos())
-                        : raycastResult.getPos();
+                        ? findGroundPos((ServerLevel) world, raycastResult.getLocation())
+                        : raycastResult.getLocation();
                 // There won't be an NPE, because lightnings are not optional features. Hopefully.
                 //noinspection DataFlowIssue
-                lightning.refreshPositionAfterTeleport(pos);
-                lightning.setChanneler(player);
+                lightning.moveTo(pos);
+                lightning.setCause(player);
                 lightning.setAttached(VivatechAttachments.THUNDERLESS_LIGHTNING, true);
-                world.spawnEntity(lightning);
-                focusStack.damage(1, user, EquipmentSlot.MAINHAND);
-                return TypedActionResult.success(gadgetStack);
+                world.addFreshEntity(lightning);
+                focusStack.hurtAndBreak(1, user, EquipmentSlot.MAINHAND);
+                return InteractionResultHolder.success(gadgetStack);
             }
 
             Reports.insufficientCharge(player);
-            return TypedActionResult.fail(gadgetStack);
+            return InteractionResultHolder.fail(gadgetStack);
         }
 
-        return TypedActionResult.consume(gadgetStack);
+        return InteractionResultHolder.consume(gadgetStack);
     }
 
-    protected Vec3d findGroundPos(ServerWorld world, Vec3d posInAir) {
-        return new Vec3d(
+    protected Vec3 findGroundPos(ServerLevel world, Vec3 posInAir) {
+        return new Vec3(
                 posInAir.x,
-                world.getTopY(Heightmap.Type.MOTION_BLOCKING, (int) posInAir.x, (int) posInAir.z),
+                world.getHeight(Heightmap.Types.MOTION_BLOCKING, (int) posInAir.x, (int) posInAir.z),
                 posInAir.z);
     }
 }
