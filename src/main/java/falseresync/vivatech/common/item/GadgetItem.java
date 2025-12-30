@@ -88,7 +88,7 @@ public class GadgetItem extends Item {
         var gadgetStack = context.getItemInHand();
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusUseOnBlock(gadgetStack, focusStack, context);
+            return focusItem.focusUseOn(gadgetStack, focusStack, context);
         }
 
         return super.useOn(context);
@@ -99,7 +99,7 @@ public class GadgetItem extends Item {
         var gadgetStack = user.getItemInHand(hand);
         var focusStack = getEquipped(gadgetStack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusUseOnEntity(gadgetStack, focusStack, user, entity, hand);
+            return focusItem.focusInteractLivingEntity(gadgetStack, focusStack, user, entity, hand);
         }
 
         return super.interactLivingEntity(stack, user, entity, hand);
@@ -109,7 +109,7 @@ public class GadgetItem extends Item {
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            focusItem.focusUsageTick(world, user, stack, focusStack, remainingUseTicks);
+            focusItem.focusOnUseTick(world, user, stack, focusStack, remainingUseTicks);
             return;
         }
 
@@ -121,7 +121,7 @@ public class GadgetItem extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusFinishUsing(stack, focusStack, world, user);
+            return focusItem.focusFinishUsingItem(stack, focusStack, world, user);
         }
 
         return super.finishUsingItem(stack, world, user);
@@ -132,7 +132,7 @@ public class GadgetItem extends Item {
     public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            focusItem.focusOnStoppedUsing(stack, focusStack, world, user, remainingUseTicks);
+            focusItem.focusReleaseUsing(stack, focusStack, world, user, remainingUseTicks);
         }
     }
 
@@ -154,7 +154,7 @@ public class GadgetItem extends Item {
     public boolean useOnRelease(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusIsUsedOnRelease(stack, focusStack);
+            return focusItem.focusUseOnRelease(stack, focusStack);
         }
 
         return super.useOnRelease(stack);
@@ -169,7 +169,7 @@ public class GadgetItem extends Item {
     public int getUseDuration(ItemStack stack, LivingEntity user) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusGetMaxUseTime(stack, focusStack, user);
+            return focusItem.focusGetUseDuration(stack, focusStack, user);
         }
 
         return super.getUseDuration(stack, user);
@@ -181,7 +181,7 @@ public class GadgetItem extends Item {
         if (weaponStack != null && weaponStack.getItem() instanceof GadgetItem) {
             var focusStack = getEquipped(weaponStack);
             if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-                return focusItem.focusGetBonusAttackDamage(weaponStack, focusStack, target, baseAttackDamage, damageSource);
+                return focusItem.focusGetAttackDamageBonus(weaponStack, focusStack, target, baseAttackDamage, damageSource);
             }
         }
 
@@ -194,7 +194,7 @@ public class GadgetItem extends Item {
     public boolean isBarVisible(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusIsItemBarVisible(stack, focusStack);
+            return focusItem.focusIsBarVisible(stack, focusStack);
         }
 
         return super.isBarVisible(stack);
@@ -204,7 +204,7 @@ public class GadgetItem extends Item {
     public int getBarWidth(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusGetItemBarStep(stack, focusStack);
+            return focusItem.focusGetBarWidth(stack, focusStack);
         }
 
         return super.getBarWidth(stack);
@@ -214,7 +214,7 @@ public class GadgetItem extends Item {
     public int getBarColor(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusGetItemBarColor(stack, focusStack);
+            return focusItem.focusGetBarColor(stack, focusStack);
         }
 
         return super.getBarColor(stack);
@@ -224,7 +224,7 @@ public class GadgetItem extends Item {
     public boolean isFoil(ItemStack stack) {
         var focusStack = getEquipped(stack);
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof FocusItem focusItem) {
-            return focusItem.focusHasGlint(stack, focusStack);
+            return focusItem.focusIsFoil(stack, focusStack);
         }
 
         return super.isFoil(stack);
@@ -238,7 +238,7 @@ public class GadgetItem extends Item {
             tooltip.add(Component
                     .translatable("tooltip.vivatech.gadget.active_focus", focusStack.getHoverName())
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
-            focusItem.focusAppendTooltip(stack, focusStack, context, tooltip, type);
+            focusItem.focusAppendHoverText(stack, focusStack, context, tooltip, type);
         }
         tooltip.add(Component
                 .translatable("tooltip.vivatech.gadget.change_focus", KeyBindingHelper.getBoundKeyOf(VivatechKeybindings.TOOL_CONTROL).getDisplayName())

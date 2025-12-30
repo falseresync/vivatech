@@ -73,7 +73,7 @@ public class EnergyVeilFocusItem extends FocusItem {
     }
 
     @Override
-    public void focusUsageTick(Level world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
+    public void focusOnUseTick(Level world, LivingEntity user, ItemStack gadgetStack, ItemStack focusStack, int remainingUseTicks) {
         findVeil(gadgetStack, world).ifPresent(veil -> {
             if (user instanceof ServerPlayer player) {
                 if (!Vivatech.getChargeManager().tryExpendGadgetCharge(gadgetStack, CONTINUOUS_COST, player)) {
@@ -87,7 +87,7 @@ public class EnergyVeilFocusItem extends FocusItem {
                     }
                 }
                 veil.incrementLifeExpectancy(2);
-                var maxUseTicks = focusGetMaxUseTime(gadgetStack, focusStack, user);
+                var maxUseTicks = focusGetUseDuration(gadgetStack, focusStack, user);
                 gadgetStack.set(VivatechComponents.ITEM_BAR,
                         new ItemBarComponent(Math.clamp(Math.round((maxUseTicks - remainingUseTicks) * 13f / maxUseTicks), 0, 13), CYAN_ARGB));
 
@@ -103,12 +103,12 @@ public class EnergyVeilFocusItem extends FocusItem {
     }
 
     @Override
-    public void focusOnStoppedUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user, int remainingUseTicks) {
-        focusFinishUsing(gadgetStack, focusStack, world, user);
+    public void focusReleaseUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user, int remainingUseTicks) {
+        focusFinishUsingItem(gadgetStack, focusStack, world, user);
     }
 
     @Override
-    public ItemStack focusFinishUsing(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user) {
+    public ItemStack focusFinishUsingItem(ItemStack gadgetStack, ItemStack focusStack, Level world, LivingEntity user) {
         if (!world.isClientSide) {
             Optional.ofNullable(gadgetStack.get(VivatechComponents.CHARGE_DEFICIT)).ifPresent(deficit -> {
                 if (deficit > CONTINUOUS_COST * 50) {
@@ -126,7 +126,7 @@ public class EnergyVeilFocusItem extends FocusItem {
     }
 
     @Override
-    public int focusGetMaxUseTime(ItemStack gadgetStack, ItemStack focusStack, LivingEntity user) {
+    public int focusGetUseDuration(ItemStack gadgetStack, ItemStack focusStack, LivingEntity user) {
         return MAX_USE_TIME;
     }
 

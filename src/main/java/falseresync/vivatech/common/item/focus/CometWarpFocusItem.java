@@ -6,7 +6,6 @@ import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.Reports;
 import java.util.List;
 
-import falseresync.vivatech.common.item.focus.FocusItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.core.GlobalPos;
@@ -59,7 +58,7 @@ public class CometWarpFocusItem extends FocusItem {
     }
 
     @Override
-    public InteractionResult focusUseOnBlock(ItemStack gadgetStack, ItemStack focusStack, UseOnContext context) {
+    public InteractionResult focusUseOn(ItemStack gadgetStack, ItemStack focusStack, UseOnContext context) {
         var world = context.getLevel();
         var player = context.getPlayer();
         if (player == null) {
@@ -98,7 +97,7 @@ public class CometWarpFocusItem extends FocusItem {
             return InteractionResult.FAIL;
         }
 
-        return super.focusUseOnBlock(gadgetStack, focusStack, context);
+        return super.focusUseOn(gadgetStack, focusStack, context);
     }
 
     @Override
@@ -175,12 +174,12 @@ public class CometWarpFocusItem extends FocusItem {
     }
 
     @Override
-    public boolean focusHasGlint(ItemStack gadgetStack, ItemStack focusStack) {
+    public boolean focusIsFoil(ItemStack gadgetStack, ItemStack focusStack) {
         return isFoil(gadgetStack);
     }
 
     @Override
-    public void focusAppendTooltip(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+    public void focusAppendHoverText(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         appendTooltip$internal(gadgetStack, focusStack, context, tooltip, type, true);
     }
 
