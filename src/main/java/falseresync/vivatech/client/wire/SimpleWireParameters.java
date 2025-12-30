@@ -11,8 +11,8 @@ public abstract class SimpleWireParameters implements WireParameters {
     public SimpleWireParameters(Wire wire, WireModel parameters) {
         this.wire = wire;
         this.parameters = parameters;
-        k1 = (float) (getSaggingCoefficient() * 4f * Math.pow(parameters.getSegmentSize() / wire.length(), 2));
-        k2 = getSaggingCoefficient() * 4f * parameters.getSegmentSize() / wire.length();
+        k1 = (float) (getSaggingCoefficient() * 4f * Math.pow(parameters.getSegmentLength() / wire.length(), 2));
+        k2 = getSaggingCoefficient() * 4f * parameters.getSegmentLength() / wire.length();
     }
 
     @Override

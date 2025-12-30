@@ -1,5 +1,6 @@
 package falseresync.vivatech.client.rendering.world;
 
+import falseresync.lib.math.VectorMath;
 import falseresync.vivatech.client.VivatechClient;
 import falseresync.vivatech.client.rendering.RenderingUtil;
 import falseresync.vivatech.client.wire.WireParameters;
@@ -8,10 +9,12 @@ import falseresync.vivatech.client.wire.WireModel;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Colors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class WireRenderer implements WorldRenderEvents.AfterEntities {
@@ -45,7 +48,7 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
 
             var positionMatrix = matrices.peek().getPositionMatrix();
             var direction = wireEnd.normalize(new Vector3f());
-            int segmentCount = (int) (wire.length() / model.getSegmentSize());
+            int segmentCount = (int) (wire.length() / model.getSegmentLength());
 
             if (direction.x == 0 && direction.z == 0) {
                 drawVerticalWire(model, wireEnd, segmentCount, buffer, positionMatrix, light);
@@ -83,7 +86,7 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
         var tangent = new Vector3f(direction.x, 0, direction.z).normalize(new Vector3f()).cross(HORIZONTAL_SEGMENT_NORMAL);
         var tangentialHalfSize = tangent.mul(model.getSegmentSize() / 2f, new Vector3f());
 
-        var stepXZ = direction.mul(model.getSegmentSize(), new Vector3f());
+        var stepXZ = direction.mul(model.getSegmentLength(), new Vector3f());
         float yPerSegment = wireEnd.y / segmentCount;
 
         var segmentAVertices = buildInitialSegmentVertices(tangentialHalfSize, new Vector3f(0, model.getSegmentSize() / 2, 0), stepXZ);

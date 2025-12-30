@@ -11,4 +11,8 @@ public interface WireModel {
     float[] getUv(int segmentNo);
 
     float getSegmentSize();
+
+    default float getSegmentLength() {
+        return getSegmentSize() * 4;
+    }
 }
