@@ -4,7 +4,6 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.VivatechSounds;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.Reports;
-import falseresync.vivatech.compat.anshar.AnsharCompat;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.component.DataComponentTypes;
@@ -32,7 +31,6 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class CometWarpFocusItem extends FocusItem {
-    public static AnsharCompat ansharCompat = new AnsharCompat() {};
     public static final BlockPredicatesChecker LODESTONE_CHECKER = new BlockPredicatesChecker(List.of(
             BlockPredicate.Builder.create()
                     .blocks(Blocks.LODESTONE)
@@ -49,14 +47,12 @@ public class CometWarpFocusItem extends FocusItem {
 
     @Override
     public void focusOnEquipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
-        ansharCompat.onEquipped(gadgetStack, focusStack, user);
         transferComponent(focusStack, gadgetStack, VivatechComponents.WARP_FOCUS_ANCHOR);
         transferComponent(focusStack, gadgetStack, VivatechComponents.WARP_FOCUS_PERSISTENT_ANCHOR);
     }
 
     @Override
     public void focusOnUnequipped(ItemStack gadgetStack, ItemStack focusStack, PlayerEntity user) {
-        ansharCompat.onUnequipped(gadgetStack, focusStack, user);
         transferComponent(gadgetStack, focusStack, VivatechComponents.WARP_FOCUS_ANCHOR);
         transferComponent(gadgetStack, focusStack, VivatechComponents.WARP_FOCUS_PERSISTENT_ANCHOR);
     }
@@ -101,21 +97,11 @@ public class CometWarpFocusItem extends FocusItem {
             return ActionResult.FAIL;
         }
 
-        var result = ansharCompat.useOnBlock(gadgetStack, focusStack, context);
-        if (result != null) {
-            return result;
-        }
-
         return super.focusUseOnBlock(gadgetStack, focusStack, context);
     }
 
     @Override
     public TypedActionResult<ItemStack> focusUse(ItemStack gadgetStack, ItemStack focusStack, World world, PlayerEntity user, Hand hand) {
-        var result = ansharCompat.use(gadgetStack, focusStack, world, user, hand);
-        if (result != null) {
-            return result;
-        }
-
         if (user instanceof ServerPlayerEntity player && world instanceof ServerWorld serverWorld) {
             if (user.isSneaking()) {
                 // Do not override lodestones
@@ -198,11 +184,6 @@ public class CometWarpFocusItem extends FocusItem {
     }
 
     private static void appendTooltip$internal(ItemStack gadgetStack, ItemStack focusStack, TooltipContext context, List<Text> tooltip, TooltipType type, boolean showSetupTip) {
-        ansharCompat.appendTooltip(gadgetStack, context, tooltip, type);
-        if (focusStack.contains(VivatechComponents.TOOLTIP_OVERRIDDEN)) {
-            return;
-        }
-
         var anchor = gadgetStack.get(VivatechComponents.WARP_FOCUS_ANCHOR);
         if (anchor != null) {
             tooltip.add(Text.translatable("tooltip.vivatech.gadget.has_anchor",
@@ -229,11 +210,6 @@ public class CometWarpFocusItem extends FocusItem {
 
     @Override
     public boolean hasGlint(ItemStack stack) {
-        var result = ansharCompat.hasGlint(stack);
-        if (result != null) {
-            return result;
-        }
-
         return stack.contains(VivatechComponents.WARP_FOCUS_ANCHOR) || stack.contains(VivatechComponents.WARP_FOCUS_PERSISTENT_ANCHOR);
     }
 

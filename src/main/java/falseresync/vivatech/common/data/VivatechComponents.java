@@ -22,8 +22,6 @@ public class VivatechComponents {
             ComponentType.<ItemBarComponent>builder().codec(ItemBarComponent.CODEC).packetCodec(ItemBarComponent.PACKET_CODEC).build();
     public static final @RegistryObject ComponentType<Boolean> IN_USE =
             ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
-    public static final @RegistryObject ComponentType<Boolean> TOOLTIP_OVERRIDDEN =
-            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
     public static final @RegistryObject ComponentType<InventoryComponent> INVENTORY =
             ComponentType.<InventoryComponent>builder().codec(InventoryComponent.CODEC).packetCodec(InventoryComponent.PACKET_CODEC).build();
     public static final @RegistryObject ComponentType<Integer> INVENTORY_SIZE =

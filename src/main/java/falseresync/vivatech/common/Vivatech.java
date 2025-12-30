@@ -15,7 +15,6 @@ import falseresync.vivatech.common.item.focus.CometWarpFocusItem;
 import falseresync.vivatech.common.item.focus.TransmutationFocusBehavior;
 import falseresync.vivatech.common.power.PowerSystem;
 import falseresync.vivatech.common.power.wire.WireType;
-import falseresync.vivatech.compat.anshar.AnsharCompatImpl;
 import falseresync.vivatech.network.VivatechNetworking;
 import falseresync.vivatech.network.VivatechServerReceivers;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -80,10 +79,6 @@ public class Vivatech implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             powerSystem = new PowerSystem(server);
         });
-
-        if (FabricLoader.getInstance().isModLoaded("anshar")) {
-            CometWarpFocusItem.ansharCompat = new AnsharCompatImpl();
-        }
 
         LOGGER.info("Initialized");
     }
