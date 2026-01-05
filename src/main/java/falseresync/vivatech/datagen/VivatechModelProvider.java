@@ -6,21 +6,19 @@ import falseresync.vivatech.common.block.VivatechBlocks;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.FocusItem;
 import falseresync.vivatech.common.item.focus.FocusPlating;
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.data.models.BlockModelGenerators;
-import net.minecraft.data.models.ItemModelGenerators;
-import net.minecraft.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.data.models.blockstates.Variant;
-import net.minecraft.data.models.blockstates.VariantProperties;
-import net.minecraft.data.models.model.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.model.*;
+import net.minecraft.resources.Identifier;
 
 import java.util.Map;
 import java.util.Optional;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
-import static net.minecraft.data.models.model.TexturedModel.createDefault;
+import static net.minecraft.client.data.models.model.TexturedModel.createDefault;
 
 public class VivatechModelProvider extends FabricModelProvider {
     public static class VivatechModels {
@@ -69,7 +67,7 @@ public class VivatechModelProvider extends FabricModelProvider {
     private void registerWirePost() {
         blockStateModelGenerator.blockStateOutput.accept(
                 MultiVariantGenerator
-                        .multiVariant(
+                        .dispatch(
                                 VivatechBlocks.WIRE_POST,
                                 Variant.variant().with(VariantProperties.MODEL, ModelLocationUtils.getModelLocation(VivatechBlocks.WIRE_POST))
                         ).with(BlockModelGenerators.createFacingDispatch())
@@ -96,7 +94,7 @@ public class VivatechModelProvider extends FabricModelProvider {
         registerFocus(VivatechItems.ENERGY_VEIL_FOCUS, itemModelGenerator);
     }
 
-    private JsonObject createFocusJson(ResourceLocation id, Map<TextureSlot, ResourceLocation> textures) {
+    private JsonObject createFocusJson(Identifier id, Map<TextureSlot, Identifier> textures) {
         var model = ModelTemplates.TWO_LAYERED_ITEM.createBaseTemplate(id, textures);
         var overrides = new JsonArray();
 
@@ -114,9 +112,9 @@ public class VivatechModelProvider extends FabricModelProvider {
     }
 
     private void registerFocus(FocusItem focus, ItemModelGenerators generator) {
-        ResourceLocation modelId = ModelLocationUtils.getModelLocation(focus);
-        ResourceLocation textureId = TextureMapping.getItemTexture(focus);
-        ModelTemplates.FLAT_ITEM.create(modelId, TextureMapping.layer0(textureId), generator.output, this::createFocusJson);
+        Identifier modelId = ModelLocationUtils.getModelLocation(focus);
+        Identifier textureId = TextureMapping.getItemTexture(focus);
+        ModelTemplates.FLAT_ITEM.create(modelId, TextureMapping.layer0(textureId), this::createFocusJson,generator.modelOutput, );
 
         for (var plating : FocusPlating.values()) {
             ModelTemplates.TWO_LAYERED_ITEM.create(

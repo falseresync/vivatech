@@ -14,7 +14,7 @@ public class VivatechBlockTagProvider extends FabricTagProvider.BlockTagProvider
 
     @Override
     protected void addTags(HolderLookup.Provider arg) {
-        getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
+        valueLookupBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(VivatechBlocks.GENERATOR)
                 .add(VivatechBlocks.GEARBOX)
                 .add(VivatechBlocks.WIND_TURBINE)

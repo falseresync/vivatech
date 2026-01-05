@@ -17,13 +17,13 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class FocusPickerHudItem implements HudItem {
-    protected static final ResourceLocation SELECTION_TEX = vtId("textures/hud/focus_picker.png");
+    protected static final Identifier SELECTION_TEX = vtId("textures/hud/focus_picker.png");
     private static final int MARGIN = 2;
     private static final int WIDGET_W = 22;
     private static final int WIDGET_H = 22;

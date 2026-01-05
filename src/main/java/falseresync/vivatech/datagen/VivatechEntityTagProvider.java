@@ -15,7 +15,7 @@ public class VivatechEntityTagProvider extends FabricTagProvider.EntityTypeTagPr
 
     @Override
     protected void addTags(HolderLookup.Provider wrapperLookup) {
-        getOrCreateTagBuilder(VivatechEntityTags.PASSES_THROUGH_ENERGY_VEIL)
+        valueLookupBuilder(VivatechEntityTags.PASSES_THROUGH_ENERGY_VEIL)
                 .add(EntityType.ITEM)
                 .add(EntityType.AREA_EFFECT_CLOUD)
                 .add(EntityType.LIGHTNING_BOLT)

@@ -8,13 +8,13 @@ import falseresync.vivatech.common.data.VivatechComponents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
 
 public class ChargeDisplayHudItem implements HudItem {
-    protected static final ResourceLocation TEX = vtId("textures/hud/charge_display.png");
+    protected static final Identifier TEX = vtId("textures/hud/charge_display.png");
     private static final int WIDGET_W = 16;
     private static final int WIDGET_H = 64;
     private static final int TEX_W = 32;

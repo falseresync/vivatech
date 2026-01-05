@@ -15,7 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -109,11 +109,11 @@ public class VivatechVanillaRecipeProvider extends FabricRecipeProvider {
         }
     }
 
-    private ResourceLocation block(Block block) {
+    private Identifier block(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 
-    private ResourceLocation item(Item item) {
+    private Identifier item(Item item) {
         return BuiltInRegistries.ITEM.getKey(item);
     }
 }

@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Matrix4f;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
@@ -16,7 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 public class StarProjectileRenderer extends EntityRenderer<StarProjectileEntity> {
-    protected static final ResourceLocation TEXTURE = vtId("textures/entity/star_projectile.png");
+    protected static final Identifier TEXTURE = vtId("textures/entity/star_projectile.png");
     private final RenderType renderLayer;
 
     public StarProjectileRenderer(EntityRendererProvider.Context context) {
@@ -64,7 +64,7 @@ public class StarProjectileRenderer extends EntityRenderer<StarProjectileEntity>
     }
 
     @Override
-    public ResourceLocation getTextureLocation(StarProjectileEntity entity) {
+    public Identifier getTextureLocation(StarProjectileEntity entity) {
         return TEXTURE;
     }
 }

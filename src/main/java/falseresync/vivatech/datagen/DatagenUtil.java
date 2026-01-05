@@ -1,10 +1,10 @@
 package falseresync.vivatech.datagen;
 
 import falseresync.vivatech.common.item.focus.FocusPlating;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class DatagenUtil {
-    public static ResourceLocation suffixPlating(ResourceLocation id, FocusPlating plating) {
+    public static Identifier suffixPlating(Identifier id, FocusPlating plating) {
         return id.withSuffix("_plating_" + plating.name().toLowerCase());
     }
 }

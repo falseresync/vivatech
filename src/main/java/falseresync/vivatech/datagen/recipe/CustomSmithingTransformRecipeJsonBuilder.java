@@ -4,7 +4,7 @@ import falseresync.vivatech.common.item.focus.FocusPlating;
 import falseresync.vivatech.datagen.DatagenUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.SmithingTransformRecipe;
@@ -26,7 +26,7 @@ public class CustomSmithingTransformRecipeJsonBuilder {
         offerTo(exporter, DatagenUtil.suffixPlating(BuiltInRegistries.ITEM.getKey(result.getItem()), plating));
     }
 
-    public void offerTo(RecipeOutput exporter, ResourceLocation recipeId) {
+    public void offerTo(RecipeOutput exporter, Identifier recipeId) {
         exporter.accept(recipeId, new SmithingTransformRecipe(template, base, addition, result), null);
     }
 

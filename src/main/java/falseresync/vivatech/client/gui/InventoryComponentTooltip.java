@@ -4,11 +4,11 @@ import falseresync.vivatech.common.data.InventoryComponent;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class InventoryComponentTooltip implements ClientTooltipComponent {
-    private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("container/bundle/background");
+    private static final Identifier BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("container/bundle/background");
     private static final int BOTTOM_MARGIN = 4;
     private static final int WIDTH_PER_COLUMN = 18;
     private static final int HEIGHT_PER_ROW = 20;
@@ -76,13 +76,13 @@ public class InventoryComponentTooltip implements ClientTooltipComponent {
     }
 
     enum SlotSprite {
-        SLOT(ResourceLocation.withDefaultNamespace("container/bundle/slot"), 18, 20);
+        SLOT(Identifier.withDefaultNamespace("container/bundle/slot"), 18, 20);
 
-        public final ResourceLocation texture;
+        public final Identifier texture;
         public final int width;
         public final int height;
 
-        SlotSprite(final ResourceLocation texture, final int width, final int height) {
+        SlotSprite(final Identifier texture, final int width, final int height) {
             this.texture = texture;
             this.width = width;
             this.height = height;

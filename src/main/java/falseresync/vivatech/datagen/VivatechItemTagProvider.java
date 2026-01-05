@@ -15,9 +15,9 @@ public class VivatechItemTagProvider extends FabricTagProvider.ItemTagProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider arg) {
-        getOrCreateTagBuilder(VivatechItemTags.FOCUSES).add(FOCUSES);
-        getOrCreateTagBuilder(VivatechItemTags.GADGETS).add(VivatechItems.GADGET);
-        getOrCreateTagBuilder(VivatechItemTags.CHARGEABLE)
+        valueLookupBuilder(VivatechItemTags.FOCUSES).add(FOCUSES);
+        valueLookupBuilder(VivatechItemTags.GADGETS).add(VivatechItems.GADGET);
+        valueLookupBuilder(VivatechItemTags.CHARGEABLE)
                 .add(VivatechItems.GADGET);
     }
 

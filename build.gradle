@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-	id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'com.gradleup.shadow' version '9.0.0-beta10'
 }
 
@@ -35,11 +35,16 @@ repositories {
 	maven {
 		url = "https://jitpack.io"
 	}
-
-	maven {
-		name = "Fuzs Mod Resources"
-		url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
-	}
+    maven {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
 }
 
 fabricApi {
@@ -51,16 +56,16 @@ loom {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	minecraft "com.mojang:minecraft:$minecraft_version"
 	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc:fabric-loader:$loader_version"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
 
 	// ------------------------
 	// --- MOD DEPENDENCIES ---
 	// ------------------------
-	modApi 'me.shedaniel.cloth:cloth-config-fabric:15.0.140'
-	modApi "dev.emi:trinkets:3.10.0"
+	modApi "me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version"
+	modApi "dev.emi:trinkets:$trinkets_version"
 
 	// --------------------------
 	// --- OTHER DEPENDENCIES ---
@@ -75,8 +80,10 @@ dependencies {
 	modLocalRuntime "mcp.mobius.waila:wthit:fabric-$wthit_version"
 	modLocalRuntime "lol.bai:badpackets:fabric-$badpackets_version"
 
-	modCompileOnly "dev.emi:emi-fabric:$emi_version:api"
-	modLocalRuntime "dev.emi:emi-fabric:$emi_version"
+//	modCompileOnly "dev.emi:emi-fabric:$emi_version:api"
+//	modLocalRuntime "dev.emi:emi-fabric:$emi_version"
+    modCompileOnly("mezz.jei:jei-$minecraft_version-fabric-api:$jei_version")
+    modRuntimeOnly("mezz.jei:jei-$minecraft_version-fabric:$jei_version")
 
 	modCompileOnly "com.terraformersmc:modmenu:$modmenu_version"
 	modLocalRuntime "com.terraformersmc:modmenu:$modmenu_version"
@@ -85,11 +92,10 @@ dependencies {
     // --- CONVENIENCE ---
     // -------------------
     // Comment out / uncomment for testing and convenience
-    modLocalRuntime "maven.modrinth:betterf3:11.0.3"
-	modLocalRuntime "maven.modrinth:component-viewer:1.2.0+1.21.1"
-	modLocalRuntime "com.github.provismet:lilylib:1.3.1-mc1.21" // required by tooltip-scroll
-	modLocalRuntime "maven.modrinth:tooltip-scroll:1.4.0+1.21"
-	modLocalRuntime "maven.modrinth:dev-tools-unlocker:1.0.0"
+//    modLocalRuntime "maven.modrinth:betterf3:11.0.3"
+	modLocalRuntime "maven.modrinth:component-viewer:1.3.2+1.21.11-fabric"
+	modLocalRuntime "maven.modrinth:tooltip-scroll:1.5.1+1.21.10"
+//	modLocalRuntime "maven.modrinth:dev-tools-unlocker:1.0.0"
 }
 
 processResources {
