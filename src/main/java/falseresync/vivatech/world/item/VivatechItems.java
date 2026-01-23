@@ -2,6 +2,7 @@ package falseresync.vivatech.world.item;
 
 import falseresync.vivatech.Vivatech;
 import falseresync.vivatech.world.block.VivatechBlocks;
+import falseresync.vivatech.world.electricity.wire.WireType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -31,8 +32,8 @@ public class VivatechItems {
     public static final BlockItem WIRE_POST
             = register("wire_post", VivatechBlocks.WIRE_POST);
 
-    public static final Item WIRE
-            = register("wire", WireItem::new);
+    public static final Item COPPER_WIRE
+            = register("copper_wire", properties -> new WireItem(properties, WireType.V_230));
     public static final Item MORTAR_AND_PESTLE
             = register("mortar_and_pestle", MortarAndPestleItem::new, new Item.Properties().stacksTo(1).durability(16));
     public static final Item SCREWDRIVER

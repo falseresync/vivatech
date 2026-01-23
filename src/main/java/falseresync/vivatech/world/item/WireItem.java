@@ -22,8 +22,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import org.jspecify.annotations.Nullable;
 
 public class WireItem extends WireManagementItem {
-    public WireItem(Properties settings) {
+    private final WireType wireType;
+
+    public WireItem(Properties settings, WireType wireType) {
         super(settings);
+        this.wireType = wireType;
     }
 
     @Override
@@ -31,13 +34,14 @@ public class WireItem extends WireManagementItem {
         if (context.getPlayer() instanceof ServerPlayer player) {
             var stack = context.getItemInHand();
             if (!player.isCreative() && !connection.pos().closerToCenterThan(player.position(), stack.getCount() * 5D / 4)) {
-                player.displayClientMessage(Component.translatable("hud.vivatech.wire").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(Component.translatable("hud.vivatech.wire.not_enough").withStyle(ChatFormatting.RED), true);
                 stack.remove(VivatechComponents.ITEM_BAR);
                 return InteractionResult.FAIL;
             }
 
-            var grid = Vivatech.getPowerSystemsManager().getFor(context.getLevel().dimension()).findOrCreate(vertexU.pos(), vertexV.pos(), WireType.V_230);
-            if (grid.getWireType() != WireType.V_230) {
+            var grid = Vivatech.getPowerSystemsManager().getFor(context.getLevel().dimension()).findOrCreate(vertexU.pos(), vertexV.pos(), wireType);
+            if (grid.getWireType() != wireType) {
+                player.displayClientMessage(Component.translatable("hud.vivatech.wire.wrong_type").withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
 

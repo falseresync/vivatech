@@ -13,12 +13,13 @@
   "itemGroup.vivatech.general": "Vivatech",
 
   "item.vivatech.mortar_and_pestle": "Mortar and pestle",
-  "item.vivatech.wire": "Wire",
+  "item.vivatech.copper_wire": "Copper wire",
   "item.vivatech.screwdriver": "Screwdriver",
   "item.vivatech.pliers": "Pliers",
   "item.vivatech.probe": "Probe",
 
   "hud.vivatech.probe.grid_frozen": "This grid is frozen! Some chunks are not loaded",
   "hud.vivatech.probe.grid_parameters": "Voltage: %d - Current: %.2f",
-  "hud.vivatech.wire": "Not enough wire"
+  "hud.vivatech.wire.not_enough": "Not enough wire",
+  "hud.vivatech.wire.wrong_type": "Cannot mix different wire types"
 }

@@ -33,24 +33,24 @@ public class Grid {
     private final Map<BlockPos, Appliance> appliances;
     private final Map<ChunkPos, Set<BlockPos>> trackedChunks;
     private final PowerSystem powerSystem;
-    private final ServerLevel world;
+    private final ServerLevel level;
     private final WireType wireType;
     private int overcurrentTicks = 0;
     private float lastVoltage = 0;
     private float lastCurrent = 0;
     private boolean frozen = false;
 
-    public Grid(PowerSystem powerSystem, ServerLevel world, WireType wireType) {
+    public Grid(PowerSystem powerSystem, ServerLevel level, WireType wireType) {
         this.powerSystem = powerSystem;
-        this.world = world;
+        this.level = level;
         this.wireType = wireType;
         graph = new SimpleGraph<>(GridEdge.class);
         appliances = new Object2ReferenceRBTreeMap<>();
         trackedChunks = PowerSystemsManager.createChunkPosKeyedMap();
     }
 
-    public Grid(PowerSystem powerSystem, ServerLevel world, WireType wireType, Set<GridEdge> edges) {
-        this(powerSystem, world, wireType);
+    public Grid(PowerSystem powerSystem, ServerLevel level, WireType wireType, Set<GridEdge> edges) {
+        this(powerSystem, level, wireType);
         edges.forEach(this::connect);
     }
 
@@ -71,8 +71,8 @@ public class Grid {
     }
 
     public boolean connect(GridEdge edge, boolean noWire) {
-        var vertexU = PowerSystemsManager.GRID_VERTICES.find(world, edge.u(), null);
-        var vertexV = PowerSystemsManager.GRID_VERTICES.find(world, edge.v(), null);
+        var vertexU = PowerSystemsManager.GRID_VERTICES.find(level, edge.u(), null);
+        var vertexV = PowerSystemsManager.GRID_VERTICES.find(level, edge.v(), null);
         return connect(vertexU, vertexV, () -> edge, noWire);
     }
 
@@ -248,13 +248,13 @@ public class Grid {
     private void removeWire(GridEdge edge, Wire.DropRule dropRule) {
         var serverWire = edge.asWire(wireType, 0);
         powerSystem.removeWire(serverWire);
-        serverWire.drop(world, wireType, dropRule);
+        serverWire.drop(level, wireType, dropRule);
     }
 
     private void pollChunks() {
         var becameFrozen = false;
         for (ChunkPos chunkPos : trackedChunks.keySet()) {
-            if (!world.shouldTickBlocksAt(chunkPos.pack())) {
+            if (!level.shouldTickBlocksAt(chunkPos.pack())) {
                 becameFrozen = true;
                 break;
             }
@@ -284,7 +284,7 @@ public class Grid {
         var appliancesToUpdate = new ObjectOpenHashSet<ReferenceObjectPair<Appliance, GridVertex>>();
         for (GridVertex oldVertex : graph.vertexSet()) {
             if (oldVertex.appliance() != null) {
-                var appliance = PowerSystemsManager.APPLIANCES.find(world, oldVertex.appliance().getAppliancePos(), oldVertex.direction());
+                var appliance = PowerSystemsManager.APPLIANCES.find(level, oldVertex.appliance().getAppliancePos(), oldVertex.direction());
                 if (oldVertex.appliance() != appliance) {
                     appliancesToUpdate.add(ReferenceObjectPair.of(appliance, oldVertex));
                 }
@@ -379,7 +379,7 @@ public class Grid {
         var mostCentralVertex = inspector.getScores().entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue));
         mostCentralVertex.map(Map.Entry::getKey).ifPresent(vertex -> {
             var edges = graph.edgesOf(vertex);
-            int randomEntry = world.getRandom().nextInt(edges.size());
+            int randomEntry = level.getRandom().nextInt(edges.size());
             int currentEntry = 0;
             for (var edge : edges) {
                 if (currentEntry == randomEntry) {
@@ -393,7 +393,7 @@ public class Grid {
 
     private void burn(GridEdge edge) {
         disconnect(edge, Wire.DropRule.PARTIAL);
-        if (world.getGameRules().get(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER) > 0) {
+        if (level.getGameRules().get(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER) > 0) {
             spreadFire(edge.u());
             spreadFire(edge.v());
         }
@@ -401,16 +401,16 @@ public class Grid {
 
     private void spreadFire(BlockPos pos) {
         int ignitedBlocks = 0;
-        int blocksToIgnite = world.getRandom().nextIntBetweenInclusive(1, 4);
+        int blocksToIgnite = level.getRandom().nextIntBetweenInclusive(1, 4);
         for (int j = 0; j < 10 && ignitedBlocks < blocksToIgnite; j++) {
-            var nearbyPos = pos.offset(world.getRandom().nextIntBetweenInclusive(-2, 2), world.getRandom().nextIntBetweenInclusive(-2, 2), world.getRandom().nextIntBetweenInclusive(-2, 2));
-            if (!world.isLoaded(nearbyPos)) {
+            var nearbyPos = pos.offset(level.getRandom().nextIntBetweenInclusive(-2, 2), level.getRandom().nextIntBetweenInclusive(-2, 2), level.getRandom().nextIntBetweenInclusive(-2, 2));
+            if (!level.isLoaded(nearbyPos)) {
                 continue;
             }
 
-            if (world.isEmptyBlock(nearbyPos)) {
+            if (level.isEmptyBlock(nearbyPos)) {
                 ignitedBlocks += 1;
-                world.setBlockAndUpdate(nearbyPos, BaseFireBlock.getState(world, nearbyPos));
+                level.setBlockAndUpdate(nearbyPos, BaseFireBlock.getState(level, nearbyPos));
             }
         }
     }

@@ -13,12 +13,13 @@
   "itemGroup.vivatech.general": "Vivatech",
 
   "item.vivatech.mortar_and_pestle": "Ступка и пестик",
-  "item.vivatech.wire": "Провод",
+  "item.vivatech.copper_wire": "Медный провод",
   "item.vivatech.screwdriver": "Отвёртка",
   "item.vivatech.pliers": "Кусачки",
   "item.vivatech.probe": "Зонд",
 
   "hud.vivatech.probe.grid_frozen": "Эта сеть заморожена! Часть чанков не загружена",
   "hud.vivatech.probe.grid_parameters": "Напряжение: %d - Ток: %.2f",
-  "hud.vivatech.wire": "Провод не достаёт"
+  "hud.vivatech.wire.not_enough": "Провод не достаёт",
+  "hud.vivatech.wire.wrong_type": "Нельзя смешивать провода разных типов"
 }

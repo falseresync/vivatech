@@ -65,7 +65,7 @@ public class VivatechModelProvider extends FabricModelProvider {
         itemModelGenerator.generateFlatItem(VivatechItems.WIND_TURBINE, ModelTemplates.FLAT_ITEM);
 
         itemModelGenerator.generateFlatItem(VivatechItems.MORTAR_AND_PESTLE, ModelTemplates.FLAT_ITEM);
-        itemModelGenerator.generateFlatItem(VivatechItems.WIRE, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.COPPER_WIRE, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.SCREWDRIVER, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.PLIERS, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.PROBE, ModelTemplates.FLAT_ITEM);

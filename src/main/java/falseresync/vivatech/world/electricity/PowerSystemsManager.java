@@ -6,6 +6,7 @@ import falseresync.vivatech.world.blockentity.VivatechBlockEntities;
 import falseresync.vivatech.world.electricity.grid.Appliance;
 import falseresync.vivatech.world.electricity.grid.GridVertex;
 import falseresync.vivatech.world.electricity.grid.GridVertexProvider;
+import falseresync.vivatech.world.electricity.wire.WireType;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
@@ -61,6 +62,8 @@ public class PowerSystemsManager {
     }
 
     public static void init() {
+        WireType.init();
+
         APPLIANCES.registerSelf(
                 VivatechBlockEntities.GENERATOR,
                 VivatechBlockEntities.HEATER,

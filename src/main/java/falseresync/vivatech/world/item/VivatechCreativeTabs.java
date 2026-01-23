@@ -24,7 +24,7 @@ public class VivatechCreativeTabs {
 
                         entries.accept(VivatechItems.WIRE_POST);
 
-                        entries.accept(VivatechItems.WIRE);
+                        entries.accept(VivatechItems.COPPER_WIRE);
                         entries.accept(VivatechItems.MORTAR_AND_PESTLE);
                         entries.accept(VivatechItems.SCREWDRIVER);
                         entries.accept(VivatechItems.PLIERS);

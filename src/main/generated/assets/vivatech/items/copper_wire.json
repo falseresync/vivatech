@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "vivatech:item/wire"
+    "model": "vivatech:item/copper_wire"
   }
 }

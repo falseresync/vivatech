@@ -12,7 +12,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
-public record WireType(Item item, int voltage, int maxCurrent, int overcurrentToleranceTime) {
+import java.util.function.Supplier;
+
+public record WireType(Supplier<Item> item, int voltage, int maxCurrent, int overcurrentToleranceTime) {
     public static final ResourceKey<Registry<WireType>> REGISTRY_KEY = ResourceKey.createRegistryKey(Vivatech.id("wire_types"));
     public static final Registry<WireType> REGISTRY =
             FabricRegistryBuilder.create(REGISTRY_KEY)
@@ -21,7 +23,7 @@ public record WireType(Item item, int voltage, int maxCurrent, int overcurrentTo
                     .buildAndRegister();
     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<WireType>> PACKET_CODEC = ByteBufCodecs.holderRegistry(REGISTRY_KEY);
 
-    public static final WireType V_230 = register("v_230", new WireType(VivatechItems.WIRE, 230, 32, 100));
+    public static final WireType V_230 = register("v_230", new WireType(() -> VivatechItems.COPPER_WIRE, 230, 32, 100));
 
     public static void init() {
     }

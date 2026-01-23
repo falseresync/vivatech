@@ -50,9 +50,9 @@ public record Wire(
             case NO_DROP -> {
             }
             case PARTIAL ->
-                    Containers.dropItemStack(level, middle.x, middle.y, middle.z, new ItemStack(type.item(), Mth.floor(length * level.getRandom().nextFloat())));
+                    Containers.dropItemStack(level, middle.x, middle.y, middle.z, new ItemStack(type.item().get(), Mth.floor(length * level.getRandom().nextFloat())));
             case FULL ->
-                    Containers.dropItemStack(level, middle.x, middle.y, middle.z, new ItemStack(type.item(), Mth.floor(length)));
+                    Containers.dropItemStack(level, middle.x, middle.y, middle.z, new ItemStack(type.item().get(), Mth.floor(length)));
         }
     }
 
