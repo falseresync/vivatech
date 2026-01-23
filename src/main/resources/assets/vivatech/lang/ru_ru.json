@@ -18,6 +18,7 @@
   "item.vivatech.pliers": "Кусачки",
   "item.vivatech.probe": "Зонд",
 
-  "hud.vivatech.probe": "Напряжение: %d - Ток: %.2f",
+  "hud.vivatech.probe.grid_frozen": "Эта сеть заморожена! Часть чанков не загружена",
+  "hud.vivatech.probe.grid_parameters": "Напряжение: %d - Ток: %.2f",
   "hud.vivatech.wire": "Провод не достаёт"
 }

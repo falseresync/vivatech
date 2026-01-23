@@ -62,6 +62,8 @@ public class VivatechItems {
 
     private static BlockItem register(String name, Block block, Item.Properties properties) {
         var id = Vivatech.id(name);
-        return Registry.register(BuiltInRegistries.ITEM, id, new BlockItem(block, properties.setId(ResourceKey.create(Registries.ITEM, id))));
+        return Registry.register(BuiltInRegistries.ITEM, id, new BlockItem(block, properties
+                .setId(ResourceKey.create(Registries.ITEM, id))
+                .useBlockDescriptionPrefix()));
     }
 }

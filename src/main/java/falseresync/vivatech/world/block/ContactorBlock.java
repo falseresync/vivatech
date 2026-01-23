@@ -89,11 +89,10 @@ public class ContactorBlock extends Block implements RestrictsWirePostPlacement 
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        if (state.is(level.getBlockState(pos).getBlock())) {
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        if (state.is(oldState.getBlock())) {
             manageGridConnection(state, level, pos);
         }
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     private static void manageGridConnection(BlockState state, Level level, BlockPos pos) {

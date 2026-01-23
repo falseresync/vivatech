@@ -318,6 +318,10 @@ public class Grid {
         }
     }
 
+    public boolean isFrozen() {
+        return frozen;
+    }
+
     public void tick() {
         pollChunks();
         if (frozen) {

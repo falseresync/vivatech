@@ -1,6 +1,7 @@
 package falseresync.vivatech.world.item;
 
 import falseresync.vivatech.Vivatech;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,7 +29,11 @@ public class ProbeItem extends Item {
         if (context.getPlayer() instanceof ServerPlayer player) {
             var grid = Vivatech.getPowerSystemsManager().getFor(context.getLevel().dimension()).getGridLookup().get(context.getClickedPos());
             if (grid != null) {
-                player.displayClientMessage(Component.translatable("hud.vivatech.probe", Math.round(grid.getLastVoltage()), grid.getLastCurrent()), true);
+                if (grid.isFrozen()) {
+                    player.displayClientMessage(Component.translatable("hud.vivatech.probe.grid_frozen").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.DARK_RED), true);
+                } else {
+                    player.displayClientMessage(Component.translatable("hud.vivatech.probe.grid_parameters", Math.round(grid.getLastVoltage()), grid.getLastCurrent()), true);
+                }
             }
         }
         return super.useOn(context);
