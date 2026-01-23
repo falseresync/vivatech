@@ -6,10 +6,11 @@ import falseresync.vivatech.client.rendering.RenderingUtil;
 import falseresync.vivatech.client.wire.WireParameters;
 import falseresync.vivatech.client.wire.WireRenderingRegistry;
 import falseresync.vivatech.client.wire.WireModel;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,21 +26,26 @@ public class WireRenderer implements WorldRenderEvents.AfterEntities {
 
     @Override
     public void afterEntities(WorldRenderContext context) {
-        var wires = VivatechClient.getClientWireManager().getWires(context.world().dimension());
+        var world = Minecraft.getInstance().level;
+        if (world == null) {
+            return;
+        }
+
+        var wires = VivatechClient.getClientWireManager().getWires(world.dimension());
         if (wires.isEmpty()) {
             return;
         }
 
-        var matrices = context.matrixStack();
-        var cameraPos = context.camera().getPosition();
+        var matrices = context.matrices();
+        var cameraPos = context.gameRenderer().getMainCamera().position();
 
         for (var wire : wires) {
             var parameters = WireRenderingRegistry.getAndBuild(wire);
             var model = parameters.getModel();
-            var buffer = model.getSprite().wrap(context.consumers().getBuffer(RenderType.cutout()));
+            var buffer = model.getSprite().wrap(context.consumers().getBuffer(RenderTypes.cutoutMovingBlock()));
 
             var wireEnd = wire.end().sub(wire.start(), new Vector3f());
-            var light = LevelRenderer.getLightColor(context.world(), BlockPos.containing(wire.middle().x, wire.middle().y, wire.middle().z));
+            var light = LevelRenderer.getLightColor(world, BlockPos.containing(wire.middle().x, wire.middle().y, wire.middle().z));
 
             matrices.pushPose();
 

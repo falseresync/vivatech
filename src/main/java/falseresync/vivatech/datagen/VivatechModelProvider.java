@@ -1,8 +1,8 @@
 package falseresync.vivatech.datagen;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import falseresync.vivatech.client.rendering.item.FocusPlatingModelProperty;
 import falseresync.vivatech.common.block.VivatechBlocks;
+import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.VivatechItems;
 import falseresync.vivatech.common.item.focus.FocusItem;
 import falseresync.vivatech.common.item.focus.FocusPlating;
@@ -10,14 +10,18 @@ import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.resources.Identifier;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static falseresync.vivatech.common.Vivatech.vtId;
+import static net.minecraft.client.data.models.BlockModelGenerators.plainVariant;
 import static net.minecraft.client.data.models.model.TexturedModel.createDefault;
 
 public class VivatechModelProvider extends FabricModelProvider {
@@ -30,6 +34,7 @@ public class VivatechModelProvider extends FabricModelProvider {
     }
 
     private BlockModelGenerators blockStateModelGenerator;
+    private Consumer<BlockModelDefinitionGenerator> blockStateOutput;
 
     public VivatechModelProvider(FabricDataOutput output) {
         super(output);
@@ -38,10 +43,11 @@ public class VivatechModelProvider extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockModelGenerators blockStateModelGenerator) {
         this.blockStateModelGenerator = blockStateModelGenerator;
+        this.blockStateOutput = blockStateModelGenerator.blockStateOutput;
 
         blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.GENERATOR, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
         blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.GEARBOX, VivatechTexturedModels.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
-        registerWindTurbine();
+        blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.WIND_TURBINE, createDefault(TextureMapping::particle, ModelTemplates.PARTICLE_ONLY));
 
         blockStateModelGenerator.createTrivialBlock(VivatechBlocks.HEATER, TexturedModel.CUBE_TOP_BOTTOM);
         blockStateModelGenerator.createTrivialBlock(VivatechBlocks.CHARGER, TexturedModel.CUBE_TOP_BOTTOM);
@@ -52,25 +58,11 @@ public class VivatechModelProvider extends FabricModelProvider {
         registerWirePost();
     }
 
-    private void registerWindTurbine() {
-        var windTurbineModelId = TexturedModel.PARTICLE_ONLY.create(VivatechBlocks.WIND_TURBINE, blockStateModelGenerator.modelOutput);
-        blockStateModelGenerator.blockStateOutput.accept(
-                MultiVariantGenerator
-                        .multiVariant(
-                                VivatechBlocks.WIND_TURBINE,
-                                Variant.variant().with(VariantProperties.MODEL, windTurbineModelId)
-                        ).with(BlockModelGenerators.createHorizontalFacingDispatch())
-        );
-        blockStateModelGenerator.skipAutoItemBlock(VivatechBlocks.WIND_TURBINE);
-    }
-
     private void registerWirePost() {
-        blockStateModelGenerator.blockStateOutput.accept(
+        blockStateOutput.accept(
                 MultiVariantGenerator
-                        .dispatch(
-                                VivatechBlocks.WIRE_POST,
-                                Variant.variant().with(VariantProperties.MODEL, ModelLocationUtils.getModelLocation(VivatechBlocks.WIRE_POST))
-                        ).with(BlockModelGenerators.createFacingDispatch())
+                        .dispatch(VivatechBlocks.WIRE_POST, plainVariant(ModelLocationUtils.getModelLocation(VivatechBlocks.WIRE_POST)))
+                        .with(BlockModelGenerators.ROTATION_FACING)
         );
     }
 
@@ -94,33 +86,50 @@ public class VivatechModelProvider extends FabricModelProvider {
         registerFocus(VivatechItems.ENERGY_VEIL_FOCUS, itemModelGenerator);
     }
 
-    private JsonObject createFocusJson(Identifier id, Map<TextureSlot, Identifier> textures) {
-        var model = ModelTemplates.TWO_LAYERED_ITEM.createBaseTemplate(id, textures);
-        var overrides = new JsonArray();
-
-        for (var plating : FocusPlating.values()) {
-            var override = new JsonObject();
-            var predicate = new JsonObject();
-            predicate.addProperty("vivatech:focus_plating", plating.index);
-            override.add("predicate", predicate);
-            override.addProperty("model", falseresync.vivatech.datagen.DatagenUtil.suffixPlating(id, plating).toString());
-            overrides.add(override);
-        }
-
-        model.add("overrides", overrides);
-        return model;
-    }
+//    private JsonObject createFocusJson(Identifier id, Map<TextureSlot, Identifier> textures) {
+//        var model = ModelTemplates.TWO_LAYERED_ITEM.createBaseTemplate(id, textures);
+//        var overrides = new JsonArray();
+//
+//        for (var plating : FocusPlating.values()) {
+//            var override = new JsonObject();
+//            var predicate = new JsonObject();
+//            predicate.addProperty("vivatech:focus_plating", plating.index);
+//            override.add("predicate", predicate);
+//            override.addProperty("model", DatagenUtil.suffixPlating(id, plating).toString());
+//            overrides.add(override);
+//        }
+//
+//        model.add("overrides", overrides);
+//        return model;
+//    }
 
     private void registerFocus(FocusItem focus, ItemModelGenerators generator) {
-        Identifier modelId = ModelLocationUtils.getModelLocation(focus);
+        // TODO
         Identifier textureId = TextureMapping.getItemTexture(focus);
-        ModelTemplates.FLAT_ITEM.create(modelId, TextureMapping.layer0(textureId), this::createFocusJson,generator.modelOutput, );
 
+        Identifier modelId = ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(focus),
+                TextureMapping.layer0(textureId),
+                generator.modelOutput
+        );
+
+        var platedVariants = new ArrayList<RangeSelectItemModel.Entry>();
         for (var plating : FocusPlating.values()) {
-            ModelTemplates.TWO_LAYERED_ITEM.create(
-                    falseresync.vivatech.datagen.DatagenUtil.suffixPlating(modelId, plating),
+            var platedModelId = ModelTemplates.TWO_LAYERED_ITEM.create(
+                    DatagenUtil.suffixPlating(modelId, plating),
                     TextureMapping.layered(textureId, DatagenUtil.suffixPlating(vtId("item/focus"), plating)),
-                    generator.output);
+                    generator.modelOutput
+            );
+            platedVariants.add(ItemModelUtils.override(ItemModelUtils.plainModel(platedModelId), plating.index));
         }
+
+        generator.itemModelOutput.accept(
+                focus,
+                ItemModelUtils.conditional(
+                        ItemModelUtils.hasComponent(VivatechComponents.FOCUS_PLATING),
+                        ItemModelUtils.rangeSelect(new FocusPlatingModelProperty(), platedVariants),
+                        ItemModelUtils.plainModel(modelId)
+                )
+        );
     }
 }

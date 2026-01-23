@@ -3,7 +3,6 @@ package falseresync.vivatech.client.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import falseresync.lib.client.BetterDrawContext;
 import falseresync.lib.math.Easing;
-import falseresync.vivatech.client.hud.HudItem;
 import falseresync.vivatech.common.data.VivatechComponents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;

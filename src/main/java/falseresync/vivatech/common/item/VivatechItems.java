@@ -1,17 +1,6 @@
 package falseresync.vivatech.common.item;
 
 import falseresync.vivatech.common.block.VivatechBlocks;
-import falseresync.vivatech.common.item.FocusesPouchItem;
-import falseresync.vivatech.common.item.GadgetItem;
-import falseresync.vivatech.common.item.InspectorGogglesItem;
-import falseresync.vivatech.common.item.MortarAndPestleItem;
-import falseresync.vivatech.common.item.PliersItem;
-import falseresync.vivatech.common.item.ProbeItem;
-import falseresync.vivatech.common.item.WireItem;
-import falseresync.vivatech.common.item.focus.CometWarpFocusItem;
-import falseresync.vivatech.common.item.focus.EnergyVeilFocusItem;
-import falseresync.vivatech.common.item.focus.LightningFocusItem;
-import falseresync.vivatech.common.item.focus.StarshooterFocusItem;
 import java.util.function.Function;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,15 +24,15 @@ public class VivatechItems {
 
     public static final BlockItem WIRE_POST = rBlockItem("wire_post", VivatechBlocks.WIRE_POST, new Item.Properties());
 
-    public static final falseresync.vivatech.common.item.WireItem WIRE = r("wire", WireItem::new, new Item.Properties());
-    public static final falseresync.vivatech.common.item.MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Properties().stacksTo(1).durability(16));
+    public static final WireItem WIRE = r("wire", WireItem::new, new Item.Properties());
+    public static final MortarAndPestleItem MORTAR_AND_PESTLE = r("mortar_and_pestle", MortarAndPestleItem::new, new Item.Properties().stacksTo(1).durability(16));
     public static final Item SCREWDRIVER = r("screwdriver", Item::new, new Item.Properties().stacksTo(1));
-    public static final falseresync.vivatech.common.item.PliersItem PLIERS = r("pliers", PliersItem::new, new Item.Properties().stacksTo(1));
-    public static final falseresync.vivatech.common.item.ProbeItem PROBE = r("probe", ProbeItem::new, new Item.Properties().stacksTo(1));
-    public static final falseresync.vivatech.common.item.InspectorGogglesItem INSPECTOR_GOGGLES = r("inspector_goggles", InspectorGogglesItem::new, new Item.Properties().stacksTo(1));
-    public static final falseresync.vivatech.common.item.FocusesPouchItem FOCUSES_POUCH = r("focuses_pouch", FocusesPouchItem::new, new Item.Properties().stacksTo(1));
+    public static final PliersItem PLIERS = r("pliers", PliersItem::new, new Item.Properties().stacksTo(1));
+    public static final ProbeItem PROBE = r("probe", ProbeItem::new, new Item.Properties().stacksTo(1));
+    public static final InspectorGogglesItem INSPECTOR_GOGGLES = r("inspector_goggles", InspectorGogglesItem::new, new Item.Properties().stacksTo(1));
+    public static final FocusesPouchItem FOCUSES_POUCH = r("focuses_pouch", FocusesPouchItem::new, new Item.Properties().stacksTo(1));
 
-    public static final falseresync.vivatech.common.item.GadgetItem GADGET = r("gadget", GadgetItem::new, new Item.Properties().stacksTo(1));
+    public static final GadgetItem GADGET = r("gadget", GadgetItem::new, new Item.Properties().stacksTo(1));
 
     public static final Item.Properties FOCUS_SETTINGS = new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON);
     public static final StarshooterFocusItem STARSHOOTER_FOCUS = r("starshooter_focus", StarshooterFocusItem::new, FOCUS_SETTINGS.durability(512));

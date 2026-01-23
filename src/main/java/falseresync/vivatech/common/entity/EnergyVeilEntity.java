@@ -5,7 +5,6 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.data.VivatechAttachments;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.VivatechItemTags;
-import net.minecraft.Util;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -102,7 +101,7 @@ public class EnergyVeilEntity extends Entity implements TraceableEntity {
         alignWithOwner();
         move(MoverType.SELF, getDeltaMovement());
 
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             repelOutsiders();
 
             if (tickCount >= lifeExpectancy) {

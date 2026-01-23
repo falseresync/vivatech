@@ -6,11 +6,12 @@ import falseresync.vivatech.common.Vivatech;
 import falseresync.vivatech.common.data.VivatechAttachments;
 import falseresync.vivatech.common.data.VivatechComponents;
 import falseresync.vivatech.common.item.VivatechItemTags;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
@@ -25,7 +26,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities {
-    private static final RenderType BASE_LAYER = RenderType.entityTranslucentEmissive(vtId("textures/world/comet_warp_beacon.png"));
+    private static final RenderType BASE_LAYER = RenderTypes.entityTranslucentEmissive(vtId("textures/world/comet_warp_beacon.png"));
     private static final Material CROWN_TEX = new Material(TextureAtlas.LOCATION_BLOCKS, vtId("world/comet_warp_beacon_crown"));
     private static final int TINT_BASE = Color.ofHsv(0f, 0f, 1, 0.5f).argb();
     private static final int TINT_CROWN = Color.WHITE.argb();
@@ -72,7 +73,7 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
 
         var perPanelAdjustment = new Matrix4f().rotateAround(Axis.YP.rotationDegrees(60), 0.5f, 0, 0.5f);
         var sprite = CROWN_TEX.sprite();
-        var buffer = CROWN_TEX.buffer(context.consumers(), RenderType::entityTranslucentEmissive);
+        var buffer = CROWN_TEX.buffer(context.consumers(), RenderTypes::entityTranslucentEmissive);
         for (int i = 0; i < 6; i++) {
             matrices.mulPose(perPanelAdjustment);
             RenderingUtil.drawSprite(matrices, buffer, sprite, TINT_BASE, light, overlay, 0, 1, 0, 1, -0.365f);
@@ -105,7 +106,7 @@ public class CometWarpBeaconRenderer implements WorldRenderEvents.AfterEntities 
             return;
         }
 
-        var matrices = context.matrixStack();
+        var matrices = context.matrices();
         var light = LevelRenderer.getLightColor(context.world(), anchor.pos().above());
         var overlay = OverlayTexture.NO_OVERLAY;
 

@@ -4,6 +4,7 @@ import falseresync.vivatech.common.data.InventoryComponent;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
@@ -19,12 +20,12 @@ public class InventoryComponentTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return getRowsHeight() + BOTTOM_MARGIN;
     }
 
     @Override
-    public int getWidth(Font textRenderer) {
+    public int getWidth(Font font) {
         return getColumnsWidth();
     }
 
@@ -37,17 +38,17 @@ public class InventoryComponentTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(Font textRenderer, int x, int y, GuiGraphics context) {
+    public void renderImage(Font font, int x, int y, int k, int l, GuiGraphics guiGraphics) {
         int columns = getColumns();
         int rows = getRows();
-        context.blitSprite(BACKGROUND_TEXTURE, x, y, this.getColumnsWidth(), this.getRowsHeight());
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURE, x, y, this.getColumnsWidth(), this.getRowsHeight());
 
         int slotIndex = 0;
         for (int row = 0; row < rows; row++) {
             for (int column = 0; column < columns; column++) {
                 int slotX = x + column * 18 + 1;
                 int slotY = y + row * 20 + 1;
-                drawSlot(slotX, slotY, slotIndex++, context, textRenderer);
+                drawSlot(slotX, slotY, slotIndex++, guiGraphics, font);
             }
         }
     }
@@ -64,7 +65,7 @@ public class InventoryComponentTooltip implements ClientTooltipComponent {
     }
 
     private void drawSprite(GuiGraphics context, int x, int y, SlotSprite sprite) {
-        context.blitSprite(sprite.texture, x, y, 0, sprite.width, sprite.height);
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, sprite.texture, x, y, 0, sprite.width, sprite.height);
     }
 
     private int getColumns() {
