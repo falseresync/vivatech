@@ -1,0 +1,23 @@
+{
+  "block.vivatech.generator": "Генератор",
+  "block.vivatech.gearbox": "Коробка передач",
+  "block.vivatech.wind_turbine": "Ветряк",
+
+  "block.vivatech.heater": "Нагреватель",
+
+  "block.vivatech.static_compensator": "Статический компенсатор",
+  "block.vivatech.contactor": "Контактор",
+
+  "block.vivatech.wire_post": "Электрический столбик",
+
+  "itemGroup.vivatech.general": "Vivatech",
+
+  "item.vivatech.mortar_and_pestle": "Ступка и пестик",
+  "item.vivatech.wire": "Провод",
+  "item.vivatech.screwdriver": "Отвёртка",
+  "item.vivatech.pliers": "Кусачки",
+  "item.vivatech.probe": "Зонд",
+
+  "hud.vivatech.probe": "Напряжение: %d - Ток: %.2f",
+  "hud.vivatech.wire": "Провод не достаёт"
+}

@@ -1,69 +1,50 @@
 package falseresync.vivatech.client;
 
-import falseresync.lib.logging.BetterLogger;
-import falseresync.vivatech.client.ClientPlayerInventoryEvents;
-import falseresync.vivatech.client.ToolManager;
-import falseresync.vivatech.client.VivatechKeybindings;
-import falseresync.vivatech.client.gui.VivatechGui;
-import falseresync.vivatech.client.hud.VivatechHud;
-import falseresync.vivatech.client.particle.VivatechParticleFactories;
-import falseresync.vivatech.client.rendering.VivatechRendering;
-import falseresync.vivatech.client.wire.ClientWireManager;
+import com.google.common.base.Preconditions;
+import falseresync.vivatech.client.rendering.block.WindTurbineBlockEntityRenderer;
+import falseresync.vivatech.client.rendering.world.WireRenderer;
+import falseresync.vivatech.client.wire.WiresManager;
 import falseresync.vivatech.client.wire.WireRenderingRegistry;
-import falseresync.vivatech.common.Vivatech;
-import falseresync.vivatech.common.config.TranslatableEnum;
-import falseresync.vivatech.common.config.TranslatableEnumGuiProvider;
-import falseresync.vivatech.common.config.VivatechConfig;
-import falseresync.vivatech.network.VivatechClientReceivers;
-import me.shedaniel.autoconfig.AutoConfig;
+import falseresync.vivatech.network.VivatechClientNetworking;
+import falseresync.vivatech.world.block.VivatechBlocks;
+import falseresync.vivatech.world.blockentity.VivatechBlockEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.api.client.rendering.v1.ChunkSectionLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import org.jspecify.annotations.Nullable;
 
 public class VivatechClient implements ClientModInitializer {
-    public static final BetterLogger LOGGER = new BetterLogger(LoggerFactory.getLogger(Vivatech.MOD_ID), "Vivatech / Client");
-    private static ClientWireManager clientWireManager;
-    private static VivatechHud hud;
-    private static falseresync.vivatech.client.ToolManager toolManager;
+	@Nullable
+	private static WiresManager wiresManager;
 
-    @Override
-    public void onInitializeClient() {
-        AutoConfig.getGuiRegistry(VivatechConfig.class).registerPredicateProvider(
-                new TranslatableEnumGuiProvider<>(),
-                field -> field.getType().isEnum() && field.isAnnotationPresent(TranslatableEnum.class)
-        );
-        
-        VivatechRendering.init();
-        VivatechParticleFactories.init();
-        VivatechGui.init();
-        VivatechKeybindings.init();
-        WireRenderingRegistry.registerAll();
-        VivatechClientReceivers.registerAll();
-        ClientPlayerInventoryEvents.init();
+	@Override
+	public void onInitializeClient() {
+		VivatechClientNetworking.init();
+		WireRenderingRegistry.init();
 
-        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            clientWireManager = new ClientWireManager(client);
-            hud = new VivatechHud(client);
-            toolManager = new falseresync.vivatech.client.ToolManager();
-        });
+		ClientLifecycleEvents.CLIENT_STARTED.register(minecraft -> {
+			wiresManager = new WiresManager(minecraft);
+		});
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            clientWireManager.tick();
-        });
 
-        LOGGER.info("Initialized");
-    }
+		ModelLayerRegistry.registerModelLayer(WindTurbineBlockEntityRenderer.LAYER, WindTurbineBlockEntityRenderer::getTexturedModelData);
 
-    public static ClientWireManager getClientWireManager() {
-        return clientWireManager;
-    }
-    
-    public static VivatechHud getHud() {
-        return hud;
-    }
+		BlockEntityRenderers.register(VivatechBlockEntities.WIND_TURBINE, WindTurbineBlockEntityRenderer::new);
 
-    public static ToolManager getToolManager() {
-        return toolManager;
-    }
+		ChunkSectionLayerMap.putBlocks(ChunkSectionLayer.CUTOUT,
+				VivatechBlocks.WIRE_POST,
+				VivatechBlocks.WIND_TURBINE
+		);
+
+		LevelRenderEvents.AFTER_ENTITIES.register(new WireRenderer());
+	}
+
+	public static WiresManager getWiresManager() {
+		Preconditions.checkState(wiresManager != null, "Trying to access WireManager before it's instantiated");
+		return wiresManager;
+	}
 }

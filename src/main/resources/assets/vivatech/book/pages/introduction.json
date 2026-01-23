@@ -1,0 +1,20 @@
+{
+  "type": "text",
+  "text": "",
+  "extra": [
+    [
+      {
+        "text": "Hello, dear player!\n",
+        "italic": true
+      },
+      "Vivatech is a tech mod, similar to any other you've used many times.\n",
+      {
+        "atlas": "minecraft:items",
+        "sprite": "minecraft:item/diamond",
+        "object": "atlas",
+        "type": "object",
+        "color": "#00FFFFFF"
+      }
+    ]
+  ]
+}

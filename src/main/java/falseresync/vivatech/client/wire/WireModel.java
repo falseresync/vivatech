@@ -2,13 +2,14 @@ package falseresync.vivatech.client.wire;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 
 public interface WireModel {
     Material getSpriteId();
 
-    TextureAtlasSprite getSprite();
+    TextureAtlasSprite getSprite(MaterialSet materialSet);
 
-    float[] getUv(int segmentNo);
+    float[] getUv(MaterialSet materialSet, int segmentNo);
 
     float getSegmentSize();
 

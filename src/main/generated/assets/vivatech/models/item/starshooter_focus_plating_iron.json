@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "vivatech:item/starshooter_focus",
-    "layer1": "vivatech:item/focus_plating_iron"
-  }
-}

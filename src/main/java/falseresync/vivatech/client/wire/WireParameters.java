@@ -1,9 +1,10 @@
 package falseresync.vivatech.client.wire;
 
-import falseresync.vivatech.common.power.wire.Wire;
+
+import falseresync.vivatech.world.electricity.wire.Wire;
 
 public interface WireParameters {
-    falseresync.vivatech.client.wire.WireModel getModel();
+    WireModel getModel();
 
     float getSaggedYForSegment(float unsaggedY, float segmentNo);
 

@@ -1,9 +1,6 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.fabricmc.loom.task.RemapJarTask
-
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
-	id 'com.gradleup.shadow' version '9.0.0-beta10'
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'com.gradleup.shadow' version '9.0.0-beta10'
 }
 
 version = project.mod_version
@@ -14,87 +11,62 @@ base {
 }
 
 repositories {
-	mavenCentral()
-	maven { url = 'https://maven.shedaniel.me/' }
-	maven { url = 'https://maven.ladysnake.org/releases' }
 	maven { url = 'https://maven.terraformersmc.com/' }
-	maven { url = 'https://maven.wispforest.io' }
-	maven {
-		url = "https://maven2.bai.lol"
-		content {
-			includeGroup "lol.bai"
-			includeGroup "mcp.mobius.waila"
-		}
-	}
 	maven {
 		url = "https://api.modrinth.com/maven"
 		content {
 			includeGroup "maven.modrinth"
 		}
 	}
-	maven {
-		url = "https://jitpack.io"
-	}
-    maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/vivatech.classtweaker")
 }
 
 fabricApi {
 	configureDataGeneration()
 }
 
-loom {
-	accessWidenerPath = file("src/main/resources/vivatech.classtweaker")
-}
-
 dependencies {
-	minecraft "com.mojang:minecraft:$minecraft_version"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:$loader_version"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// ------------------------
 	// --- MOD DEPENDENCIES ---
 	// ------------------------
-	modApi "me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version"
-	modApi "dev.emi:trinkets:$trinkets_version"
 
-	// --------------------------
-	// --- OTHER DEPENDENCIES ---
-	// --------------------------
-	implementation 'org.jgrapht:jgrapht-core:1.5.2'
-	shadow 'org.jgrapht:jgrapht-core:1.5.2'
+    // --------------------------
+    // --- OTHER DEPENDENCIES ---
+    // --------------------------
+    implementation 'org.jgrapht:jgrapht-core:1.5.2'
+    shadow 'org.jgrapht:jgrapht-core:1.5.2'
+
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	// ---------------------
 	// --- COMPATIBILITY ---
 	// ---------------------
-	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-$wthit_version"
-	modLocalRuntime "mcp.mobius.waila:wthit:fabric-$wthit_version"
-	modLocalRuntime "lol.bai:badpackets:fabric-$badpackets_version"
+//	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-$wthit_version"
+//	modLocalRuntime "mcp.mobius.waila:wthit:fabric-$wthit_version"
+//	modLocalRuntime "lol.bai:badpackets:fabric-$badpackets_version"
 
 //	modCompileOnly "dev.emi:emi-fabric:$emi_version:api"
 //	modLocalRuntime "dev.emi:emi-fabric:$emi_version"
-    modCompileOnly("mezz.jei:jei-$minecraft_version-fabric-api:$jei_version")
-    modRuntimeOnly("mezz.jei:jei-$minecraft_version-fabric:$jei_version")
+//	modCompileOnly("mezz.jei:jei-$minecraft_version-fabric-api:$jei_version")
+//	modRuntimeOnly("mezz.jei:jei-$minecraft_version-fabric:$jei_version")
 
-	modCompileOnly "com.terraformersmc:modmenu:$modmenu_version"
-	modLocalRuntime "com.terraformersmc:modmenu:$modmenu_version"
+	compileOnly "com.terraformersmc:modmenu:$modmenu_version"
+	localRuntime "com.terraformersmc:modmenu:$modmenu_version"
 
-    // -------------------
-    // --- CONVENIENCE ---
-    // -------------------
-    // Comment out / uncomment for testing and convenience
+	// -------------------
+	// --- CONVENIENCE ---
+	// -------------------
+	// Comment out / uncomment for testing and convenience
 //    modLocalRuntime "maven.modrinth:betterf3:11.0.3"
-	modLocalRuntime "maven.modrinth:component-viewer:1.3.2+1.21.11-fabric"
-	modLocalRuntime "maven.modrinth:tooltip-scroll:1.5.1+1.21.10"
+//	modLocalRuntime "maven.modrinth:component-viewer:1.3.2+1.21.11-fabric"
+//	modLocalRuntime "maven.modrinth:tooltip-scroll:1.5.1+1.21.10"
 //	modLocalRuntime "maven.modrinth:dev-tools-unlocker:1.0.0"
 }
 
@@ -102,36 +74,28 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
+
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
-}
-
-tasks.withType(ShadowJar).configureEach {
-	dependsOn('jar')
-
-	configurations = [project.configurations.shadow]
-	enableRelocation = true
-	relocationPrefix = "falseresync.shadowed"
-	minimize()
-	exclude('.cache/**')
-
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-tasks.withType(RemapJarTask).configureEach {
-	dependsOn('shadowJar')
-	mustRunAfter('shadowJar')
-	inputFile = shadowJar.archiveFile.get()
+	it.options.release = 25
 }
 
 java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+jar {
+	inputs.property "archivesName", project.base.archivesName
+
+	from("LICENSE") {
+		rename { "${it}_${inputs.properties.archivesName}"}
+	}
 }

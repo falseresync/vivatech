@@ -1,33 +1,39 @@
 package falseresync.vivatech.client.rendering.block;
 
-import falseresync.vivatech.common.block.WindTurbineBlock;
-import falseresync.vivatech.common.blockentity.WindTurbineBlockEntity;
-import net.minecraft.client.model.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import falseresync.vivatech.Vivatech;
+import falseresync.vivatech.world.block.WindTurbineBlock;
+import falseresync.vivatech.world.blockentity.WindTurbineBlockEntity;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
-import static falseresync.vivatech.common.Vivatech.vtId;
-
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
-
-public class WindTurbineBlockEntityRenderer implements BlockEntityRenderer<WindTurbineBlockEntity> {
-    public static final ModelLayerLocation LAYER = new ModelLayerLocation(vtId("wind_turbine"), "main");
-    public static final Material TEX = new Material(TextureAtlas.LOCATION_BLOCKS, vtId("block/wind_turbine"));
+public class WindTurbineBlockEntityRenderer implements BlockEntityRenderer<WindTurbineBlockEntity, WindTurbineBlockEntityRenderer.State> {
+    public static final ModelLayerLocation LAYER = new ModelLayerLocation(Vivatech.id("wind_turbine"), "main");
+    public static final Material TEX = new Material(TextureAtlas.LOCATION_BLOCKS, Vivatech.id("block/wind_turbine"));
+    private final MaterialSet materials;
     private final ModelPart model;
 
     public WindTurbineBlockEntityRenderer(BlockEntityRendererProvider.Context ctx) {
+        materials = ctx.materials();
         model = ctx.bakeLayer(LAYER);
         model.setInitialPose(PartPose.offset(8, 8, 0));
         model.resetPose();
@@ -44,16 +50,31 @@ public class WindTurbineBlockEntityRenderer implements BlockEntityRenderer<WindT
     }
 
     @Override
-    public void render(WindTurbineBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(WindTurbineBlockEntity blockEntity, State state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderState.extractBase(blockEntity, state, breakProgress);
+        state.rotationProgress = blockEntity.getRotationProgress(partialTicks);
+    }
+
+    @Override
+    public void submit(State state, PoseStack matrices, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         matrices.pushPose();
-        matrices.rotateAround(Axis.YN.rotationDegrees(entity.getBlockState().getValue(WindTurbineBlock.FACING).getOpposite().toYRot()), 0.5f, 0.5f, 0.5f);
-        model.zRot = entity.getRotationProgress(tickDelta);
-        model.render(matrices, TEX.buffer(vertexConsumers, RenderType::entityCutout), light, overlay);
+        matrices.rotateAround(Axis.YN.rotationDegrees(state.blockState.getValue(WindTurbineBlock.FACING).getOpposite().toYRot()), 0.5f, 0.5f, 0.5f);
+        model.zRot = state.rotationProgress;
+        submitNodeCollector.submitModelPart(model, matrices, TEX.renderType(RenderTypes::entityCutout), state.lightCoords, OverlayTexture.NO_OVERLAY, materials.get(TEX));
         matrices.popPose();
     }
 
     @Override
-    public boolean shouldRenderOffScreen(WindTurbineBlockEntity blockEntity) {
+    public boolean shouldRenderOffScreen() {
         return true;
+    }
+
+    public static class State extends BlockEntityRenderState {
+        public float rotationProgress;
     }
 }

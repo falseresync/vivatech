@@ -1,20 +1,22 @@
 package falseresync.vivatech.client.wire;
 
-import java.util.Random;
-import java.util.function.Function;
-
-import falseresync.vivatech.client.wire.WireModel;
-import net.minecraft.Util;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.util.Util;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Random;
+import java.util.function.Function;
 
 public class RandomizedUvWireModel implements WireModel {
     private static final Random RANDOM = new Random();
     protected final float segmentSize;
     private final Material spriteId;
     private int uvChunkAmount;
+    @Nullable
     private TextureAtlasSprite sprite;
-    private float[] defaultUv;
+    private float @Nullable [] defaultUv = null;
     private float segmentWidthOnAtlas;
     private float segmentHeightOnAtlas;
     private final Function<Integer, float[]> randomizedUv = Util.memoize(memoizationKey -> {
@@ -40,18 +42,18 @@ public class RandomizedUvWireModel implements WireModel {
     }
 
     @Override
-    public TextureAtlasSprite getSprite() {
+    public TextureAtlasSprite getSprite(MaterialSet materialSet) {
         if (sprite == null) {
-            sprite = getSpriteId().sprite();
+            sprite = materialSet.get(getSpriteId());
         }
         return sprite;
     }
 
     @Override
-    public float[] getUv(int segmentNo) {
+    public float[] getUv(MaterialSet materialSet, int segmentNo) {
         if (defaultUv == null) {
             defaultUv = new float[] {
-                    getSprite().getU0(), getSprite().getU1(), getSprite().getV0(), getSprite().getV1()
+                    getSprite(materialSet).getU0(), getSprite(materialSet).getU1(), getSprite(materialSet).getV0(), getSprite(materialSet).getV1()
             };
             segmentWidthOnAtlas = (defaultUv[1] - defaultUv[0]) / uvChunkAmount;
             segmentHeightOnAtlas = (defaultUv[3] - defaultUv[2]) / uvChunkAmount;

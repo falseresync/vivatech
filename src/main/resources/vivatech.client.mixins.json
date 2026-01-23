@@ -1,14 +1,11 @@
 {
-  "required": true,
-  "package": "falseresync.vivatech.client.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "client": [
-    "MultiPlayerGameModeMixin",
-    "ClientPacketListenerMixin",
-    "ItemInHandRendererMixin",
-    "PlayerRendererMixin"
-  ]
+	"required": true,
+	"package": "falseresync.vivatech.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"ExampleClientMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }

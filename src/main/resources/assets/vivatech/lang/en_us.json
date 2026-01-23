@@ -4,7 +4,6 @@
   "block.vivatech.wind_turbine": "Wind turbine",
 
   "block.vivatech.heater": "Heater",
-  "block.vivatech.charger": "Charger",
 
   "block.vivatech.static_compensator": "Static compensator",
   "block.vivatech.contactor": "Contactor",
@@ -18,76 +17,7 @@
   "item.vivatech.screwdriver": "Screwdriver",
   "item.vivatech.pliers": "Pliers",
   "item.vivatech.probe": "Probe",
-  "item.vivatech.inspector_goggles": "Inspector goggles",
-  "item.vivatech.focuses_pouch": "Focuses pouch",
 
-  "item.vivatech.gadget": "Gadget",
-  "item.vivatech.starshooter_focus": "Starshooter focus",
-  "item.vivatech.lightning_focus": "Lightning focus",
-  "item.vivatech.comet_warp_focus": "Comet warp focus",
-  "item.vivatech.energy_veil_focus": "Energy veil focus",
-
-  "tag.item.vivatech.focuses": "Focuses",
-  "tag.item.vivatech.gadgets": "Gadgets",
-  "tag.entity.vivatech.passes_through_energy_veil": "Passes through Energy veil",
-
-  "entity.vivatech.star_projectile": "Star projectile",
-  "entity.vivatech.energy_veil": "Energy veil",
-
-  "tooltip.vivatech.gadget.active_focus": "Active focus: %s",
-  "tooltip.vivatech.gadget.change_focus": "Press [%s] to change focus",
-  "tooltip.vivatech.gadget.setup_anchor": "Use while sneaking to setup an anchor",
-  "tooltip.vivatech.gadget.has_anchor": "Anchored in %s at %s",
-  "tooltip.vivatech.gadget.has_permanent_anchor": "Permanently anchored in %s at %s",
-  "tooltip.vivatech.gadget.anshar_compat.bound": "Permanently bound to the embedded state",
-  "tooltip.vivatech.gadget.anshar_compat.enter": "Enter the embedded state",
-
-  "hud.vivatech.gadget.no_focuses": "No other focus to pick",
-  "hud.vivatech.gadget.insufficient_charge": "Not enough charge",
-  "hud.vivatech.gadget.full_inventory": "Cannot pick a focus with a full inventory",
-  "hud.vivatech.focus.comet_warp.no_anchor": "Setup an anchor first",
-  "hud.vivatech.focus.comet_warp.permanently_anchored": "Permanently anchored in %s at %s",
-  "hud.vivatech.focus.comet_warp.cannot_anchor_here": "Cannot anchor here",
   "hud.vivatech.probe": "Voltage: %d - Current: %.2f",
-  "hud.vivatech.wire": "Not enough wire",
-
-  "sound.vivatech.entity.star_projectile.explode": "Star projectile explodes",
-  "sound.vivatech.focus.comet_warp.anchor_placed": "Placed a Comet warp anchor",
-  "sound.vivatech.item.gadget.insufficient_charge": "Insufficient charge",
-
-  "keyCategory.vivatech": "Vivatech",
-  "key.vivatech.tool_control": "Tool control",
-
-  "text.autoconfig.vivatech.title": "Vivatech Config",
-  "text.autoconfig.vivatech.category.general": "Cheats",
-  "text.autoconfig.vivatech.category.performance": "Performance",
-  "text.autoconfig.vivatech.category.accessibility": "Accessibility",
-
-  "text.autoconfig.vivatech.option.infiniteCharge": "Tools have infinite charge",
-  "text.autoconfig.vivatech.option.infiniteCharge.NEVER": "Never",
-  "text.autoconfig.vivatech.option.infiniteCharge.CREATIVE_ONLY": "Creative only",
-  "text.autoconfig.vivatech.option.infiniteCharge.ALWAYS": "Always",
-  "text.autoconfig.vivatech.option.passiveCharge": "Tools charge passively",
-  "text.autoconfig.vivatech.option.passiveCharge.DISABLED": "Disabled",
-  "text.autoconfig.vivatech.option.passiveCharge.DEFAULT": "Enabled",
-  "text.autoconfig.vivatech.option.passiveCharge.FASTER": "Enabled (faster)",
-  "text.autoconfig.vivatech.option.transmutation": "Transmutation",
-  "text.autoconfig.vivatech.option.transmutation.@Tooltip[0]": "Configure the weight (i.e. relative chance) of each possible outcome of a transmutation.",
-  "text.autoconfig.vivatech.option.transmutation.@Tooltip[1]": "IMPORTANT: To configure which entities a transmutation affects and which it produces,",
-  "text.autoconfig.vivatech.option.transmutation.@Tooltip[2]": "you need to edit the corresponding tags.",
-  "text.autoconfig.vivatech.option.transmutation.agingWeight": "Aging weight",
-  "text.autoconfig.vivatech.option.transmutation.transformationWeight": "Transformation weight",
-  "text.autoconfig.vivatech.option.transmutation.doNothingWeight": "Do nothing weight",
-
-  "text.autoconfig.vivatech.option.inspectorGogglesDisplayRange": "Inspector goggles display range",
-  "text.autoconfig.vivatech.option.animationParticlesAmount": "Animation particles amount",
-  "text.autoconfig.vivatech.option.animationParticlesAmount.DEFAULT": "Normal",
-  "text.autoconfig.vivatech.option.animationParticlesAmount.REDUCED": "Reduced",
-  "text.autoconfig.vivatech.option.animationQuality": "Animations quality",
-  "text.autoconfig.vivatech.option.animationQuality.DEFAULT": "Normal",
-  "text.autoconfig.vivatech.option.animationQuality.FAST": "Fast",
-
-  "text.autoconfig.vivatech.option.fullscreenEffectsTransparency": "Fullscreen effects transparency",
-  "text.autoconfig.vivatech.option.fullscreenEffectsTransparency.DEFAULT": "Normal",
-  "text.autoconfig.vivatech.option.fullscreenEffectsTransparency.INCREASED": "Increased"
+  "hud.vivatech.wire": "Not enough wire"
 }

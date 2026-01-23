@@ -3,42 +3,40 @@
 	"id": "vivatech",
 	"version": "${version}",
 	"name": "Vivatech",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Classic technologies rethought",
 	"authors": [
 		"falseresync"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/vivatech",
+		"sources": "https://github.com/falseresync/vivatech"
 	},
 	"license": "Apache-2.0",
 	"icon": "assets/vivatech/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-            "falseresync.vivatech.common.Vivatech"
+			"falseresync.vivatech.Vivatech"
 		],
 		"client": [
 			"falseresync.vivatech.client.VivatechClient"
 		],
 		"fabric-datagen": [
-			"falseresync.vivatech.datagen.VivatechDatagen"
-		],
-		"modmenu": [
-			"falseresync.vivatech.compat.modmenu.VivatechModMenuCompat"
+			"falseresync.vivatech.data.VivatechDataGenerator"
 		]
 	},
-	"accessWidener" : "vivatech.classtweaker",
+	"accessWidener": "vivatech.classtweaker",
 	"mixins": [
-		"vivatech.common.mixins.json",
-		"vivatech.client.mixins.json"
+		"vivatech.mixins.json",
+		{
+			"config": "vivatech.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"depends": {
-		"fabricloader": ">=0.16.9",
-		"minecraft": "1.21.1",
-		"java": ">=21",
-		"fabric-api": "*",
-		"cloth-config": "*",
-		"trinkets": "*"
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~26.1-",
+		"java": ">=25",
+		"fabric-api": "*"
 	}
 }
