@@ -54,6 +54,14 @@ public abstract class BaseAppliance extends BlockEntity implements Appliance {
         maxAcceptableVoltage = max;
     }
 
+    public float getMinAcceptableVoltage() {
+        return minAcceptableVoltage;
+    }
+
+    public float getMaxAcceptableVoltage() {
+        return maxAcceptableVoltage;
+    }
+
     protected boolean isOperational() {
         return connected && operational && !frozen;
     }

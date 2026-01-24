@@ -26,7 +26,6 @@ public class HeaterBlockEntity extends BaseAppliance implements Ticking {
 
     public HeaterBlockEntity(BlockPos pos, BlockState state) {
         super(VivatechBlockEntities.HEATER, pos, state);
-        setAcceptableVoltage(220, 240);
         cachedBurnTimes.defaultReturnValue(0);
     }
 

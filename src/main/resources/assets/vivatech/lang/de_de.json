@@ -1,0 +1,25 @@
+{
+  "block.vivatech.generator": "Generator",
+  "block.vivatech.gearbox": "Getriebe",
+  "block.vivatech.wind_turbine": "Windrad",
+
+  "block.vivatech.heater": "Heizung",
+
+  "block.vivatech.static_compensator": "Statische Kompensator",
+  "block.vivatech.contactor": "Schaltschütz",
+
+  "block.vivatech.wire_post": "Drahtpfosten",
+
+  "itemGroup.vivatech.general": "Vivatech",
+
+  "item.vivatech.mortar_and_pestle": "Mörser und Stößel",
+  "item.vivatech.copper_wire": "Kupferdraht",
+  "item.vivatech.screwdriver": "Schraubendreher",
+  "item.vivatech.pliers": "Kneifzange",
+  "item.vivatech.probe": "Sonde",
+
+  "hud.vivatech.probe.grid_frozen": "Dieses Netz ist gefroren! Manche Chunks sind nicht geladen",
+  "hud.vivatech.probe.grid_parameters": "Spannung: %d - Strom: %.2f",
+  "hud.vivatech.wire.not_enough": "Nicht genug Draht",
+  "hud.vivatech.wire.wrong_type": "Darf nicht verschiedene Drahttypen mischen"
+}
