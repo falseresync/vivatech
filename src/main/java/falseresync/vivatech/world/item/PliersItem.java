@@ -16,7 +16,7 @@ public class PliersItem extends WireManagementItem {
     @Override
     protected InteractionResult manageWire(UseOnContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV) {
         if (context.getPlayer() instanceof ServerPlayer) {
-            var grid = Vivatech.getPowerSystemsManager().getFor(context.getLevel().dimension()).find(vertexU.pos(), vertexV.pos());
+            var grid = Vivatech.getPowerSystemsManager().getFor(context.getLevel().dimension()).findAny(vertexU.pos(), vertexV.pos());
             if (grid == null) {
                 return InteractionResult.FAIL;
             }

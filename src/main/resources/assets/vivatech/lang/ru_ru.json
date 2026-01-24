@@ -10,13 +10,27 @@
 
   "block.vivatech.wire_post": "Электрический столбик",
 
+  "block.vivatech.machine_chassis": "Корпус машины",
+
+  "block.vivatech.cuprosteel_block": "Купростальной блок",
+  "block.vivatech.brass_block": "Латунный блок",
+
   "itemGroup.vivatech.general": "Vivatech",
+
+  "item.vivatech.cuprosteel_ingot": "Купростальной слиток",
+  "item.vivatech.cuprosteel_nugget": "Купростальной самородок",
+  "item.vivatech.brass_ingot": "Латунный слиток",
+  "item.vivatech.brass_nugget": "Латунный самородок",
 
   "item.vivatech.mortar_and_pestle": "Ступка и пестик",
   "item.vivatech.copper_wire": "Медный провод",
+  "item.vivatech.cuprosteel_wire": "Купростальной провод",
+  "item.vivatech.thick_cuprosteel_wire": "Толстый купростальной провод",
   "item.vivatech.screwdriver": "Отвёртка",
   "item.vivatech.pliers": "Кусачки",
   "item.vivatech.probe": "Зонд",
+
+  "item.vivatech.vivatech_book": "Книга Vivatech",
 
   "hud.vivatech.probe.grid_frozen": "Эта сеть заморожена! Часть чанков не загружена",
   "hud.vivatech.probe.grid_parameters": "Напряжение: %d - Ток: %.2f",

@@ -50,6 +50,11 @@ public class VivatechModelProvider extends FabricModelProvider {
         blockStateModelGenerator.createHorizontallyRotatedBlock(VivatechBlocks.CONTACTOR, TexturedModelProviders.ADEQUATE_CUBE_COLUMN_HORIZONTAL);
 
         registerWirePost();
+
+        blockStateModelGenerator.createTrivialCube(VivatechBlocks.MACHINE_CHASSIS);
+
+        blockStateModelGenerator.createTrivialCube(VivatechBlocks.CUPROSTEEL_BLOCK);
+        blockStateModelGenerator.createTrivialCube(VivatechBlocks.BRASS_BLOCK);
     }
 
     private void registerWirePost() {
@@ -64,10 +69,19 @@ public class VivatechModelProvider extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerators itemModelGenerator) {
         itemModelGenerator.generateFlatItem(VivatechItems.WIND_TURBINE, ModelTemplates.FLAT_ITEM);
 
+        itemModelGenerator.generateFlatItem(VivatechItems.CUPROSTEEL_INGOT, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.CUPROSTEEL_NUGGET, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.BRASS_INGOT, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.BRASS_NUGGET, ModelTemplates.FLAT_ITEM);
+
         itemModelGenerator.generateFlatItem(VivatechItems.MORTAR_AND_PESTLE, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.COPPER_WIRE, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.CUPROSTEEL_WIRE, ModelTemplates.FLAT_ITEM);
+        itemModelGenerator.generateFlatItem(VivatechItems.THICK_CURPOSTEEL_WIRE, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.SCREWDRIVER, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.PLIERS, ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(VivatechItems.PROBE, ModelTemplates.FLAT_ITEM);
+
+        itemModelGenerator.generateFlatItem(VivatechItems.VIVATECH_BOOK, ModelTemplates.FLAT_ITEM);
     }
 }

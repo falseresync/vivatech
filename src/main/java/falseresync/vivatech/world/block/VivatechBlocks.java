@@ -24,12 +24,20 @@ public class VivatechBlocks {
             = register("heater", HeaterBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK));
 
     public static final StaticCompensatorBlock STATIC_COMPENSATOR
-            = register("static_compensator", StaticCompensatorBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK));
+            = register("static_compensator", StaticCompensatorBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).pushReaction(PushReaction.BLOCK));
     public static final ContactorBlock CONTACTOR
             = register("contactor", ContactorBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).pushReaction(PushReaction.BLOCK));
 
     public static final WirePostBlock WIRE_POST
             = register("wire_post", WirePostBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.LIGHTNING_ROD));
+
+    public static final Block MACHINE_CHASSIS
+            = register("machine_chassis", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+
+    public static final Block CUPROSTEEL_BLOCK
+            = register("cuprosteel_block", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    public static final Block BRASS_BLOCK
+            = register("brass_block", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
 
     private static <T extends Block> T register(String name, Function<BlockBehaviour.Properties, T> block, BlockBehaviour.Properties settings) {
         var id = Vivatech.id(name);

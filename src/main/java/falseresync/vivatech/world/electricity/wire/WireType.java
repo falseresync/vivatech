@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
 
-public record WireType(Supplier<Item> item, int voltage, int maxCurrent, int overcurrentToleranceTime) {
+public record WireType(Supplier<Item> item, int voltage, float maxCurrent, int overcurrentToleranceTime) {
     public static final ResourceKey<Registry<WireType>> REGISTRY_KEY = ResourceKey.createRegistryKey(Vivatech.id("wire_types"));
     public static final Registry<WireType> REGISTRY =
             FabricRegistryBuilder.create(REGISTRY_KEY)
@@ -23,7 +23,9 @@ public record WireType(Supplier<Item> item, int voltage, int maxCurrent, int ove
                     .buildAndRegister();
     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<WireType>> PACKET_CODEC = ByteBufCodecs.holderRegistry(REGISTRY_KEY);
 
-    public static final WireType V_230 = register("v_230", new WireType(() -> VivatechItems.COPPER_WIRE, 230, 32, 100));
+    public static final WireType V_230 = register("v_230", new WireType(() -> VivatechItems.COPPER_WIRE, 230, 16, 100));
+    public static final WireType V_20K = register("v_20k", new WireType(() -> VivatechItems.CUPROSTEEL_WIRE, 20_000, 1, 300));
+    public static final WireType V_330K = register("v_330k", new WireType(() -> VivatechItems.THICK_CURPOSTEEL_WIRE, 330_000, 1, 1000));
 
     public static void init() {
     }

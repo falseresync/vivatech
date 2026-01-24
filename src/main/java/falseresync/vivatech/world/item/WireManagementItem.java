@@ -40,8 +40,13 @@ public abstract class WireManagementItem extends Item {
         var stack = context.getItemInHand();
         var connection = stack.get(VivatechComponents.CONNECTION);
         if (connection == null) {
-            stack.set(VivatechComponents.CONNECTION, new GlobalPos(level.dimension(), currentPos));
-            return InteractionResult.SUCCESS;
+            connection = new GlobalPos(level.dimension(), currentPos);
+            if (canStartManagingWire(context, connection)) {
+                stack.set(VivatechComponents.CONNECTION, connection);
+                return InteractionResult.SUCCESS;
+            } else {
+                return InteractionResult.FAIL;
+            }
         }
 
         if (connection.dimension() != level.dimension() || connection.pos().equals(currentPos)) {
@@ -55,6 +60,10 @@ public abstract class WireManagementItem extends Item {
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    protected boolean canStartManagingWire(UseOnContext context, GlobalPos connection) {
+        return true;
     }
 
     protected abstract InteractionResult manageWire(UseOnContext context, GlobalPos connection, GridVertex vertexU, GridVertex vertexV);

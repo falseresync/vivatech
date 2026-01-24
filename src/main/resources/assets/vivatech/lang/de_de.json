@@ -10,13 +10,27 @@
 
   "block.vivatech.wire_post": "Drahtpfosten",
 
+  "block.vivatech.machine_chassis": "Maschinenhülle",
+
+  "block.vivatech.cuprosteel_block": "Kupferstahlblock",
+  "block.vivatech.brass_block": "Messingblock",
+
   "itemGroup.vivatech.general": "Vivatech",
+
+  "item.vivatech.cuprosteel_ingot": "Kupferstahlbarren",
+  "item.vivatech.cuprosteel_nugget": "Kupferstahlklumpen",
+  "item.vivatech.brass_ingot": "Messingbarren",
+  "item.vivatech.brass_nugget": "Messingklumpen",
 
   "item.vivatech.mortar_and_pestle": "Mörser und Stößel",
   "item.vivatech.copper_wire": "Kupferdraht",
+  "item.vivatech.cuprosteel_wire": "Kupferstahldraht",
+  "item.vivatech.thick_cuprosteel_wire": "Dicker Kupferstahldraht",
   "item.vivatech.screwdriver": "Schraubendreher",
   "item.vivatech.pliers": "Kneifzange",
   "item.vivatech.probe": "Sonde",
+
+  "item.vivatech.vivatech_book": "Vivatech Buch",
 
   "hud.vivatech.probe.grid_frozen": "Dieses Netz ist gefroren! Manche Chunks sind nicht geladen",
   "hud.vivatech.probe.grid_parameters": "Spannung: %d - Strom: %.2f",

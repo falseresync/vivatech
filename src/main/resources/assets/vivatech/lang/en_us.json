@@ -10,13 +10,27 @@
 
   "block.vivatech.wire_post": "Wire post",
 
+  "block.vivatech.machine_chassis": "Machine chassis",
+
+  "block.vivatech.cuprosteel_block": "Cuprosteel block",
+  "block.vivatech.brass_block": "Brass block",
+
   "itemGroup.vivatech.general": "Vivatech",
+
+  "item.vivatech.cuprosteel_ingot": "Cuprosteel ingot",
+  "item.vivatech.cuprosteel_nugget": "Cuprosteel nugget",
+  "item.vivatech.brass_ingot": "Brass ingot",
+  "item.vivatech.brass_nugget": "Brass nugget",
 
   "item.vivatech.mortar_and_pestle": "Mortar and pestle",
   "item.vivatech.copper_wire": "Copper wire",
+  "item.vivatech.cuprosteel_wire": "Cuprosteel wire",
+  "item.vivatech.thick_cuprosteel_wire": "Thick cuprosteel wire",
   "item.vivatech.screwdriver": "Screwdriver",
   "item.vivatech.pliers": "Pliers",
   "item.vivatech.probe": "Probe",
+
+  "item.vivatech.vivatech_book": "Vivatech Book",
 
   "hud.vivatech.probe.grid_frozen": "This grid is frozen! Some chunks are not loaded",
   "hud.vivatech.probe.grid_parameters": "Voltage: %d - Current: %.2f",

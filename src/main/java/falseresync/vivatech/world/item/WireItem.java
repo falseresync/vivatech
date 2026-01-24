@@ -40,8 +40,9 @@ public class WireItem extends WireManagementItem {
             }
 
             var grid = Vivatech.getPowerSystemsManager().getFor(context.getLevel().dimension()).findOrCreate(vertexU.pos(), vertexV.pos(), wireType);
-            if (grid.getWireType() != wireType) {
+            if (grid == null) {
                 player.displayClientMessage(Component.translatable("hud.vivatech.wire.wrong_type").withStyle(ChatFormatting.RED), true);
+                stack.remove(VivatechComponents.ITEM_BAR);
                 return InteractionResult.FAIL;
             }
 
@@ -54,6 +55,18 @@ public class WireItem extends WireManagementItem {
         }
 
         return InteractionResult.CONSUME;
+    }
+
+    @Override
+    protected boolean canStartManagingWire(UseOnContext context, GlobalPos connection) {
+        var grid = Vivatech.getPowerSystemsManager().getFor(connection.dimension()).getGridLookup().get(connection.pos());
+        if (grid != null && grid.getWireType() != wireType) {
+            context.getPlayer().displayClientMessage(Component.translatable("hud.vivatech.wire.wrong_type").withStyle(ChatFormatting.RED), true);
+            context.getItemInHand().remove(VivatechComponents.ITEM_BAR);
+            return false;
+        }
+
+        return true;
     }
 
     @Override

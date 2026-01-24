@@ -20,10 +20,12 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -137,16 +139,31 @@ public class PowerSystem {
         return grids.size();
     }
 
+    @Nullable
     public Grid findOrCreate(BlockPos u, BlockPos v, WireType wireType) {
-        var found = find(u, v);
-        if (found != null) {
-            return found;
+        var gridU = gridLookup.get(u);
+        if (gridU != null && gridU.getWireType() != wireType) {
+            return null;
         }
+
+        var gridV = gridLookup.get(v);
+        if (gridV != null && gridV.getWireType() != wireType) {
+            return null;
+        }
+
+        if (gridU != null) {
+            return gridU;
+        }
+
+        if (gridV != null) {
+            return gridV;
+        }
+
         return create(wireType);
     }
 
     @Nullable
-    public Grid find(BlockPos u, BlockPos v) {
+    public Grid findAny(BlockPos u, BlockPos v) {
         var gridU = gridLookup.get(u);
         if (gridU != null) {
             return gridU;
